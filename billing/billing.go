@@ -83,9 +83,9 @@ type Invoice struct {
 	CancelledAt string       `json:"cancelled_at"`
 	Number      string       `json:"number"`
 	DueAt       string       `json:"due_at"`
-	Id          string       `json:"id"`
-	State       InvoiceState `json:"state"`
-	NetAmount   float32      `json:"net_amount"`
+	Id        string       `json:"id"`
+	State     InvoiceState `json:"state"`
+	NetAmount float32      `json:"net_amount"`
 	CustomerId  int          `json:"customer_id"`
 }
 
@@ -144,9 +144,9 @@ type CustomerTransaction struct {
 	Amount     float32                 `json:"amount"`
 	Id         string                  `json:"id"`
 	CustomerId int                     `json:"customer_id"`
-	Title      string                  `json:"title"`
-	Type       CustomerTransactionType `json:"type"`
-	ObjectId   string                  `json:"object_id"`
+	Title    string                  `json:"title"`
+	Type     CustomerTransactionType `json:"type"`
+	ObjectId string                  `json:"object_id"`
 }
 
 type FileDownload struct {
@@ -599,10 +599,10 @@ type OfferUpdateRequest struct {
 type InvoiceCreateRequest struct {
 	PaidAt      string                         `json:"paid_at"`
 	CancelledAt string                         `json:"cancelled_at"`
-	DueAt       string                         `json:"due_at"`
-	Positions   []InvoiceCreateRequestPosition `json:"positions"`
-	State       InvoiceState                   `json:"state"`
-	CustomerId  int                            `json:"customer_id"`
+	DueAt      string                         `json:"due_at"`
+	Positions  []InvoiceCreateRequestPosition `json:"positions"`
+	State      InvoiceState                   `json:"state"`
+	CustomerId int                            `json:"customer_id"`
 }
 
 type OfferPositionUpdateRequest struct {
@@ -610,9 +610,9 @@ type OfferPositionUpdateRequest struct {
 	Note            string                `json:"note"`
 	Amount          float32               `json:"amount"`
 	Price           float32               `json:"price"`
-	Description     string                `json:"description"`
-	Interval        OfferPositionInterval `json:"interval"`
-	Title           string                `json:"title"`
+	Description string                `json:"description"`
+	Interval    OfferPositionInterval `json:"interval"`
+	Title       string                `json:"title"`
 	VatRate         float32               `json:"vat_rate"`
 }
 
@@ -661,9 +661,9 @@ type InvoicePositionUpdateRequest struct {
 type InvoiceUpdateRequest struct {
 	PaidAt      string       `json:"paid_at"`
 	CancelledAt string       `json:"cancelled_at"`
-	DueAt       string       `json:"due_at"`
-	State       InvoiceState `json:"state"`
-	CustomerId  int          `json:"customer_id"`
+	DueAt      string       `json:"due_at"`
+	State      InvoiceState `json:"state"`
+	CustomerId int          `json:"customer_id"`
 }
 
 type OfferCreateRequest struct {
@@ -755,12 +755,12 @@ type InvoicePositionCreateRequest struct {
 
 type ServiceContractCreateRequest struct {
 	CancellationPeriod int                                    `json:"cancellation_period"`
-	Description        string                                 `json:"description"`
-	Runtime            ServiceContractInterval                `json:"runtime"`
-	Positions          []ServiceContractCreateRequestPosition `json:"positions"`
-	CustomerId         int                                    `json:"customer_id"`
-	Title              string                                 `json:"title"`
-	AccountingPeriod   ServiceContractInterval                `json:"accounting_period"`
+	Description      string                                 `json:"description"`
+	Runtime          ServiceContractInterval                `json:"runtime"`
+	Positions        []ServiceContractCreateRequestPosition `json:"positions"`
+	CustomerId       int                                    `json:"customer_id"`
+	Title            string                                 `json:"title"`
+	AccountingPeriod ServiceContractInterval                `json:"accounting_period"`
 }
 
 type DebitMandateCreateRequest struct {
@@ -781,10 +781,10 @@ type DebitMandateCreateRequest struct {
 
 type ServiceContractUpdateRequest struct {
 	CancellationPeriod int                     `json:"cancellation_period"`
-	Description        string                  `json:"description"`
-	Runtime            ServiceContractInterval `json:"runtime"`
-	Title              string                  `json:"title"`
-	AccountingPeriod   ServiceContractInterval `json:"accounting_period"`
+	Description      string                  `json:"description"`
+	Runtime          ServiceContractInterval `json:"runtime"`
+	Title            string                  `json:"title"`
+	AccountingPeriod ServiceContractInterval `json:"accounting_period"`
 }
 
 type CustomerUpdateRequest struct {
@@ -812,9 +812,9 @@ type OfferPositionCreateRequest struct {
 	Note            string                `json:"note"`
 	Amount          float32               `json:"amount"`
 	Price           float32               `json:"price"`
-	Description     string                `json:"description"`
-	Interval        OfferPositionInterval `json:"interval"`
-	Title           string                `json:"title"`
+	Description string                `json:"description"`
+	Interval    OfferPositionInterval `json:"interval"`
+	Title       string                `json:"title"`
 	OfferId         string                `json:"offer_id"`
 	VatRate         float32               `json:"vat_rate"`
 }

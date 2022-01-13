@@ -192,9 +192,9 @@ type Network struct {
 	CreatedAt string      `json:"created_at"`
 	Id        string      `json:"id"`
 	Tag       int         `json:"tag"`
-	Title     string      `json:"title"`
-	Type      NetworkType `json:"type"`
-	Labels    interface{} `json:"labels"`
+	Title  string      `json:"title"`
+	Type   NetworkType `json:"type"`
+	Labels interface{} `json:"labels"`
 }
 
 type ServerStatus struct {
@@ -986,8 +986,8 @@ type NetworkCreateRequest struct {
 	ZoneId    string      `json:"zone_id"`
 	ProjectId string      `json:"project_id"`
 	Tag       int         `json:"tag"`
-	Title     string      `json:"title"`
-	Type      NetworkType `json:"type"`
+	Title string      `json:"title"`
+	Type  NetworkType `json:"type"`
 }
 
 type ServerVariantCreateRequest struct {
