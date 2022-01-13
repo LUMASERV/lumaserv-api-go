@@ -2470,11 +2470,11 @@ type QueryParams struct {
     Search string `url:"search"`
     WithLabels bool `url:"with_labels"`
     ProjectId string `url:"project_id"`
-    Filter QueryParamsFilter `url:"Filter"`
+    Filter QueryParamsFilter `url:"filter"`
     Limit int `url:"limit"`
     Resources string `url:"resources"`
     Force bool `url:"force"`
-    Labels QueryParamsLabels `url:"Labels"`
+    Labels QueryParamsLabels `url:"labels"`
     Page int `url:"page"`
     PageSize int `url:"page_size"`
 }

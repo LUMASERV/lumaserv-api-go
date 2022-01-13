@@ -105,7 +105,7 @@ type TokenScope struct {
 type Token struct {
     UserId int `json:"user_id"`
     Scope TokenScope `json:"scope"`
-    ValidUntil string `json:"validUntil"`
+    ValidUntil string `json:"validuntil"`
     CreatedAt string `json:"created_at"`
     Type string `json:"type"`
     Token string `json:"token"`
