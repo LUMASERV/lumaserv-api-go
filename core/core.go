@@ -1,13 +1,13 @@
 package core
 
 import (
-	"bytes"
-	"encoding/json"
-	"github.com/google/go-querystring/query"
-	"io"
+    "bytes"
 	"io/ioutil"
 	"net/http"
 	"time"
+	"encoding/json"
+	"io"
+	"github.com/google/go-querystring/query"
 )
 
 type CoreClient struct {
@@ -16,19 +16,19 @@ type CoreClient struct {
 	client  *http.Client
 }
 
-func NewClient(apiKey string) CoreClient {
-	return NewClientWithUrl(apiKey, "")
+func NewClient (apiKey string) CoreClient {
+    return NewClientWithUrl(apiKey, "")
 }
 
-func NewClientWithUrl(apiKey string, baseUrl string) CoreClient {
-	if len(baseUrl) == 0 {
-		baseUrl = "https://api.lumaserv.cloud"
-	}
+func NewClientWithUrl (apiKey string, baseUrl string) CoreClient {
+    if len(baseUrl) == 0 {
+        baseUrl = "https://api.lumaserv.cloud"
+    }
 
-	return CoreClient{
-		apiKey:  apiKey,
-		baseUrl: baseUrl,
-	}
+    return CoreClient {
+        apiKey: apiKey,
+        baseUrl: baseUrl,
+    }
 }
 
 func (c *CoreClient) SetHttpClient(client *http.Client) {
@@ -63,14 +63,13 @@ func (c *CoreClient) Request(method string, path string, postBody io.Reader) (*h
 
 	return res, body, err
 }
-
 type SSHKey struct {
-	PublicKey string      `json:"public_key"`
-	ProjectId string      `json:"project_id"`
-	CreatedAt string      `json:"created_at"`
-	Id        string      `json:"id"`
-	Title     string      `json:"title"`
-	Labels    interface{} `json:"labels"`
+	PublicKey string `json:"public_key"`
+	ProjectId string `json:"project_id"`
+	CreatedAt string `json:"created_at"`
+	Id string `json:"id"`
+	Title string `json:"title"`
+	Labels interface{} `json:"labels"`
 }
 
 type DomainVerificationStatus struct {
@@ -78,135 +77,135 @@ type DomainVerificationStatus struct {
 }
 
 type Server struct {
-	VariantId  int         `json:"variant_id"`
-	ProjectId  string      `json:"project_id"`
-	Name       string      `json:"name"`
-	MediaId    string      `json:"media_id"`
-	CreatedAt  string      `json:"created_at"`
-	LegacyId   int         `json:"legacy_id"`
-	TemplateId string      `json:"template_id"`
-	Id         string      `json:"id"`
-	Labels     interface{} `json:"labels"`
+	VariantId int `json:"variant_id"`
+	ProjectId string `json:"project_id"`
+	Name string `json:"name"`
+	MediaId string `json:"media_id"`
+	CreatedAt string `json:"created_at"`
+	LegacyId int `json:"legacy_id"`
+	TemplateId string `json:"template_id"`
+	Id string `json:"id"`
+	Labels interface{} `json:"labels"`
 }
 
 type Address struct {
-	Address   string `json:"address"`
+	Address string `json:"address"`
 	ProjectId string `json:"project_id"`
-	SubnetId  string `json:"subnet_id"`
+	SubnetId string `json:"subnet_id"`
 	CreatedAt string `json:"created_at"`
-	Id        string `json:"id"`
+	Id string `json:"id"`
 }
 
 type DomainRequestNameserver struct {
 	Addresses []string `json:"addresses"`
-	Name      string   `json:"name"`
+	Name string `json:"name"`
 }
 
 type PleskLicenseType struct {
-	Id    string `json:"id"`
+	Id string `json:"id"`
 	Title string `json:"title"`
 }
 
 type SearchResults struct {
-	Domains       []Domain       `json:"domains"`
+	Domains []Domain `json:"domains"`
 	DomainHandles []DomainHandle `json:"domain_handles"`
 }
 
 type DomainPricing struct {
 	Restore float32 `json:"restore"`
-	Create  float32 `json:"create"`
-	Renew   float32 `json:"renew"`
-	Tld     string  `json:"tld"`
+	Create float32 `json:"create"`
+	Renew float32 `json:"renew"`
+	Tld string `json:"tld"`
 }
 
 type DomainHandle struct {
-	Code                      string      `json:"code"`
-	BirthRegion               string      `json:"birth_region"`
-	Gender                    string      `json:"gender"`
-	City                      string      `json:"city"`
-	VatNumber                 string      `json:"vat_number"`
-	BirthDate                 string      `json:"birth_date"`
-	IdCard                    string      `json:"id_card"`
-	Organisation              string      `json:"organisation"`
-	CreatedAt                 string      `json:"created_at"`
-	Type                      string      `json:"type"`
-	BirthCountryCode          string      `json:"birth_country_code"`
-	ProjectId                 string      `json:"project_id"`
-	Street                    string      `json:"street"`
-	TaxNumber                 string      `json:"tax_number"`
-	Fax                       string      `json:"fax"`
-	IdCardAuthority           string      `json:"id_card_authority"`
-	FirstName                 string      `json:"first_name"`
-	Email                     string      `json:"email"`
-	AdditionalAddress         string      `json:"additional_address"`
-	LastName                  string      `json:"last_name"`
-	BirthPlace                string      `json:"birth_place"`
-	IdCardIssueDate           string      `json:"id_card_issue_date"`
-	Labels                    interface{} `json:"labels"`
-	CountryCode               string      `json:"country_code"`
-	CompanyRegistrationNumber string      `json:"company_registration_number"`
-	Phone                     string      `json:"phone"`
-	StreetNumber              string      `json:"street_number"`
-	PostalCode                string      `json:"postal_code"`
-	Region                    string      `json:"region"`
-	PrivacyProtection         bool        `json:"privacy_protection"`
+	Code string `json:"code"`
+	BirthRegion string `json:"birth_region"`
+	Gender string `json:"gender"`
+	City string `json:"city"`
+	VatNumber string `json:"vat_number"`
+	BirthDate string `json:"birth_date"`
+	IdCard string `json:"id_card"`
+	Organisation string `json:"organisation"`
+	CreatedAt string `json:"created_at"`
+	Type string `json:"type"`
+	BirthCountryCode string `json:"birth_country_code"`
+	ProjectId string `json:"project_id"`
+	Street string `json:"street"`
+	TaxNumber string `json:"tax_number"`
+	Fax string `json:"fax"`
+	IdCardAuthority string `json:"id_card_authority"`
+	FirstName string `json:"first_name"`
+	Email string `json:"email"`
+	AdditionalAddress string `json:"additional_address"`
+	LastName string `json:"last_name"`
+	BirthPlace string `json:"birth_place"`
+	IdCardIssueDate string `json:"id_card_issue_date"`
+	Labels interface{} `json:"labels"`
+	CountryCode string `json:"country_code"`
+	CompanyRegistrationNumber string `json:"company_registration_number"`
+	Phone string `json:"phone"`
+	StreetNumber string `json:"street_number"`
+	PostalCode string `json:"postal_code"`
+	Region string `json:"region"`
+	PrivacyProtection bool `json:"privacy_protection"`
 }
 
 type S3AccessKey struct {
-	ProjectId string      `json:"project_id"`
-	Id        string      `json:"id"`
-	Title     string      `json:"title"`
-	Labels    interface{} `json:"labels"`
+	ProjectId string `json:"project_id"`
+	Id string `json:"id"`
+	Title string `json:"title"`
+	Labels interface{} `json:"labels"`
 }
 
 type S3Bucket struct {
-	ProjectId string      `json:"project_id"`
-	Id        string      `json:"id"`
-	Title     string      `json:"title"`
-	Labels    interface{} `json:"labels"`
+	ProjectId string `json:"project_id"`
+	Id string `json:"id"`
+	Title string `json:"title"`
+	Labels interface{} `json:"labels"`
 }
 
 type S3AccessGrant struct {
-	BucketId string      `json:"bucket_id"`
-	Path     string      `json:"path"`
-	Role     string      `json:"role"`
-	Id       string      `json:"id"`
-	Labels   interface{} `json:"labels"`
+	BucketId string `json:"bucket_id"`
+	Path string `json:"path"`
+	Role string `json:"role"`
+	Id string `json:"id"`
+	Labels interface{} `json:"labels"`
 }
 
 type DomainAuthinfo struct {
 	ValidUntil string `json:"valid_until"`
-	Authinfo   string `json:"authinfo"`
+	Authinfo string `json:"authinfo"`
 }
 
 type ServerTemplate struct {
-	Id    string `json:"id"`
+	Id string `json:"id"`
 	Title string `json:"title"`
 }
 
 type NetworkType string
 
 type Network struct {
-	ZoneId    string      `json:"zone_id"`
-	ProjectId string      `json:"project_id"`
-	CreatedAt string      `json:"created_at"`
-	Id        string      `json:"id"`
-	Tag       int         `json:"tag"`
-	Title  string      `json:"title"`
-	Type   NetworkType `json:"type"`
+	ZoneId string `json:"zone_id"`
+	ProjectId string `json:"project_id"`
+	CreatedAt string `json:"created_at"`
+	Id string `json:"id"`
+	Tag int `json:"tag"`
+	Title string `json:"title"`
+	Type NetworkType `json:"type"`
 	Labels interface{} `json:"labels"`
 }
 
 type ServerStatus struct {
-	Memory      int     `json:"memory"`
-	Online      bool    `json:"online"`
+	Memory int `json:"memory"`
+	Online bool `json:"online"`
 	MemoryUsage float32 `json:"memory_usage"`
-	CpuUsage    float32 `json:"cpu_usage"`
-	Uptime      int     `json:"uptime"`
+	CpuUsage float32 `json:"cpu_usage"`
+	Uptime int `json:"uptime"`
 }
 
 type SSLType struct {
-	Id    string `json:"id"`
+	Id string `json:"id"`
 	Title string `json:"title"`
 }
 
@@ -216,832 +215,832 @@ type DomainCheckResult struct {
 
 type ResponseMessages struct {
 	Warnings []ResponseMessage `json:"warnings"`
-	Errors   []ResponseMessage `json:"errors"`
-	Infos    []ResponseMessage `json:"infos"`
+	Errors []ResponseMessage `json:"errors"`
+	Infos []ResponseMessage `json:"infos"`
 }
 
 type SSLContact struct {
-	AdditionalAddress string      `json:"additional_address"`
-	Address           string      `json:"address"`
-	City              string      `json:"city"`
-	LastName          string      `json:"last_name"`
-	Organisation      string      `json:"organisation"`
-	CreatedAt         string      `json:"created_at"`
-	Title             string      `json:"title"`
-	Labels            interface{} `json:"labels"`
-	CountryCode       string      `json:"country_code"`
-	ProjectId         string      `json:"project_id"`
-	Phone             string      `json:"phone"`
-	Id                string      `json:"id"`
-	Fax               string      `json:"fax"`
-	PostalCode        string      `json:"postal_code"`
-	Region            string      `json:"region"`
-	FirstName         string      `json:"first_name"`
-	Email             string      `json:"email"`
+	AdditionalAddress string `json:"additional_address"`
+	Address string `json:"address"`
+	City string `json:"city"`
+	LastName string `json:"last_name"`
+	Organisation string `json:"organisation"`
+	CreatedAt string `json:"created_at"`
+	Title string `json:"title"`
+	Labels interface{} `json:"labels"`
+	CountryCode string `json:"country_code"`
+	ProjectId string `json:"project_id"`
+	Phone string `json:"phone"`
+	Id string `json:"id"`
+	Fax string `json:"fax"`
+	PostalCode string `json:"postal_code"`
+	Region string `json:"region"`
+	FirstName string `json:"first_name"`
+	Email string `json:"email"`
 }
 
 type ServerHost struct {
-	ZoneId    string `json:"zone_id"`
+	ZoneId string `json:"zone_id"`
 	CreatedAt string `json:"created_at"`
-	Id        string `json:"id"`
-	Title     string `json:"title"`
+	Id string `json:"id"`
+	Title string `json:"title"`
 }
 
 type PleskLicense struct {
-	License   string      `json:"license"`
-	ProjectId string      `json:"project_id"`
-	CreatedAt string      `json:"created_at"`
-	Id        string      `json:"id"`
-	Key       string      `json:"key"`
-	Labels    interface{} `json:"labels"`
+	License string `json:"license"`
+	ProjectId string `json:"project_id"`
+	CreatedAt string `json:"created_at"`
+	Id string `json:"id"`
+	Key string `json:"key"`
+	Labels interface{} `json:"labels"`
 }
 
 type SSLCertificate struct {
-	OrganisationId string      `json:"organisation_id"`
-	ValidUntil     string      `json:"valid_until"`
-	ProjectId      string      `json:"project_id"`
-	TypeId         string      `json:"type_id"`
-	ApproverEmail  string      `json:"approver_email"`
-	CreatedAt      string      `json:"created_at"`
-	AdminContactId string      `json:"admin_contact_id"`
-	Id             string      `json:"id"`
-	TechContactId  string      `json:"tech_contact_id"`
-	Labels         interface{} `json:"labels"`
+	OrganisationId string `json:"organisation_id"`
+	ValidUntil string `json:"valid_until"`
+	ProjectId string `json:"project_id"`
+	TypeId string `json:"type_id"`
+	ApproverEmail string `json:"approver_email"`
+	CreatedAt string `json:"created_at"`
+	AdminContactId string `json:"admin_contact_id"`
+	Id string `json:"id"`
+	TechContactId string `json:"tech_contact_id"`
+	Labels interface{} `json:"labels"`
 }
 
 type ServerVolume struct {
-	Size      int         `json:"size"`
-	ProjectId string      `json:"project_id"`
-	ClassId   string      `json:"class_id"`
-	Root      bool        `json:"root"`
-	CreatedAt string      `json:"created_at"`
-	Id        string      `json:"id"`
-	Title     string      `json:"title"`
-	ServerId  string      `json:"server_id"`
-	Labels    interface{} `json:"labels"`
+	Size int `json:"size"`
+	ProjectId string `json:"project_id"`
+	ClassId string `json:"class_id"`
+	Root bool `json:"root"`
+	CreatedAt string `json:"created_at"`
+	Id string `json:"id"`
+	Title string `json:"title"`
+	ServerId string `json:"server_id"`
+	Labels interface{} `json:"labels"`
 }
 
 type DNSRecord struct {
 	Data string `json:"data"`
 	Name string `json:"name"`
-	Id   string `json:"id"`
+	Id string `json:"id"`
 	Type string `json:"type"`
-	Ttl  int    `json:"ttl"`
+	Ttl int `json:"ttl"`
 }
 
 type ServerVNC struct {
 	Password string `json:"password"`
-	Port     int    `json:"port"`
-	Host     string `json:"host"`
+	Port int `json:"port"`
+	Host string `json:"host"`
 }
 
 type DNSZone struct {
-	Hostmaster string      `json:"hostmaster"`
-	ProjectId  string      `json:"project_id"`
-	Name       string      `json:"name"`
-	CreatedAt  string      `json:"created_at"`
-	Type       string      `json:"type"`
-	Ns2        string      `json:"ns2"`
-	Ns1        string      `json:"ns1"`
-	Labels     interface{} `json:"labels"`
+	Hostmaster string `json:"hostmaster"`
+	ProjectId string `json:"project_id"`
+	Name string `json:"name"`
+	CreatedAt string `json:"created_at"`
+	Type string `json:"type"`
+	Ns2 string `json:"ns2"`
+	Ns1 string `json:"ns1"`
+	Labels interface{} `json:"labels"`
 }
 
 type AvailabilityZone struct {
-	Id     string      `json:"id"`
-	Title  string      `json:"title"`
+	Id string `json:"id"`
+	Title string `json:"title"`
 	Config interface{} `json:"config"`
 }
 
 type ServerNetwork struct {
-	Default     bool        `json:"default"`
-	NetworkId   string      `json:"network_id"`
-	AddressV6Id string      `json:"address_v6_id"`
-	CreatedAt   string      `json:"created_at"`
-	ExternalId  string      `json:"external_id"`
-	Id          string      `json:"id"`
-	AddressV4Id string      `json:"address_v4_id"`
-	HostId      string      `json:"host_id"`
-	Labels      interface{} `json:"labels"`
+	Default bool `json:"default"`
+	NetworkId string `json:"network_id"`
+	AddressV6Id string `json:"address_v6_id"`
+	CreatedAt string `json:"created_at"`
+	ExternalId string `json:"external_id"`
+	Id string `json:"id"`
+	AddressV4Id string `json:"address_v4_id"`
+	HostId string `json:"host_id"`
+	Labels interface{} `json:"labels"`
 }
 
 type ServerStorage struct {
-	ZoneId     string `json:"zone_id"`
+	ZoneId string `json:"zone_id"`
 	ExternalId string `json:"external_id"`
-	Id         string `json:"id"`
+	Id string `json:"id"`
 }
 
 type ResponseMessage struct {
 	Message string `json:"message"`
-	Key     string `json:"key"`
+	Key string `json:"key"`
 }
 
 type ServerMedia struct {
-	ZoneId     string      `json:"zone_id"`
-	ProjectId  string      `json:"project_id"`
-	CreatedAt  string      `json:"created_at"`
-	ExternalId string      `json:"external_id"`
-	Id         string      `json:"id"`
-	Title      string      `json:"title"`
-	Labels     interface{} `json:"labels"`
+	ZoneId string `json:"zone_id"`
+	ProjectId string `json:"project_id"`
+	CreatedAt string `json:"created_at"`
+	ExternalId string `json:"external_id"`
+	Id string `json:"id"`
+	Title string `json:"title"`
+	Labels interface{} `json:"labels"`
 }
 
 type ResponsePagination struct {
-	Total    int `json:"total"`
-	Page     int `json:"page"`
+	Total int `json:"total"`
+	Page int `json:"page"`
 	PageSize int `json:"page_size"`
 }
 
 type SSLOrganisation struct {
-	AdditionalAddress  string      `json:"additional_address"`
-	Address            string      `json:"address"`
-	City               string      `json:"city"`
-	RegistrationNumber string      `json:"registration_number"`
-	CreatedAt          string      `json:"created_at"`
-	Labels             interface{} `json:"labels"`
-	Division           string      `json:"division"`
-	CountryCode        string      `json:"country_code"`
-	ProjectId          string      `json:"project_id"`
-	Phone              string      `json:"phone"`
-	Name               string      `json:"name"`
-	Duns               string      `json:"duns"`
-	Id                 string      `json:"id"`
-	PostalCode         string      `json:"postal_code"`
-	Region             string      `json:"region"`
-	Fax                string      `json:"fax"`
+	AdditionalAddress string `json:"additional_address"`
+	Address string `json:"address"`
+	City string `json:"city"`
+	RegistrationNumber string `json:"registration_number"`
+	CreatedAt string `json:"created_at"`
+	Labels interface{} `json:"labels"`
+	Division string `json:"division"`
+	CountryCode string `json:"country_code"`
+	ProjectId string `json:"project_id"`
+	Phone string `json:"phone"`
+	Name string `json:"name"`
+	Duns string `json:"duns"`
+	Id string `json:"id"`
+	PostalCode string `json:"postal_code"`
+	Region string `json:"region"`
+	Fax string `json:"fax"`
 }
 
 type Domain struct {
-	ProjectId       string      `json:"project_id"`
-	AdminHandleCode string      `json:"admin_handle_code"`
-	Name            string      `json:"name"`
-	OwnerHandleCode string      `json:"owner_handle_code"`
-	TechHandleCode  string      `json:"tech_handle_code"`
-	CreatedAt       string      `json:"created_at"`
-	ZoneHandleCode  string      `json:"zone_handle_code"`
-	Labels          interface{} `json:"labels"`
+	ProjectId string `json:"project_id"`
+	AdminHandleCode string `json:"admin_handle_code"`
+	Name string `json:"name"`
+	OwnerHandleCode string `json:"owner_handle_code"`
+	TechHandleCode string `json:"tech_handle_code"`
+	CreatedAt string `json:"created_at"`
+	ZoneHandleCode string `json:"zone_handle_code"`
+	Labels interface{} `json:"labels"`
 }
 
 type ServerVariant struct {
-	Disk           int    `json:"disk"`
-	Cores          int    `json:"cores"`
-	Memory         int    `json:"memory"`
+	Disk int `json:"disk"`
+	Cores int `json:"cores"`
+	Memory int `json:"memory"`
 	StorageClassId string `json:"storage_class_id"`
-	Id             string `json:"id"`
-	Title          string `json:"title"`
+	Id string `json:"id"`
+	Title string `json:"title"`
 }
 
 type Subnet struct {
 	NetworkId string `json:"network_id"`
-	Address   string `json:"address"`
-	Prefix    int    `json:"prefix"`
+	Address string `json:"address"`
+	Prefix int `json:"prefix"`
 	CreatedAt string `json:"created_at"`
-	Id        string `json:"id"`
+	Id string `json:"id"`
 }
 
 type ServerStorageClass struct {
-	Replication int    `json:"replication"`
-	Id          string `json:"id"`
-	Title       string `json:"title"`
+	Replication int `json:"replication"`
+	Id string `json:"id"`
+	Title string `json:"title"`
 }
 
 type ServerAction struct {
-	StartedAt   string `json:"started_at"`
-	Id          string `json:"id"`
-	State       string `json:"state"`
-	Type        string `json:"type"`
-	Cancellable bool   `json:"cancellable"`
-	EndedAt     string `json:"ended_at"`
+	StartedAt string `json:"started_at"`
+	Id string `json:"id"`
+	State string `json:"state"`
+	Type string `json:"type"`
+	Cancellable bool `json:"cancellable"`
+	EndedAt string `json:"ended_at"`
 }
 
 type ResponseMetadata struct {
-	TransactionId  string `json:"transaction_id"`
-	BuildCommit    string `json:"build_commit"`
+	TransactionId string `json:"transaction_id"`
+	BuildCommit string `json:"build_commit"`
 	BuildTimestamp string `json:"build_timestamp"`
 }
 
 type S3AccessGrantListResponse struct {
-	Metadata   ResponseMetadata   `json:"metadata"`
+	Metadata ResponseMetadata `json:"metadata"`
 	Pagination ResponsePagination `json:"pagination"`
-	Data       []S3AccessGrant    `json:"data"`
-	Success    bool               `json:"success"`
-	Messages   ResponseMessages   `json:"messages"`
+	Data []S3AccessGrant `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type NetworkSingleResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     Network          `json:"data"`
-	Success  bool             `json:"success"`
+	Data Network `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type DomainHandleSingleResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     DomainHandle     `json:"data"`
-	Success  bool             `json:"success"`
+	Data DomainHandle `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type DomainListResponse struct {
-	Metadata   ResponseMetadata   `json:"metadata"`
+	Metadata ResponseMetadata `json:"metadata"`
 	Pagination ResponsePagination `json:"pagination"`
-	Data       []Domain           `json:"data"`
-	Success    bool               `json:"success"`
-	Messages   ResponseMessages   `json:"messages"`
+	Data []Domain `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type S3AccessGrantSingleResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     S3AccessGrant    `json:"data"`
-	Success  bool             `json:"success"`
+	Data S3AccessGrant `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type ServerHostListResponse struct {
-	Metadata   ResponseMetadata   `json:"metadata"`
+	Metadata ResponseMetadata `json:"metadata"`
 	Pagination ResponsePagination `json:"pagination"`
-	Data       []ServerHost       `json:"data"`
-	Success    bool               `json:"success"`
-	Messages   ResponseMessages   `json:"messages"`
+	Data []ServerHost `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type SSLCertificateSingleResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     SSLCertificate   `json:"data"`
-	Success  bool             `json:"success"`
+	Data SSLCertificate `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type ServerVariantListResponse struct {
-	Metadata   ResponseMetadata   `json:"metadata"`
+	Metadata ResponseMetadata `json:"metadata"`
 	Pagination ResponsePagination `json:"pagination"`
-	Data       []ServerVariant    `json:"data"`
-	Success    bool               `json:"success"`
-	Messages   ResponseMessages   `json:"messages"`
+	Data []ServerVariant `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type SubnetListResponse struct {
-	Metadata   ResponseMetadata   `json:"metadata"`
+	Metadata ResponseMetadata `json:"metadata"`
 	Pagination ResponsePagination `json:"pagination"`
-	Data       []Subnet           `json:"data"`
-	Success    bool               `json:"success"`
-	Messages   ResponseMessages   `json:"messages"`
+	Data []Subnet `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type PleskLicenseSingleResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     PleskLicense     `json:"data"`
-	Success  bool             `json:"success"`
+	Data PleskLicense `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type ServerNetworkListResponse struct {
-	Metadata   ResponseMetadata   `json:"metadata"`
+	Metadata ResponseMetadata `json:"metadata"`
 	Pagination ResponsePagination `json:"pagination"`
-	Data       []ServerNetwork    `json:"data"`
-	Success    bool               `json:"success"`
-	Messages   ResponseMessages   `json:"messages"`
+	Data []ServerNetwork `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type AvailabilityZoneSingleResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     AvailabilityZone `json:"data"`
-	Success  bool             `json:"success"`
+	Data AvailabilityZone `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type ServerStorageClassSingleResponse struct {
-	Metadata ResponseMetadata   `json:"metadata"`
-	Data     ServerStorageClass `json:"data"`
-	Success  bool               `json:"success"`
-	Messages ResponseMessages   `json:"messages"`
+	Metadata ResponseMetadata `json:"metadata"`
+	Data ServerStorageClass `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type ServerVariantSingleResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     ServerVariant    `json:"data"`
-	Success  bool             `json:"success"`
+	Data ServerVariant `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type DomainPriceListResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     []DomainPricing  `json:"data"`
-	Success  bool             `json:"success"`
+	Data []DomainPricing `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type S3AccessKeyListResponse struct {
-	Metadata   ResponseMetadata   `json:"metadata"`
+	Metadata ResponseMetadata `json:"metadata"`
 	Pagination ResponsePagination `json:"pagination"`
-	Data       []S3AccessKey      `json:"data"`
-	Success    bool               `json:"success"`
-	Messages   ResponseMessages   `json:"messages"`
+	Data []S3AccessKey `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type SSLOrganisationSingleResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     SSLOrganisation  `json:"data"`
-	Success  bool             `json:"success"`
+	Data SSLOrganisation `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type ServerVNCResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     ServerVNC        `json:"data"`
-	Success  bool             `json:"success"`
+	Data ServerVNC `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type AddressSingleResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     Address          `json:"data"`
-	Success  bool             `json:"success"`
+	Data Address `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type ServerActionListResponse struct {
-	Metadata   ResponseMetadata   `json:"metadata"`
+	Metadata ResponseMetadata `json:"metadata"`
 	Pagination ResponsePagination `json:"pagination"`
-	Data       []ServerAction     `json:"data"`
-	Success    bool               `json:"success"`
-	Messages   ResponseMessages   `json:"messages"`
+	Data []ServerAction `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type NetworkListResponse struct {
-	Metadata   ResponseMetadata   `json:"metadata"`
+	Metadata ResponseMetadata `json:"metadata"`
 	Pagination ResponsePagination `json:"pagination"`
-	Data       []Network          `json:"data"`
-	Success    bool               `json:"success"`
-	Messages   ResponseMessages   `json:"messages"`
+	Data []Network `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type S3BucketListResponse struct {
-	Metadata   ResponseMetadata   `json:"metadata"`
+	Metadata ResponseMetadata `json:"metadata"`
 	Pagination ResponsePagination `json:"pagination"`
-	Data       []S3Bucket         `json:"data"`
-	Success    bool               `json:"success"`
-	Messages   ResponseMessages   `json:"messages"`
+	Data []S3Bucket `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type ServerStorageSingleResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     ServerStorage    `json:"data"`
-	Success  bool             `json:"success"`
+	Data ServerStorage `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type ServerSingleResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     Server           `json:"data"`
-	Success  bool             `json:"success"`
+	Data Server `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type ServerStorageClassListResponse struct {
-	Metadata   ResponseMetadata     `json:"metadata"`
-	Pagination ResponsePagination   `json:"pagination"`
-	Data       []ServerStorageClass `json:"data"`
-	Success    bool                 `json:"success"`
-	Messages   ResponseMessages     `json:"messages"`
+	Metadata ResponseMetadata `json:"metadata"`
+	Pagination ResponsePagination `json:"pagination"`
+	Data []ServerStorageClass `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type ServerMediaListResponse struct {
-	Metadata   ResponseMetadata   `json:"metadata"`
+	Metadata ResponseMetadata `json:"metadata"`
 	Pagination ResponsePagination `json:"pagination"`
-	Data       []ServerMedia      `json:"data"`
-	Success    bool               `json:"success"`
-	Messages   ResponseMessages   `json:"messages"`
+	Data []ServerMedia `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type SSHKeySingleResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     SSHKey           `json:"data"`
-	Success  bool             `json:"success"`
+	Data SSHKey `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type SearchResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     SearchResults    `json:"data"`
-	Success  bool             `json:"success"`
+	Data SearchResults `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type ServerTemplateListResponse struct {
-	Metadata   ResponseMetadata   `json:"metadata"`
+	Metadata ResponseMetadata `json:"metadata"`
 	Pagination ResponsePagination `json:"pagination"`
-	Data       []ServerTemplate   `json:"data"`
-	Success    bool               `json:"success"`
-	Messages   ResponseMessages   `json:"messages"`
+	Data []ServerTemplate `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type ServerHostSingleResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     ServerHost       `json:"data"`
-	Success  bool             `json:"success"`
+	Data ServerHost `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type SSLTypeSingleResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     SSLType          `json:"data"`
-	Success  bool             `json:"success"`
+	Data SSLType `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type DNSZoneSingleResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     DNSZone          `json:"data"`
-	Success  bool             `json:"success"`
+	Data DNSZone `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type SubnetSingleResponse struct {
-	Metadata   ResponseMetadata   `json:"metadata"`
+	Metadata ResponseMetadata `json:"metadata"`
 	Pagination ResponsePagination `json:"pagination"`
-	Data       Subnet             `json:"data"`
-	Success    bool               `json:"success"`
-	Messages   ResponseMessages   `json:"messages"`
+	Data Subnet `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type DNSZoneListResponse struct {
-	Metadata   ResponseMetadata   `json:"metadata"`
+	Metadata ResponseMetadata `json:"metadata"`
 	Pagination ResponsePagination `json:"pagination"`
-	Data       []DNSZone          `json:"data"`
-	Success    bool               `json:"success"`
-	Messages   ResponseMessages   `json:"messages"`
+	Data []DNSZone `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type SSLTypeListResponse struct {
-	Metadata   ResponseMetadata   `json:"metadata"`
+	Metadata ResponseMetadata `json:"metadata"`
 	Pagination ResponsePagination `json:"pagination"`
-	Data       []SSLType          `json:"data"`
-	Success    bool               `json:"success"`
-	Messages   ResponseMessages   `json:"messages"`
+	Data []SSLType `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type ServerStorageListResponse struct {
-	Metadata   ResponseMetadata   `json:"metadata"`
+	Metadata ResponseMetadata `json:"metadata"`
 	Pagination ResponsePagination `json:"pagination"`
-	Data       []ServerStorage    `json:"data"`
-	Success    bool               `json:"success"`
-	Messages   ResponseMessages   `json:"messages"`
+	Data []ServerStorage `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type EmptyResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Success  bool             `json:"success"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type PleskLicenseTypeListResponse struct {
-	Metadata   ResponseMetadata   `json:"metadata"`
+	Metadata ResponseMetadata `json:"metadata"`
 	Pagination ResponsePagination `json:"pagination"`
-	Data       []PleskLicenseType `json:"data"`
-	Success    bool               `json:"success"`
-	Messages   ResponseMessages   `json:"messages"`
+	Data []PleskLicenseType `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type ServerActionSingleResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     ServerAction     `json:"data"`
-	Success  bool             `json:"success"`
+	Data ServerAction `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type DomainHandleListResponse struct {
-	Metadata   ResponseMetadata   `json:"metadata"`
+	Metadata ResponseMetadata `json:"metadata"`
 	Pagination ResponsePagination `json:"pagination"`
-	Data       []DomainHandle     `json:"data"`
-	Success    bool               `json:"success"`
-	Messages   ResponseMessages   `json:"messages"`
+	Data []DomainHandle `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type S3BucketSingleResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     S3Bucket         `json:"data"`
-	Success  bool             `json:"success"`
+	Data S3Bucket `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type DomainCheckVerificationResponse struct {
-	Metadata ResponseMetadata         `json:"metadata"`
-	Data     DomainVerificationStatus `json:"data"`
-	Success  bool                     `json:"success"`
-	Messages ResponseMessages         `json:"messages"`
+	Metadata ResponseMetadata `json:"metadata"`
+	Data DomainVerificationStatus `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type InvalidRequestResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     interface{}      `json:"data"`
-	Success  bool             `json:"success"`
+	Data interface{} `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type PleskLicenseTypeSingleResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     PleskLicenseType `json:"data"`
-	Success  bool             `json:"success"`
+	Data PleskLicenseType `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type AddressListResponse struct {
-	Metadata   ResponseMetadata   `json:"metadata"`
+	Metadata ResponseMetadata `json:"metadata"`
 	Pagination ResponsePagination `json:"pagination"`
-	Data       []Address          `json:"data"`
-	Success    bool               `json:"success"`
-	Messages   ResponseMessages   `json:"messages"`
+	Data []Address `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type ServerTemplateSingleResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     ServerTemplate   `json:"data"`
-	Success  bool             `json:"success"`
+	Data ServerTemplate `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type DomainCheckResponse struct {
-	Metadata ResponseMetadata  `json:"metadata"`
-	Data     DomainCheckResult `json:"data"`
-	Success  bool              `json:"success"`
-	Messages ResponseMessages  `json:"messages"`
+	Metadata ResponseMetadata `json:"metadata"`
+	Data DomainCheckResult `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type SSHKeyListResponse struct {
-	Metadata   ResponseMetadata   `json:"metadata"`
+	Metadata ResponseMetadata `json:"metadata"`
 	Pagination ResponsePagination `json:"pagination"`
-	Data       []SSHKey           `json:"data"`
-	Success    bool               `json:"success"`
-	Messages   ResponseMessages   `json:"messages"`
+	Data []SSHKey `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type SSLContactSingleResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     SSLContact       `json:"data"`
-	Success  bool             `json:"success"`
+	Data SSLContact `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type DomainSingleResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     Domain           `json:"data"`
-	Success  bool             `json:"success"`
+	Data Domain `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type DNSRecordSingleResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     DNSRecord        `json:"data"`
-	Success  bool             `json:"success"`
+	Data DNSRecord `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type PleskLicenseListResponse struct {
-	Metadata   ResponseMetadata   `json:"metadata"`
+	Metadata ResponseMetadata `json:"metadata"`
 	Pagination ResponsePagination `json:"pagination"`
-	Data       []PleskLicense     `json:"data"`
-	Success    bool               `json:"success"`
-	Messages   ResponseMessages   `json:"messages"`
+	Data []PleskLicense `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type ServerStatusResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     ServerStatus     `json:"data"`
-	Success  bool             `json:"success"`
+	Data ServerStatus `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type ServerListResponse struct {
-	Metadata   ResponseMetadata   `json:"metadata"`
+	Metadata ResponseMetadata `json:"metadata"`
 	Pagination ResponsePagination `json:"pagination"`
-	Data       []Server           `json:"data"`
-	Success    bool               `json:"success"`
-	Messages   ResponseMessages   `json:"messages"`
+	Data []Server `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type ServerMediaSingleResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     ServerMedia      `json:"data"`
-	Success  bool             `json:"success"`
+	Data ServerMedia `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type DNSRecordListResponse struct {
-	Metadata   ResponseMetadata   `json:"metadata"`
+	Metadata ResponseMetadata `json:"metadata"`
 	Pagination ResponsePagination `json:"pagination"`
-	Data       []DNSRecord        `json:"data"`
-	Success    bool               `json:"success"`
-	Messages   ResponseMessages   `json:"messages"`
+	Data []DNSRecord `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type SSLOrganisationListResponse struct {
-	Metadata   ResponseMetadata   `json:"metadata"`
+	Metadata ResponseMetadata `json:"metadata"`
 	Pagination ResponsePagination `json:"pagination"`
-	Data       []SSLOrganisation  `json:"data"`
-	Success    bool               `json:"success"`
-	Messages   ResponseMessages   `json:"messages"`
+	Data []SSLOrganisation `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type ServerNetworkSingleResponse struct {
-	Metadata   ResponseMetadata   `json:"metadata"`
+	Metadata ResponseMetadata `json:"metadata"`
 	Pagination ResponsePagination `json:"pagination"`
-	Data       ServerNetwork      `json:"data"`
-	Success    bool               `json:"success"`
-	Messages   ResponseMessages   `json:"messages"`
+	Data ServerNetwork `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type SSLContactListResponse struct {
-	Metadata   ResponseMetadata   `json:"metadata"`
+	Metadata ResponseMetadata `json:"metadata"`
 	Pagination ResponsePagination `json:"pagination"`
-	Data       []SSLContact       `json:"data"`
-	Success    bool               `json:"success"`
-	Messages   ResponseMessages   `json:"messages"`
+	Data []SSLContact `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type SSLCertificateListResponse struct {
-	Metadata   ResponseMetadata   `json:"metadata"`
+	Metadata ResponseMetadata `json:"metadata"`
 	Pagination ResponsePagination `json:"pagination"`
-	Data       []SSLCertificate   `json:"data"`
-	Success    bool               `json:"success"`
-	Messages   ResponseMessages   `json:"messages"`
+	Data []SSLCertificate `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type S3AccessKeySingleResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     S3AccessKey      `json:"data"`
-	Success  bool             `json:"success"`
+	Data S3AccessKey `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type AvailabilityZoneListResponse struct {
-	Metadata   ResponseMetadata   `json:"metadata"`
+	Metadata ResponseMetadata `json:"metadata"`
 	Pagination ResponsePagination `json:"pagination"`
-	Data       []AvailabilityZone `json:"data"`
-	Success    bool               `json:"success"`
-	Messages   ResponseMessages   `json:"messages"`
+	Data []AvailabilityZone `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type ServerVolumeListResponse struct {
-	Metadata   ResponseMetadata   `json:"metadata"`
+	Metadata ResponseMetadata `json:"metadata"`
 	Pagination ResponsePagination `json:"pagination"`
-	Data       []ServerVolume     `json:"data"`
-	Success    bool               `json:"success"`
-	Messages   ResponseMessages   `json:"messages"`
+	Data []ServerVolume `json:"data"`
+	Success bool `json:"success"`
+	Messages ResponseMessages `json:"messages"`
 }
 
 type ServerVolumeSingleResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     ServerVolume     `json:"data"`
-	Success  bool             `json:"success"`
+	Data ServerVolume `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type DomainAuthinfoResponse struct {
 	Metadata ResponseMetadata `json:"metadata"`
-	Data     DomainAuthinfo   `json:"data"`
-	Success  bool             `json:"success"`
+	Data DomainAuthinfo `json:"data"`
+	Success bool `json:"success"`
 	Messages ResponseMessages `json:"messages"`
 }
 
 type DomainHandleCreateRequest struct {
-	BirthRegion               string      `json:"birth_region"`
-	Gender                    string      `json:"gender"`
-	City                      string      `json:"city"`
-	VatNumber                 string      `json:"vat_number"`
-	BirthDate                 string      `json:"birth_date"`
-	IdCard                    string      `json:"id_card"`
-	Organisation              string      `json:"organisation"`
-	Type                      string      `json:"type"`
-	BirthCountryCode          string      `json:"birth_country_code"`
-	ProjectId                 string      `json:"project_id"`
-	Street                    string      `json:"street"`
-	TaxNumber                 string      `json:"tax_number"`
-	Fax                       string      `json:"fax"`
-	IdCardAuthority           string      `json:"id_card_authority"`
-	FirstName                 string      `json:"first_name"`
-	Email                     string      `json:"email"`
-	AdditionalAddress         string      `json:"additional_address"`
-	LastName                  string      `json:"last_name"`
-	BirthPlace                string      `json:"birth_place"`
-	IdCardIssueDate           string      `json:"id_card_issue_date"`
-	Labels                    interface{} `json:"labels"`
-	CountryCode               string      `json:"country_code"`
-	CompanyRegistrationNumber string      `json:"company_registration_number"`
-	Phone                     string      `json:"phone"`
-	StreetNumber              string      `json:"street_number"`
-	PostalCode                string      `json:"postal_code"`
-	Region                    string      `json:"region"`
-	PrivacyProtection         bool        `json:"privacy_protection"`
+	BirthRegion string `json:"birth_region"`
+	Gender string `json:"gender"`
+	City string `json:"city"`
+	VatNumber string `json:"vat_number"`
+	BirthDate string `json:"birth_date"`
+	IdCard string `json:"id_card"`
+	Organisation string `json:"organisation"`
+	Type string `json:"type"`
+	BirthCountryCode string `json:"birth_country_code"`
+	ProjectId string `json:"project_id"`
+	Street string `json:"street"`
+	TaxNumber string `json:"tax_number"`
+	Fax string `json:"fax"`
+	IdCardAuthority string `json:"id_card_authority"`
+	FirstName string `json:"first_name"`
+	Email string `json:"email"`
+	AdditionalAddress string `json:"additional_address"`
+	LastName string `json:"last_name"`
+	BirthPlace string `json:"birth_place"`
+	IdCardIssueDate string `json:"id_card_issue_date"`
+	Labels interface{} `json:"labels"`
+	CountryCode string `json:"country_code"`
+	CompanyRegistrationNumber string `json:"company_registration_number"`
+	Phone string `json:"phone"`
+	StreetNumber string `json:"street_number"`
+	PostalCode string `json:"postal_code"`
+	Region string `json:"region"`
+	PrivacyProtection bool `json:"privacy_protection"`
 }
 
 type ServerCreateRequest struct {
-	ZoneId     string      `json:"zone_id"`
-	VariantId  string      `json:"variant_id"`
-	SshKeys    []string    `json:"ssh_keys"`
-	ProjectId  string      `json:"project_id"`
-	Name       string      `json:"name"`
-	TemplateId string      `json:"template_id"`
-	Labels     interface{} `json:"labels"`
+	ZoneId string `json:"zone_id"`
+	VariantId string `json:"variant_id"`
+	SshKeys []string `json:"ssh_keys"`
+	ProjectId string `json:"project_id"`
+	Name string `json:"name"`
+	TemplateId string `json:"template_id"`
+	Labels interface{} `json:"labels"`
 }
 
 type DNSZoneUpdateRequest struct {
-	Hostmaster string      `json:"hostmaster"`
-	Ns2        string      `json:"ns2"`
-	Ns1        string      `json:"ns1"`
-	Labels     interface{} `json:"labels"`
+	Hostmaster string `json:"hostmaster"`
+	Ns2 string `json:"ns2"`
+	Ns1 string `json:"ns1"`
+	Labels interface{} `json:"labels"`
 }
 
 type DNSRecordCreateRequest struct {
 	Data string `json:"data"`
 	Name string `json:"name"`
 	Type string `json:"type"`
-	Ttl  int    `json:"ttl"`
+	Ttl int `json:"ttl"`
 }
 
 type ServerTemplateCreateRequest struct {
-	RootSlot string      `json:"root_slot"`
-	Zones    interface{} `json:"zones"`
-	Title    string      `json:"title"`
+	RootSlot string `json:"root_slot"`
+	Zones interface{} `json:"zones"`
+	Title string `json:"title"`
 }
 
 type SSLContactCreateRequest struct {
-	AdditionalAddress string      `json:"additional_address"`
-	Address           string      `json:"address"`
-	City              string      `json:"city"`
-	LastName          string      `json:"last_name"`
-	Organisation      string      `json:"organisation"`
-	Title             string      `json:"title"`
-	Labels            interface{} `json:"labels"`
-	CountryCode       string      `json:"country_code"`
-	ProjectId         string      `json:"project_id"`
-	Phone             string      `json:"phone"`
-	Fax               string      `json:"fax"`
-	PostalCode        string      `json:"postal_code"`
-	Region            string      `json:"region"`
-	FirstName         string      `json:"first_name"`
-	Email             string      `json:"email"`
+	AdditionalAddress string `json:"additional_address"`
+	Address string `json:"address"`
+	City string `json:"city"`
+	LastName string `json:"last_name"`
+	Organisation string `json:"organisation"`
+	Title string `json:"title"`
+	Labels interface{} `json:"labels"`
+	CountryCode string `json:"country_code"`
+	ProjectId string `json:"project_id"`
+	Phone string `json:"phone"`
+	Fax string `json:"fax"`
+	PostalCode string `json:"postal_code"`
+	Region string `json:"region"`
+	FirstName string `json:"first_name"`
+	Email string `json:"email"`
 }
 
 type NetworkCreateRequest struct {
-	ZoneId    string      `json:"zone_id"`
-	ProjectId string      `json:"project_id"`
-	Tag       int         `json:"tag"`
-	Title string      `json:"title"`
-	Type  NetworkType `json:"type"`
+	ZoneId string `json:"zone_id"`
+	ProjectId string `json:"project_id"`
+	Tag int `json:"tag"`
+	Title string `json:"title"`
+	Type NetworkType `json:"type"`
 }
 
 type ServerVariantCreateRequest struct {
-	ZoneIds        string `json:"zone_ids"`
-	Disk           int    `json:"disk"`
-	Cores          int    `json:"cores"`
-	Memory         int    `json:"memory"`
-	Legacy         bool   `json:"legacy"`
+	ZoneIds string `json:"zone_ids"`
+	Disk int `json:"disk"`
+	Cores int `json:"cores"`
+	Memory int `json:"memory"`
+	Legacy bool `json:"legacy"`
 	StorageClassId string `json:"storage_class_id"`
-	Title          string `json:"title"`
+	Title string `json:"title"`
 }
 
 type DomainCreateRequest struct {
-	Duration        int                       `json:"duration"`
-	ProjectId       string                    `json:"project_id"`
-	AdminHandleCode string                    `json:"admin_handle_code"`
-	Name            string                    `json:"name"`
-	OwnerHandleCode string                    `json:"owner_handle_code"`
-	TechHandleCode  string                    `json:"tech_handle_code"`
-	Nameserver      []DomainRequestNameserver `json:"nameserver"`
-	Authinfo        string                    `json:"authinfo"`
-	ZoneHandleCode  string                    `json:"zone_handle_code"`
-	Labels          interface{}               `json:"labels"`
+	Duration int `json:"duration"`
+	ProjectId string `json:"project_id"`
+	AdminHandleCode string `json:"admin_handle_code"`
+	Name string `json:"name"`
+	OwnerHandleCode string `json:"owner_handle_code"`
+	TechHandleCode string `json:"tech_handle_code"`
+	Nameserver []DomainRequestNameserver `json:"nameserver"`
+	Authinfo string `json:"authinfo"`
+	ZoneHandleCode string `json:"zone_handle_code"`
+	Labels interface{} `json:"labels"`
 }
 
 type SSLCertificateCreateRequest struct {
-	OrganisationId   string      `json:"organisation_id"`
-	TechContact      interface{} `json:"tech_contact"`
-	Csr              string      `json:"csr"`
-	ProjectId        string      `json:"project_id"`
-	TypeId           string      `json:"type_id"`
-	AdminContact     interface{} `json:"admin_contact"`
-	Organisation     interface{} `json:"organisation"`
-	ApproverEmail    string      `json:"approver_email"`
-	AdminContactId   string      `json:"admin_contact_id"`
-	TechContactId    string      `json:"tech_contact_id"`
-	ValidationMethod string      `json:"validation_method"`
-	Labels           interface{} `json:"labels"`
+	OrganisationId string `json:"organisation_id"`
+	TechContact interface{} `json:"tech_contact"`
+	Csr string `json:"csr"`
+	ProjectId string `json:"project_id"`
+	TypeId string `json:"type_id"`
+	AdminContact interface{} `json:"admin_contact"`
+	Organisation interface{} `json:"organisation"`
+	ApproverEmail string `json:"approver_email"`
+	AdminContactId string `json:"admin_contact_id"`
+	TechContactId string `json:"tech_contact_id"`
+	ValidationMethod string `json:"validation_method"`
+	Labels interface{} `json:"labels"`
 }
 
 type SSHKeyCreateRequest struct {
-	PublicKey string      `json:"public_key"`
-	ProjectId string      `json:"project_id"`
-	Title     string      `json:"title"`
-	Labels    interface{} `json:"labels"`
+	PublicKey string `json:"public_key"`
+	ProjectId string `json:"project_id"`
+	Title string `json:"title"`
+	Labels interface{} `json:"labels"`
 }
 
 type ServerStorageCreateRequest struct {
-	ZoneId     string `json:"zone_id"`
+	ZoneId string `json:"zone_id"`
 	ExternalId string `json:"external_id"`
 }
 
 type AvailabilityZoneCreateRequest struct {
-	Title  string      `json:"title"`
+	Title string `json:"title"`
 	Config interface{} `json:"config"`
 }
 
@@ -1050,15 +1049,15 @@ type ServerNetworkCreateRequest struct {
 }
 
 type AvailabilityZoneUpdateRequest struct {
-	Title  string      `json:"title"`
+	Title string `json:"title"`
 	Config interface{} `json:"config"`
 }
 
 type S3AccessKeyCreateRequest struct {
-	SecretKey string      `json:"secret_key"`
-	ProjectId string      `json:"project_id"`
-	Title     string      `json:"title"`
-	Labels    interface{} `json:"labels"`
+	SecretKey string `json:"secret_key"`
+	ProjectId string `json:"project_id"`
+	Title string `json:"title"`
+	Labels interface{} `json:"labels"`
 }
 
 type SubnetAddressCreateRequest struct {
@@ -1066,104 +1065,104 @@ type SubnetAddressCreateRequest struct {
 }
 
 type SSLOrganisationCreateRequest struct {
-	AdditionalAddress  string      `json:"additional_address"`
-	Address            string      `json:"address"`
-	City               string      `json:"city"`
-	RegistrationNumber string      `json:"registration_number"`
-	Labels             interface{} `json:"labels"`
-	Division           string      `json:"division"`
-	CountryCode        string      `json:"country_code"`
-	ProjectId          string      `json:"project_id"`
-	Phone              string      `json:"phone"`
-	Name               string      `json:"name"`
-	Duns               string      `json:"duns"`
-	PostalCode         string      `json:"postal_code"`
-	Region             string      `json:"region"`
-	Fax                string      `json:"fax"`
+	AdditionalAddress string `json:"additional_address"`
+	Address string `json:"address"`
+	City string `json:"city"`
+	RegistrationNumber string `json:"registration_number"`
+	Labels interface{} `json:"labels"`
+	Division string `json:"division"`
+	CountryCode string `json:"country_code"`
+	ProjectId string `json:"project_id"`
+	Phone string `json:"phone"`
+	Name string `json:"name"`
+	Duns string `json:"duns"`
+	PostalCode string `json:"postal_code"`
+	Region string `json:"region"`
+	Fax string `json:"fax"`
 }
 
 type ServerMediaCreateRequest struct {
-	ZoneId     string `json:"zone_id"`
+	ZoneId string `json:"zone_id"`
 	ExternalId string `json:"external_id"`
-	Title      string `json:"title"`
+	Title string `json:"title"`
 }
 
 type DomainUpdateRequest struct {
-	AdminHandleCode string                    `json:"admin_handle_code"`
-	OwnerHandleCode string                    `json:"owner_handle_code"`
-	TechHandleCode  string                    `json:"tech_handle_code"`
-	Nameserver      []DomainRequestNameserver `json:"nameserver"`
-	ZoneHandleCode  string                    `json:"zone_handle_code"`
-	Labels          interface{}               `json:"labels"`
+	AdminHandleCode string `json:"admin_handle_code"`
+	OwnerHandleCode string `json:"owner_handle_code"`
+	TechHandleCode string `json:"tech_handle_code"`
+	Nameserver []DomainRequestNameserver `json:"nameserver"`
+	ZoneHandleCode string `json:"zone_handle_code"`
+	Labels interface{} `json:"labels"`
 }
 
 type S3AccessGrantCreateRequest struct {
-	BucketId string      `json:"bucket_id"`
-	Path     string      `json:"path"`
-	Role     string      `json:"role"`
-	Labels   interface{} `json:"labels"`
+	BucketId string `json:"bucket_id"`
+	Path string `json:"path"`
+	Role string `json:"role"`
+	Labels interface{} `json:"labels"`
 }
 
 type DNSRecordUpdateRequest struct {
 	Data string `json:"data"`
 	Name string `json:"name"`
 	Type string `json:"type"`
-	Ttl  int    `json:"ttl"`
+	Ttl int `json:"ttl"`
 }
 
 type DomainHandleUpdateRequest struct {
-	AdditionalAddress         string      `json:"additional_address"`
-	BirthRegion               string      `json:"birth_region"`
-	City                      string      `json:"city"`
-	VatNumber                 string      `json:"vat_number"`
-	BirthDate                 string      `json:"birth_date"`
-	IdCard                    string      `json:"id_card"`
-	BirthPlace                string      `json:"birth_place"`
-	IdCardIssueDate           string      `json:"id_card_issue_date"`
-	Labels                    interface{} `json:"labels"`
-	BirthCountryCode          string      `json:"birth_country_code"`
-	CountryCode               string      `json:"country_code"`
-	CompanyRegistrationNumber string      `json:"company_registration_number"`
-	Phone                     string      `json:"phone"`
-	Street                    string      `json:"street"`
-	TaxNumber                 string      `json:"tax_number"`
-	StreetNumber              string      `json:"street_number"`
-	PostalCode                string      `json:"postal_code"`
-	Region                    string      `json:"region"`
-	Fax                       string      `json:"fax"`
-	IdCardAuthority           string      `json:"id_card_authority"`
-	PrivacyProtection         bool        `json:"privacy_protection"`
-	Email                     string      `json:"email"`
+	AdditionalAddress string `json:"additional_address"`
+	BirthRegion string `json:"birth_region"`
+	City string `json:"city"`
+	VatNumber string `json:"vat_number"`
+	BirthDate string `json:"birth_date"`
+	IdCard string `json:"id_card"`
+	BirthPlace string `json:"birth_place"`
+	IdCardIssueDate string `json:"id_card_issue_date"`
+	Labels interface{} `json:"labels"`
+	BirthCountryCode string `json:"birth_country_code"`
+	CountryCode string `json:"country_code"`
+	CompanyRegistrationNumber string `json:"company_registration_number"`
+	Phone string `json:"phone"`
+	Street string `json:"street"`
+	TaxNumber string `json:"tax_number"`
+	StreetNumber string `json:"street_number"`
+	PostalCode string `json:"postal_code"`
+	Region string `json:"region"`
+	Fax string `json:"fax"`
+	IdCardAuthority string `json:"id_card_authority"`
+	PrivacyProtection bool `json:"privacy_protection"`
+	Email string `json:"email"`
 }
 
 type ServerHostCreateRequest struct {
-	ZoneId     string `json:"zone_id"`
+	ZoneId string `json:"zone_id"`
 	ExternalId string `json:"external_id"`
-	Title      string `json:"title"`
+	Title string `json:"title"`
 }
 
 type PleskLicenseCreateRequest struct {
-	Address   string      `json:"address"`
-	ProjectId string      `json:"project_id"`
-	TypeId    string      `json:"type_id"`
-	Labels    interface{} `json:"labels"`
+	Address string `json:"address"`
+	ProjectId string `json:"project_id"`
+	TypeId string `json:"type_id"`
+	Labels interface{} `json:"labels"`
 }
 
 type ServerStorageClassCreateRequest struct {
-	Replication int      `json:"replication"`
-	StorageIds  []string `json:"storage_ids"`
-	Title       string   `json:"title"`
+	Replication int `json:"replication"`
+	StorageIds []string `json:"storage_ids"`
+	Title string `json:"title"`
 }
 
 type PleskLicenseUpdateRequest struct {
-	Address string      `json:"address"`
-	Labels  interface{} `json:"labels"`
+	Address string `json:"address"`
+	Labels interface{} `json:"labels"`
 }
 
 type S3BucketCreateRequest struct {
-	ProjectId string      `json:"project_id"`
-	Title     string      `json:"title"`
-	Labels    interface{} `json:"labels"`
+	ProjectId string `json:"project_id"`
+	Title string `json:"title"`
+	Labels interface{} `json:"labels"`
 }
 
 type DomainScheduleDeleteRequest struct {
@@ -1172,10 +1171,10 @@ type DomainScheduleDeleteRequest struct {
 
 type SubnetCreateRequest struct {
 	NetworkId string `json:"network_id"`
-	Address   string `json:"address"`
-	Public    bool   `json:"public"`
+	Address string `json:"address"`
+	Public bool `json:"public"`
 	ProjectId string `json:"project_id"`
-	Prefix    int    `json:"prefix"`
+	Prefix int `json:"prefix"`
 }
 
 type ServerVolumeAttachRequest struct {
@@ -1183,11 +1182,11 @@ type ServerVolumeAttachRequest struct {
 }
 
 type DNSRecordsUpdateRequest []struct {
-	Data string `json:"data"`
-	Name string `json:"name"`
-	Type string `json:"type"`
-	Ttl  int    `json:"ttl"`
-}
+		Data string `json:"data"`
+		Name string `json:"name"`
+		Type string `json:"type"`
+		Ttl int `json:"ttl"`
+	}
 
 func (c CoreClient) CreateSSHKey(in SSHKeyCreateRequest) (SSHKeySingleResponse, *http.Response, error) {
 	body := SSHKeySingleResponse{}
@@ -2469,3 +2468,5 @@ func (c CoreClient) DetachServerVolume(id string) (ServerVolumeSingleResponse, *
 
 type QueryParams struct {
 }
+
+
