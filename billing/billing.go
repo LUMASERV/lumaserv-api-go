@@ -35,6 +35,10 @@ func (c *BillingClient) SetHttpClient(client *http.Client) {
     c.client = client
 }
 
+func (c *BillingClient) SetAccessToken(token string) {
+    c.apiKey = token
+}
+
 func (c *BillingClient) Request(method string, path string, postBody io.Reader) (*http.Response, []byte, error) {
     if c.client == nil {
         c.client = &http.Client{
@@ -1514,9 +1518,9 @@ func (c BillingClient) GetPaymentReminders(qParams QueryParams) (PaymentReminder
 }
 
 type QueryParams struct {
-    Search string `url:"search"`
-    Page int `url:"page"`
-    PageSize int `url:"page_size"`
+    Search string `url:"search,omitempty"`
+    Page int `url:"page,omitempty"`
+    PageSize int `url:"page_size,omitempty"`
 }
 
 

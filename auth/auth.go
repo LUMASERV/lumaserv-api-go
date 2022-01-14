@@ -35,6 +35,10 @@ func (c *AuthClient) SetHttpClient(client *http.Client) {
     c.client = client
 }
 
+func (c *AuthClient) SetAccessToken(token string) {
+    c.apiKey = token
+}
+
 func (c *AuthClient) Request(method string, path string, postBody io.Reader) (*http.Response, []byte, error) {
     if c.client == nil {
         c.client = &http.Client{
@@ -457,10 +461,10 @@ func (c AuthClient) GetUserProjectMemberships(id string) (ProjectMemberListRespo
 }
 
 type QueryParams struct {
-    Search string `url:"search"`
-    Page int `url:"page"`
-    Detail bool `url:"detail"`
-    PageSize int `url:"page_size"`
+    Search string `url:"search,omitempty"`
+    Page int `url:"page,omitempty"`
+    Detail bool `url:"detail,omitempty"`
+    PageSize int `url:"page_size,omitempty"`
 }
 
 

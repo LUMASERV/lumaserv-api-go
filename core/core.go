@@ -35,6 +35,10 @@ func (c *CoreClient) SetHttpClient(client *http.Client) {
     c.client = client
 }
 
+func (c *CoreClient) SetAccessToken(token string) {
+    c.apiKey = token
+}
+
 func (c *CoreClient) Request(method string, path string, postBody io.Reader) (*http.Response, []byte, error) {
     if c.client == nil {
         c.client = &http.Client{
@@ -2467,37 +2471,37 @@ func (c CoreClient) DetachServerVolume(id string) (ServerVolumeSingleResponse, *
 }
 
 type QueryParams struct {
-    Search string `url:"search"`
-    WithLabels bool `url:"with_labels"`
-    ProjectId string `url:"project_id"`
-    Filter QueryParamsFilter `url:"filter"`
-    Limit int `url:"limit"`
-    Resources string `url:"resources"`
-    Force bool `url:"force"`
-    Labels QueryParamsLabels `url:"labels"`
-    Page int `url:"page"`
-    PageSize int `url:"page_size"`
+    Search string `url:"search,omitempty"`
+    WithLabels bool `url:"with_labels,omitempty"`
+    ProjectId string `url:"project_id,omitempty"`
+    Filter QueryParamsFilter `url:"filter,omitempty"`
+    Limit int `url:"limit,omitempty"`
+    Resources string `url:"resources,omitempty"`
+    Force bool `url:"force,omitempty"`
+    Labels QueryParamsLabels `url:"labels,omitempty"`
+    Page int `url:"page,omitempty"`
+    PageSize int `url:"page_size,omitempty"`
 }
 
 
 type QueryParamsFilter struct {
-    OrganisationId string `url:"organisation_id"`
-    ProjectId string `url:"project_id"`
-    TypeId string `url:"type_id"`
-    AdminHandleCode string `url:"admin_handle_code"`
-    OwnerHandleCode string `url:"owner_handle_code"`
-    TechHandleCode string `url:"tech_handle_code"`
-    AdminContactId string `url:"admin_contact_id"`
-    TechContactId string `url:"tech_contact_id"`
-    ServerId string `url:"server_id"`
-    Tld string `url:"tld"`
-    Labels string `url:"labels"`
-    ZoneHandleCode string `url:"zone_handle_code"`
+    OrganisationId string `url:"organisation_id,omitempty"`
+    ProjectId string `url:"project_id,omitempty"`
+    TypeId string `url:"type_id,omitempty"`
+    AdminHandleCode string `url:"admin_handle_code,omitempty"`
+    OwnerHandleCode string `url:"owner_handle_code,omitempty"`
+    TechHandleCode string `url:"tech_handle_code,omitempty"`
+    AdminContactId string `url:"admin_contact_id,omitempty"`
+    TechContactId string `url:"tech_contact_id,omitempty"`
+    ServerId string `url:"server_id,omitempty"`
+    Tld string `url:"tld,omitempty"`
+    Labels string `url:"labels,omitempty"`
+    ZoneHandleCode string `url:"zone_handle_code,omitempty"`
 }
 
 
 type QueryParamsLabels struct {
-    Name interface{} `url:"name"`
+    Name interface{} `url:"name,omitempty"`
 }
 
 
