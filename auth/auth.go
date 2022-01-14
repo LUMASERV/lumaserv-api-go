@@ -7,6 +7,8 @@ import (
     "time"
     "encoding/json"
     "io"
+    "errors"
+    "strconv"
     "github.com/google/go-querystring/query"
 )
 
@@ -66,6 +68,17 @@ func (c *AuthClient) Request(method string, path string, postBody io.Reader) (*h
     body, err := ioutil.ReadAll(res.Body)
 
     return res, body, err
+}
+
+func (c AuthClient) toStr(in interface{}) string {
+    switch in.(type) {
+        case string:
+            return in.(string)
+        case int:
+            return strconv.Itoa(in.(int))
+    }
+
+    panic("Unhandled type in toStr")
 }
 type Project struct {
     Id string `json:"id"`
@@ -256,6 +269,12 @@ func (c AuthClient) CreateProject(in ProjectCreateRequest) (ProjectSingleRespons
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -270,6 +289,12 @@ func (c AuthClient) GetProjects(qParams QueryParams) (ProjectListResponse, *http
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -279,32 +304,50 @@ func (c AuthClient) GetProject(id string, qParams QueryParams) (ProjectSingleRes
     if err != nil {
         return body, nil, err
     }
-    res, j, err := c.Request("GET", "/projects/"+id+"?"+q.Encode(), nil)
+    res, j, err := c.Request("GET", "/projects/"+c.toStr(id)+"?"+q.Encode(), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c AuthClient) DeleteProject(id string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
-    res, j, err := c.Request("DELETE", "/projects/"+id, nil)
+    res, j, err := c.Request("DELETE", "/projects/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c AuthClient) UpdateProject(in ProjectUpdateRequest, id string) (ProjectSingleResponse, *http.Response, error) {
     body := ProjectSingleResponse{}
     inJson, err := json.Marshal(in)
-    res, j, err := c.Request("PUT", "/projects/"+id, bytes.NewBuffer(inJson))
+    res, j, err := c.Request("PUT", "/projects/"+c.toStr(id), bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -316,6 +359,12 @@ func (c AuthClient) Login(in LoginRequest) (LoginResponse, *http.Response, error
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -330,16 +379,28 @@ func (c AuthClient) GetUsers(qParams QueryParams) (UserListResponse, *http.Respo
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c AuthClient) GetUser(id string) (UserSingleResponse, *http.Response, error) {
     body := UserSingleResponse{}
-    res, j, err := c.Request("GET", "/users/"+id, nil)
+    res, j, err := c.Request("GET", "/users/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -351,6 +412,12 @@ func (c AuthClient) RequestPasswordReset(in RequestPasswordResetRequest) (EmptyR
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -362,6 +429,12 @@ func (c AuthClient) ExecutePasswordReset(in ExecutePasswordResetRequest) (EmptyR
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -373,6 +446,12 @@ func (c AuthClient) CreateToken(in TokenCreateRequest) (TokenSingleResponse, *ht
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -383,36 +462,60 @@ func (c AuthClient) GetTokens() (TokenListResponse, *http.Response, error) {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c AuthClient) GetToken(id string) (TokenSingleResponse, *http.Response, error) {
     body := TokenSingleResponse{}
-    res, j, err := c.Request("GET", "/tokens/"+id, nil)
+    res, j, err := c.Request("GET", "/tokens/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c AuthClient) DeleteToken(id string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
-    res, j, err := c.Request("DELETE", "/tokens/"+id, nil)
+    res, j, err := c.Request("DELETE", "/tokens/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c AuthClient) ValidateToken(token string) (TokenValidationResponse, *http.Response, error) {
     body := TokenValidationResponse{}
-    res, j, err := c.Request("GET", "/validate/"+token, nil)
+    res, j, err := c.Request("GET", "/validate/"+c.toStr(token), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -422,11 +525,17 @@ func (c AuthClient) GetProjectMembers(id string, qParams QueryParams) (ProjectMe
     if err != nil {
         return body, nil, err
     }
-    res, j, err := c.Request("GET", "/projects/"+id+"/members"+"?"+q.Encode(), nil)
+    res, j, err := c.Request("GET", "/projects/"+c.toStr(id)+"/members"+"?"+q.Encode(), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -437,26 +546,44 @@ func (c AuthClient) ValidateSelf() (TokenValidationResponse, *http.Response, err
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c AuthClient) RemoveProjectMember(id string, user_id string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
-    res, j, err := c.Request("DELETE", "/projects/"+id+"/members/"+user_id, nil)
+    res, j, err := c.Request("DELETE", "/projects/"+c.toStr(id)+"/members/"+c.toStr(user_id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c AuthClient) GetUserProjectMemberships(id string) (ProjectMemberListResponse, *http.Response, error) {
     body := ProjectMemberListResponse{}
-    res, j, err := c.Request("GET", "/users/"+id+"/project_memberships", nil)
+    res, j, err := c.Request("GET", "/users/"+c.toStr(id)+"/project_memberships", nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 

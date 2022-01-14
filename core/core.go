@@ -7,6 +7,8 @@ import (
     "time"
     "encoding/json"
     "io"
+    "errors"
+    "strconv"
     "github.com/google/go-querystring/query"
 )
 
@@ -66,6 +68,17 @@ func (c *CoreClient) Request(method string, path string, postBody io.Reader) (*h
     body, err := ioutil.ReadAll(res.Body)
 
     return res, body, err
+}
+
+func (c CoreClient) toStr(in interface{}) string {
+    switch in.(type) {
+        case string:
+            return in.(string)
+        case int:
+            return strconv.Itoa(in.(int))
+    }
+
+    panic("Unhandled type in toStr")
 }
 type SSHKey struct {
     PublicKey string `json:"public_key"`
@@ -1200,6 +1213,12 @@ func (c CoreClient) CreateSSHKey(in SSHKeyCreateRequest) (SSHKeySingleResponse, 
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1214,16 +1233,28 @@ func (c CoreClient) GetSSHKeys(qParams QueryParams) (SSHKeyListResponse, *http.R
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) StartServer(id string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
-    res, j, err := c.Request("POST", "/servers/"+id+"/start", nil)
+    res, j, err := c.Request("POST", "/servers/"+c.toStr(id)+"/start", nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1235,6 +1266,12 @@ func (c CoreClient) CreateAvailabilityZone(in AvailabilityZoneCreateRequest) (Av
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1249,16 +1286,28 @@ func (c CoreClient) GetAvailabilityZones(qParams QueryParams) (AvailabilityZoneL
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) GetServerTemplate(id string) (ServerTemplateSingleResponse, *http.Response, error) {
     body := ServerTemplateSingleResponse{}
-    res, j, err := c.Request("GET", "/server-templates/"+id, nil)
+    res, j, err := c.Request("GET", "/server-templates/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1268,91 +1317,145 @@ func (c CoreClient) ShutdownServer(id string, qParams QueryParams) (EmptyRespons
     if err != nil {
         return body, nil, err
     }
-    res, j, err := c.Request("POST", "/servers/"+id+"/shutdown"+"?"+q.Encode(), nil)
+    res, j, err := c.Request("POST", "/servers/"+c.toStr(id)+"/shutdown"+"?"+q.Encode(), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) GetServer(id string) (ServerSingleResponse, *http.Response, error) {
     body := ServerSingleResponse{}
-    res, j, err := c.Request("GET", "/servers/"+id, nil)
+    res, j, err := c.Request("GET", "/servers/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) DeleteServer(id string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
-    res, j, err := c.Request("DELETE", "/servers/"+id, nil)
+    res, j, err := c.Request("DELETE", "/servers/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) GetServerStorageClass(id string) (ServerStorageClassSingleResponse, *http.Response, error) {
     body := ServerStorageClassSingleResponse{}
-    res, j, err := c.Request("GET", "/server-storage-classes/"+id, nil)
+    res, j, err := c.Request("GET", "/server-storage-classes/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) GetSSLOrganisation(id string) (SSLOrganisationSingleResponse, *http.Response, error) {
     body := SSLOrganisationSingleResponse{}
-    res, j, err := c.Request("GET", "/ssl/organisations/"+id, nil)
+    res, j, err := c.Request("GET", "/ssl/organisations/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) DeleteSSLOrganisation(id string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
-    res, j, err := c.Request("DELETE", "/ssl/organisations/"+id, nil)
+    res, j, err := c.Request("DELETE", "/ssl/organisations/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) GetServerAction(id string, action_id string) (ServerActionSingleResponse, *http.Response, error) {
     body := ServerActionSingleResponse{}
-    res, j, err := c.Request("GET", "/servers/"+id+"/actions/"+action_id, nil)
+    res, j, err := c.Request("GET", "/servers/"+c.toStr(id)+"/actions/"+c.toStr(action_id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) GetSSLContact(id string) (SSLContactSingleResponse, *http.Response, error) {
     body := SSLContactSingleResponse{}
-    res, j, err := c.Request("GET", "/ssl/contacts/"+id, nil)
+    res, j, err := c.Request("GET", "/ssl/contacts/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) DeleteSSLContact(id string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
-    res, j, err := c.Request("DELETE", "/ssl/contacts/"+id, nil)
+    res, j, err := c.Request("DELETE", "/ssl/contacts/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1367,36 +1470,60 @@ func (c CoreClient) GetDNSZones(qParams QueryParams) (DNSZoneListResponse, *http
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) RecreateServer(id string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
-    res, j, err := c.Request("POST", "/servers/"+id+"/recreate", nil)
+    res, j, err := c.Request("POST", "/servers/"+c.toStr(id)+"/recreate", nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) SendDomainVerification(name string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
-    res, j, err := c.Request("POST", "/domains/"+name+"/verification", nil)
+    res, j, err := c.Request("POST", "/domains/"+c.toStr(name)+"/verification", nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) CheckDomainVerification(name string) (DomainCheckVerificationResponse, *http.Response, error) {
     body := DomainCheckVerificationResponse{}
-    res, j, err := c.Request("GET", "/domains/"+name+"/verification", nil)
+    res, j, err := c.Request("GET", "/domains/"+c.toStr(name)+"/verification", nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1408,6 +1535,12 @@ func (c CoreClient) CreateServerHost(in ServerHostCreateRequest) (ServerHostSing
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1422,6 +1555,12 @@ func (c CoreClient) GetServerHosts(qParams QueryParams) (ServerHostListResponse,
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1433,6 +1572,12 @@ func (c CoreClient) CreateServer(in ServerCreateRequest) (ServerSingleResponse, 
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1447,109 +1592,175 @@ func (c CoreClient) GetServers(qParams QueryParams) (ServerListResponse, *http.R
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) DeleteServerNetwork(id string, network_id string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
-    res, j, err := c.Request("DELETE", "/servers/"+id+"/networks/"+network_id, nil)
+    res, j, err := c.Request("DELETE", "/servers/"+c.toStr(id)+"/networks/"+c.toStr(network_id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) CheckDomain(name string) (DomainCheckResponse, *http.Response, error) {
     body := DomainCheckResponse{}
-    res, j, err := c.Request("GET", "/domains/"+name+"/check", nil)
+    res, j, err := c.Request("GET", "/domains/"+c.toStr(name)+"/check", nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) GetDomain(name string) (DomainSingleResponse, *http.Response, error) {
     body := DomainSingleResponse{}
-    res, j, err := c.Request("GET", "/domains/"+name, nil)
+    res, j, err := c.Request("GET", "/domains/"+c.toStr(name), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) DeleteDomain(name string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
-    res, j, err := c.Request("DELETE", "/domains/"+name, nil)
+    res, j, err := c.Request("DELETE", "/domains/"+c.toStr(name), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) UpdateDomain(in DomainUpdateRequest, name string) (DomainSingleResponse, *http.Response, error) {
     body := DomainSingleResponse{}
     inJson, err := json.Marshal(in)
-    res, j, err := c.Request("PUT", "/domains/"+name, bytes.NewBuffer(inJson))
+    res, j, err := c.Request("PUT", "/domains/"+c.toStr(name), bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) GetDomainHandle(code string) (DomainHandleSingleResponse, *http.Response, error) {
     body := DomainHandleSingleResponse{}
-    res, j, err := c.Request("GET", "/domain-handles/"+code, nil)
+    res, j, err := c.Request("GET", "/domain-handles/"+c.toStr(code), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) DeleteDomainHandle(code string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
-    res, j, err := c.Request("DELETE", "/domain-handles/"+code, nil)
+    res, j, err := c.Request("DELETE", "/domain-handles/"+c.toStr(code), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) UpdateDomainHandle(in DomainHandleUpdateRequest, code string) (DomainHandleSingleResponse, *http.Response, error) {
     body := DomainHandleSingleResponse{}
     inJson, err := json.Marshal(in)
-    res, j, err := c.Request("PUT", "/domain-handles/"+code, bytes.NewBuffer(inJson))
+    res, j, err := c.Request("PUT", "/domain-handles/"+c.toStr(code), bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) GetAvailabilityZone(in AvailabilityZoneUpdateRequest, id string) (AvailabilityZoneSingleResponse, *http.Response, error) {
     body := AvailabilityZoneSingleResponse{}
     inJson, err := json.Marshal(in)
-    res, j, err := c.Request("GET", "/availability-zones/"+id, bytes.NewBuffer(inJson))
+    res, j, err := c.Request("GET", "/availability-zones/"+c.toStr(id), bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) UpdateAvailabilityZone(id string) (AvailabilityZoneSingleResponse, *http.Response, error) {
     body := AvailabilityZoneSingleResponse{}
-    res, j, err := c.Request("PUT", "/availability-zones/"+id, nil)
+    res, j, err := c.Request("PUT", "/availability-zones/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1561,6 +1772,12 @@ func (c CoreClient) CreateSubnet(in SubnetCreateRequest) (SubnetSingleResponse, 
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1575,6 +1792,12 @@ func (c CoreClient) GetSubnets(qParams QueryParams) (SubnetListResponse, *http.R
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1589,16 +1812,28 @@ func (c CoreClient) GetServerVolumes(qParams QueryParams) (ServerVolumeListRespo
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) GetPleskLicenseType(id string) (PleskLicenseTypeSingleResponse, *http.Response, error) {
     body := PleskLicenseTypeSingleResponse{}
-    res, j, err := c.Request("GET", "/licenses/plesk-types/"+id, nil)
+    res, j, err := c.Request("GET", "/licenses/plesk-types/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1610,6 +1845,12 @@ func (c CoreClient) CreateServerStorageClass(in ServerStorageClassCreateRequest)
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1624,6 +1865,12 @@ func (c CoreClient) GetServerVolumeClasses(qParams QueryParams) (ServerStorageCl
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1638,6 +1885,12 @@ func (c CoreClient) Search(qParams QueryParams) (SearchResponse, *http.Response,
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1649,6 +1902,12 @@ func (c CoreClient) CreateS3Bucket(in S3BucketCreateRequest) (S3BucketSingleResp
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1663,6 +1922,12 @@ func (c CoreClient) GetS3Buckets(qParams QueryParams) (S3BucketListResponse, *ht
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1677,6 +1942,12 @@ func (c CoreClient) GetPleskLicenseTypes(qParams QueryParams) (PleskLicenseTypeL
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1686,21 +1957,33 @@ func (c CoreClient) GetServerActions(id string, qParams QueryParams) (ServerActi
     if err != nil {
         return body, nil, err
     }
-    res, j, err := c.Request("GET", "/servers/"+id+"/actions"+"?"+q.Encode(), nil)
+    res, j, err := c.Request("GET", "/servers/"+c.toStr(id)+"/actions"+"?"+q.Encode(), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) GetServerStatus(id string) (ServerStatusResponse, *http.Response, error) {
     body := ServerStatusResponse{}
-    res, j, err := c.Request("GET", "/servers/"+id+"/status", nil)
+    res, j, err := c.Request("GET", "/servers/"+c.toStr(id)+"/status", nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1712,6 +1995,12 @@ func (c CoreClient) CreateSSLOrganisation(in SSLOrganisationCreateRequest) (SSLO
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1726,16 +2015,28 @@ func (c CoreClient) GetSSLOrganisations(qParams QueryParams) (SSLOrganisationLis
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) GetSSLType(id string) (SSLTypeSingleResponse, *http.Response, error) {
     body := SSLTypeSingleResponse{}
-    res, j, err := c.Request("GET", "/ssl/types/"+id, nil)
+    res, j, err := c.Request("GET", "/ssl/types/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1750,48 +2051,78 @@ func (c CoreClient) GetSSLTypes(qParams QueryParams) (SSLTypeListResponse, *http
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) DeleteDNSRecord(name string, id string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
-    res, j, err := c.Request("DELETE", "/dns/zones/"+name+"/records/"+id, nil)
+    res, j, err := c.Request("DELETE", "/dns/zones/"+c.toStr(name)+"/records/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) UpdateDNSRecord(in DNSRecordUpdateRequest, name string, id string) (DNSRecordSingleResponse, *http.Response, error) {
     body := DNSRecordSingleResponse{}
     inJson, err := json.Marshal(in)
-    res, j, err := c.Request("PUT", "/dns/zones/"+name+"/records/"+id, bytes.NewBuffer(inJson))
+    res, j, err := c.Request("PUT", "/dns/zones/"+c.toStr(name)+"/records/"+c.toStr(id), bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) GetPleskLicense(id string) (PleskLicenseSingleResponse, *http.Response, error) {
     body := PleskLicenseSingleResponse{}
-    res, j, err := c.Request("GET", "/licenses/plesk/"+id, nil)
+    res, j, err := c.Request("GET", "/licenses/plesk/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) UpdatePleskLicense(in PleskLicenseUpdateRequest, id string) (PleskLicenseSingleResponse, *http.Response, error) {
     body := PleskLicenseSingleResponse{}
     inJson, err := json.Marshal(in)
-    res, j, err := c.Request("PUT", "/licenses/plesk/"+id, bytes.NewBuffer(inJson))
+    res, j, err := c.Request("PUT", "/licenses/plesk/"+c.toStr(id), bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1803,6 +2134,12 @@ func (c CoreClient) CreateServerTemplate(in ServerTemplateCreateRequest) (Server
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1817,47 +2154,77 @@ func (c CoreClient) GetServerTemplates(qParams QueryParams) (ServerTemplateListR
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) GetServerHost(id string) (ServerHostSingleResponse, *http.Response, error) {
     body := ServerHostSingleResponse{}
-    res, j, err := c.Request("GET", "/server-hosts/"+id, nil)
+    res, j, err := c.Request("GET", "/server-hosts/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) UnscheduleDomainDelete(name string) (DomainSingleResponse, *http.Response, error) {
     body := DomainSingleResponse{}
-    res, j, err := c.Request("POST", "/domains/"+name+"/unschedule-delete", nil)
+    res, j, err := c.Request("POST", "/domains/"+c.toStr(name)+"/unschedule-delete", nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) StopServer(id string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
-    res, j, err := c.Request("POST", "/servers/"+id+"/stop", nil)
+    res, j, err := c.Request("POST", "/servers/"+c.toStr(id)+"/stop", nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) CreateDNSZoneRecord(in DNSRecordCreateRequest, name string) (DNSRecordSingleResponse, *http.Response, error) {
     body := DNSRecordSingleResponse{}
     inJson, err := json.Marshal(in)
-    res, j, err := c.Request("POST", "/dns/zones/"+name+"/records", bytes.NewBuffer(inJson))
+    res, j, err := c.Request("POST", "/dns/zones/"+c.toStr(name)+"/records", bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1867,43 +2234,67 @@ func (c CoreClient) GetDNSZoneRecords(name string, qParams QueryParams) (DNSReco
     if err != nil {
         return body, nil, err
     }
-    res, j, err := c.Request("GET", "/dns/zones/"+name+"/records"+"?"+q.Encode(), nil)
+    res, j, err := c.Request("GET", "/dns/zones/"+c.toStr(name)+"/records"+"?"+q.Encode(), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) UpdateDNSZoneRecords(in DNSRecordsUpdateRequest, name string) (DNSRecordListResponse, *http.Response, error) {
     body := DNSRecordListResponse{}
     inJson, err := json.Marshal(in)
-    res, j, err := c.Request("PUT", "/dns/zones/"+name+"/records", bytes.NewBuffer(inJson))
+    res, j, err := c.Request("PUT", "/dns/zones/"+c.toStr(name)+"/records", bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) GetServerVolume(id string) (ServerVolumeSingleResponse, *http.Response, error) {
     body := ServerVolumeSingleResponse{}
-    res, j, err := c.Request("GET", "/server-volumes/"+id, nil)
+    res, j, err := c.Request("GET", "/server-volumes/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) CreateServerNetwork(in ServerNetworkCreateRequest, id string) (ServerNetworkSingleResponse, *http.Response, error) {
     body := ServerNetworkSingleResponse{}
     inJson, err := json.Marshal(in)
-    res, j, err := c.Request("POST", "/servers/"+id+"/networks", bytes.NewBuffer(inJson))
+    res, j, err := c.Request("POST", "/servers/"+c.toStr(id)+"/networks", bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1913,11 +2304,17 @@ func (c CoreClient) GetServerNetworks(id string, qParams QueryParams) (ServerNet
     if err != nil {
         return body, nil, err
     }
-    res, j, err := c.Request("GET", "/servers/"+id+"/networks"+"?"+q.Encode(), nil)
+    res, j, err := c.Request("GET", "/servers/"+c.toStr(id)+"/networks"+"?"+q.Encode(), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1929,6 +2326,12 @@ func (c CoreClient) CreateServerVariant(in ServerVariantCreateRequest) (ServerVa
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1943,66 +2346,108 @@ func (c CoreClient) GetServerVariants(qParams QueryParams) (ServerVariantListRes
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) GetServerStorage(id string) (ServerStorageSingleResponse, *http.Response, error) {
     body := ServerStorageSingleResponse{}
-    res, j, err := c.Request("GET", "/server-storages/"+id, nil)
+    res, j, err := c.Request("GET", "/server-storages/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) GetSSHKey(id string) (SSHKeySingleResponse, *http.Response, error) {
     body := SSHKeySingleResponse{}
-    res, j, err := c.Request("GET", "/ssh-keys/"+id, nil)
+    res, j, err := c.Request("GET", "/ssh-keys/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) DeleteSSHKey(id string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
-    res, j, err := c.Request("DELETE", "/ssh-keys/"+id, nil)
+    res, j, err := c.Request("DELETE", "/ssh-keys/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) GetServerVariant(id string) (ServerVariantSingleResponse, *http.Response, error) {
     body := ServerVariantSingleResponse{}
-    res, j, err := c.Request("GET", "/server-variants/"+id, nil)
+    res, j, err := c.Request("GET", "/server-variants/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) DeleteServerVariant(id string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
-    res, j, err := c.Request("DELETE", "/server-variants/"+id, nil)
+    res, j, err := c.Request("DELETE", "/server-variants/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) DeleteS3AccessKeyGrant(access_key_id string, id string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
-    res, j, err := c.Request("DELETE", "/storage/s3/access-keys/"+access_key_id+"/grants/"+id, nil)
+    res, j, err := c.Request("DELETE", "/storage/s3/access-keys/"+c.toStr(access_key_id)+"/grants/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -2014,6 +2459,12 @@ func (c CoreClient) CreateServerMedia(in ServerMediaCreateRequest) (ServerMediaS
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -2028,37 +2479,61 @@ func (c CoreClient) GetServerMedias(qParams QueryParams) (ServerMediaListRespons
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) GetSubnet(id string) (SubnetSingleResponse, *http.Response, error) {
     body := SubnetSingleResponse{}
-    res, j, err := c.Request("GET", "/subnets/"+id, nil)
+    res, j, err := c.Request("GET", "/subnets/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) DeleteSubnet(id string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
-    res, j, err := c.Request("DELETE", "/subnets/"+id, nil)
+    res, j, err := c.Request("DELETE", "/subnets/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) AttachServerVolume(in ServerVolumeAttachRequest, id string) (ServerVolumeSingleResponse, *http.Response, error) {
     body := ServerVolumeSingleResponse{}
     inJson, err := json.Marshal(in)
-    res, j, err := c.Request("POST", "/server-volumes/"+id+"/attach", bytes.NewBuffer(inJson))
+    res, j, err := c.Request("POST", "/server-volumes/"+c.toStr(id)+"/attach", bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -2070,6 +2545,12 @@ func (c CoreClient) CreatePleskLicense(in PleskLicenseCreateRequest) (PleskLicen
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -2084,26 +2565,44 @@ func (c CoreClient) GetPleskLicenses(qParams QueryParams) (PleskLicenseListRespo
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) GetS3AccessKey(id string) (S3AccessKeySingleResponse, *http.Response, error) {
     body := S3AccessKeySingleResponse{}
-    res, j, err := c.Request("GET", "/storage/s3/access-keys/"+id, nil)
+    res, j, err := c.Request("GET", "/storage/s3/access-keys/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) DeleteS3AccessKey(id string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
-    res, j, err := c.Request("DELETE", "/storage/s3/access-keys/"+id, nil)
+    res, j, err := c.Request("DELETE", "/storage/s3/access-keys/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -2115,6 +2614,12 @@ func (c CoreClient) CreateS3AccessKey(in S3AccessKeyCreateRequest) (S3AccessKeyS
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -2129,27 +2634,45 @@ func (c CoreClient) GetS3AccessKeys(qParams QueryParams) (S3AccessKeyListRespons
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) GetDNSZone(name string) (DNSZoneSingleResponse, *http.Response, error) {
     body := DNSZoneSingleResponse{}
-    res, j, err := c.Request("GET", "/dns/zones/"+name, nil)
+    res, j, err := c.Request("GET", "/dns/zones/"+c.toStr(name), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) UpdateDNSZone(in DNSZoneUpdateRequest, name string) (DNSZoneSingleResponse, *http.Response, error) {
     body := DNSZoneSingleResponse{}
     inJson, err := json.Marshal(in)
-    res, j, err := c.Request("PUT", "/dns/zones/"+name, bytes.NewBuffer(inJson))
+    res, j, err := c.Request("PUT", "/dns/zones/"+c.toStr(name), bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -2161,6 +2684,12 @@ func (c CoreClient) CreateDomainHandle(in DomainHandleCreateRequest) (DomainHand
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -2175,6 +2704,12 @@ func (c CoreClient) GetDomainHandles(qParams QueryParams) (DomainHandleListRespo
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -2186,6 +2721,12 @@ func (c CoreClient) CreateSSLCertificate(in SSLCertificateCreateRequest) (SSLCer
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -2200,17 +2741,29 @@ func (c CoreClient) GetSSLCertificates(qParams QueryParams) (SSLCertificateListR
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) ScheduleDomainDelete(in DomainScheduleDeleteRequest, name string) (DomainSingleResponse, *http.Response, error) {
     body := DomainSingleResponse{}
     inJson, err := json.Marshal(in)
-    res, j, err := c.Request("POST", "/domains/"+name+"/schedule-delete", bytes.NewBuffer(inJson))
+    res, j, err := c.Request("POST", "/domains/"+c.toStr(name)+"/schedule-delete", bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -2225,27 +2778,45 @@ func (c CoreClient) GetDomainPricingList(qParams QueryParams) (DomainPriceListRe
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) GetSSLCertificate(id string) (SSLCertificateSingleResponse, *http.Response, error) {
     body := SSLCertificateSingleResponse{}
-    res, j, err := c.Request("GET", "/ssl/certificates/"+id, nil)
+    res, j, err := c.Request("GET", "/ssl/certificates/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) CreateSubnetAddress(in SubnetAddressCreateRequest, id string) (AddressSingleResponse, *http.Response, error) {
     body := AddressSingleResponse{}
     inJson, err := json.Marshal(in)
-    res, j, err := c.Request("POST", "/subnets/"+id+"/addresses", bytes.NewBuffer(inJson))
+    res, j, err := c.Request("POST", "/subnets/"+c.toStr(id)+"/addresses", bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -2257,6 +2828,12 @@ func (c CoreClient) CreateNetwork(in NetworkCreateRequest) (NetworkSingleRespons
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -2271,26 +2848,44 @@ func (c CoreClient) GetNetworks(qParams QueryParams) (NetworkListResponse, *http
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) GetDomainAuthinfo(name string) (DomainAuthinfoResponse, *http.Response, error) {
     body := DomainAuthinfoResponse{}
-    res, j, err := c.Request("GET", "/domains/"+name+"/authinfo", nil)
+    res, j, err := c.Request("GET", "/domains/"+c.toStr(name)+"/authinfo", nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) RemoveDomainAuthinfo(name string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
-    res, j, err := c.Request("DELETE", "/domains/"+name+"/authinfo", nil)
+    res, j, err := c.Request("DELETE", "/domains/"+c.toStr(name)+"/authinfo", nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -2302,6 +2897,12 @@ func (c CoreClient) CreateServerStorage(in ServerStorageCreateRequest) (ServerSt
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -2312,16 +2913,28 @@ func (c CoreClient) GetServerStorages() (ServerStorageListResponse, *http.Respon
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) RestoreDomain(name string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
-    res, j, err := c.Request("POST", "/domains/"+name+"/restore", nil)
+    res, j, err := c.Request("POST", "/domains/"+c.toStr(name)+"/restore", nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -2333,6 +2946,12 @@ func (c CoreClient) CreateSSLContact(in SSLContactCreateRequest) (SSLContactSing
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -2347,37 +2966,61 @@ func (c CoreClient) GetSSLContacts(qParams QueryParams) (SSLContactListResponse,
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) GetServerMedia(id string) (ServerMediaSingleResponse, *http.Response, error) {
     body := ServerMediaSingleResponse{}
-    res, j, err := c.Request("GET", "/server-medias/"+id, nil)
+    res, j, err := c.Request("GET", "/server-medias/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) DeleteServerMedia(id string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
-    res, j, err := c.Request("DELETE", "/server-medias/"+id, nil)
+    res, j, err := c.Request("DELETE", "/server-medias/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) CreateS3AccessKeyGrant(in S3AccessGrantCreateRequest, access_key_id string) (S3AccessGrantSingleResponse, *http.Response, error) {
     body := S3AccessGrantSingleResponse{}
     inJson, err := json.Marshal(in)
-    res, j, err := c.Request("POST", "/storage/s3/access-keys/"+access_key_id+"/grants", bytes.NewBuffer(inJson))
+    res, j, err := c.Request("POST", "/storage/s3/access-keys/"+c.toStr(access_key_id)+"/grants", bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -2387,51 +3030,81 @@ func (c CoreClient) GetS3AccessKeyGrants(access_key_id string, qParams QueryPara
     if err != nil {
         return body, nil, err
     }
-    res, j, err := c.Request("GET", "/storage/s3/access-keys/"+access_key_id+"/grants"+"?"+q.Encode(), nil)
+    res, j, err := c.Request("GET", "/storage/s3/access-keys/"+c.toStr(access_key_id)+"/grants"+"?"+q.Encode(), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) GetServerVNC(id string) (ServerVNCResponse, *http.Response, error) {
     body := ServerVNCResponse{}
-    res, j, err := c.Request("GET", "/servers/"+id+"/vnc", nil)
+    res, j, err := c.Request("GET", "/servers/"+c.toStr(id)+"/vnc", nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) GetNetwork(id string) (NetworkSingleResponse, *http.Response, error) {
     body := NetworkSingleResponse{}
-    res, j, err := c.Request("GET", "/networks/"+id, nil)
+    res, j, err := c.Request("GET", "/networks/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) GetS3Bucket(id string) (S3BucketSingleResponse, *http.Response, error) {
     body := S3BucketSingleResponse{}
-    res, j, err := c.Request("GET", "/storage/s3/buckets/"+id, nil)
+    res, j, err := c.Request("GET", "/storage/s3/buckets/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) DeleteS3Bucket(id string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
-    res, j, err := c.Request("DELETE", "/storage/s3/buckets/"+id, nil)
+    res, j, err := c.Request("DELETE", "/storage/s3/buckets/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -2443,6 +3116,12 @@ func (c CoreClient) CreateDomain(in DomainCreateRequest) (DomainSingleResponse, 
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -2457,16 +3136,28 @@ func (c CoreClient) GetDomains(qParams QueryParams) (DomainListResponse, *http.R
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c CoreClient) DetachServerVolume(id string) (ServerVolumeSingleResponse, *http.Response, error) {
     body := ServerVolumeSingleResponse{}
-    res, j, err := c.Request("POST", "/server-volumes/"+id+"/detach", nil)
+    res, j, err := c.Request("POST", "/server-volumes/"+c.toStr(id)+"/detach", nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 

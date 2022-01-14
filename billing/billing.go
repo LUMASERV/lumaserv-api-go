@@ -7,6 +7,8 @@ import (
     "time"
     "encoding/json"
     "io"
+    "errors"
+    "strconv"
     "github.com/google/go-querystring/query"
 )
 
@@ -66,6 +68,17 @@ func (c *BillingClient) Request(method string, path string, postBody io.Reader) 
     body, err := ioutil.ReadAll(res.Body)
 
     return res, body, err
+}
+
+func (c BillingClient) toStr(in interface{}) string {
+    switch in.(type) {
+        case string:
+            return in.(string)
+        case int:
+            return strconv.Itoa(in.(int))
+    }
+
+    panic("Unhandled type in toStr")
 }
 type BillingInterval string
 
@@ -824,42 +837,66 @@ type OfferPositionCreateRequest struct {
 
 func (c BillingClient) GetInvoiceFile(id string) (FileSingleResponse, *http.Response, error) {
     body := FileSingleResponse{}
-    res, j, err := c.Request("GET", "/invoices/"+id+"/file", nil)
+    res, j, err := c.Request("GET", "/invoices/"+c.toStr(id)+"/file", nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) GetBillingPosition(id string) (BillingPositionSingleResponse, *http.Response, error) {
     body := BillingPositionSingleResponse{}
-    res, j, err := c.Request("GET", "/billing-positions/"+id, nil)
+    res, j, err := c.Request("GET", "/billing-positions/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) DeleteBillingPosition(id string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
-    res, j, err := c.Request("DELETE", "/billing-positions/"+id, nil)
+    res, j, err := c.Request("DELETE", "/billing-positions/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) UpdateBillingPosition(in BillingPositionUpdateRequest, id string) (BillingPositionSingleResponse, *http.Response, error) {
     body := BillingPositionSingleResponse{}
     inJson, err := json.Marshal(in)
-    res, j, err := c.Request("PUT", "/billing-positions/"+id, bytes.NewBuffer(inJson))
+    res, j, err := c.Request("PUT", "/billing-positions/"+c.toStr(id), bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -871,6 +908,12 @@ func (c BillingClient) CreateBankAccount(in BankAccountCreateRequest) (BankAccou
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -885,6 +928,12 @@ func (c BillingClient) GetBankAccounts(qParams QueryParams) (BankAccountListResp
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -896,6 +945,12 @@ func (c BillingClient) CreateServiceContractPosition(in ServiceContractPositionC
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -910,6 +965,12 @@ func (c BillingClient) GetServiceContractPositions(qParams QueryParams) (Service
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -921,6 +982,12 @@ func (c BillingClient) CreateBillingPosition(in BillingPositionCreateRequest) (B
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -935,6 +1002,12 @@ func (c BillingClient) GetBillingPositions(qParams QueryParams) (BillingPosition
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -946,6 +1019,12 @@ func (c BillingClient) CreateCustomer(in CustomerCreateRequest) (CustomerSingleR
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -960,37 +1039,61 @@ func (c BillingClient) GetCustomers(qParams QueryParams) (CustomerListResponse, 
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) GetInvoicePosition(id string) (InvoicePositionSingleResponse, *http.Response, error) {
     body := InvoicePositionSingleResponse{}
-    res, j, err := c.Request("GET", "/invoice-positions/"+id, nil)
+    res, j, err := c.Request("GET", "/invoice-positions/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) DeleteInvoicePosition(id string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
-    res, j, err := c.Request("DELETE", "/invoice-positions/"+id, nil)
+    res, j, err := c.Request("DELETE", "/invoice-positions/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) UpdateInvoicePosition(in InvoicePositionUpdateRequest, id string) (InvoicePositionSingleResponse, *http.Response, error) {
     body := InvoicePositionSingleResponse{}
     inJson, err := json.Marshal(in)
-    res, j, err := c.Request("PUT", "/invoice-positions/"+id, bytes.NewBuffer(inJson))
+    res, j, err := c.Request("PUT", "/invoice-positions/"+c.toStr(id), bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1005,27 +1108,45 @@ func (c BillingClient) GetDebits(qParams QueryParams) (DebitListResponse, *http.
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) GetCustomer(id int) (CustomerSingleResponse, *http.Response, error) {
     body := CustomerSingleResponse{}
-    res, j, err := c.Request("GET", "/customers/"+id, nil)
+    res, j, err := c.Request("GET", "/customers/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) UpdateCustomer(in CustomerUpdateRequest, id int) (CustomerSingleResponse, *http.Response, error) {
     body := CustomerSingleResponse{}
     inJson, err := json.Marshal(in)
-    res, j, err := c.Request("PUT", "/customers/"+id, bytes.NewBuffer(inJson))
+    res, j, err := c.Request("PUT", "/customers/"+c.toStr(id), bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1040,16 +1161,28 @@ func (c BillingClient) GetOnlinePayments(qParams QueryParams) (OnlinePaymentList
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) GetFileDownload(id string) (FileDownloadResponse, *http.Response, error) {
     body := FileDownloadResponse{}
-    res, j, err := c.Request("GET", "/files/"+id+"/download", nil)
+    res, j, err := c.Request("GET", "/files/"+c.toStr(id)+"/download", nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1061,6 +1194,12 @@ func (c BillingClient) CreateInvoice(in InvoiceCreateRequest) (InvoiceSingleResp
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1075,99 +1214,159 @@ func (c BillingClient) GetInvoices(qParams QueryParams) (InvoiceListResponse, *h
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) GetOfferPosition(id string) (OfferPositionSingleResponse, *http.Response, error) {
     body := OfferPositionSingleResponse{}
-    res, j, err := c.Request("GET", "/offer-positions/"+id, nil)
+    res, j, err := c.Request("GET", "/offer-positions/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) DeleteOfferPosition(id string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
-    res, j, err := c.Request("DELETE", "/offer-positions/"+id, nil)
+    res, j, err := c.Request("DELETE", "/offer-positions/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) UpdateOfferPosition(in OfferPositionUpdateRequest, id string) (OfferPositionSingleResponse, *http.Response, error) {
     body := OfferPositionSingleResponse{}
     inJson, err := json.Marshal(in)
-    res, j, err := c.Request("PUT", "/offer-positions/"+id, bytes.NewBuffer(inJson))
+    res, j, err := c.Request("PUT", "/offer-positions/"+c.toStr(id), bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) GetFile(id string) (FileSingleResponse, *http.Response, error) {
     body := FileSingleResponse{}
-    res, j, err := c.Request("GET", "/files/"+id, nil)
+    res, j, err := c.Request("GET", "/files/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) GetServiceContractPosition(id string) (ServiceContractPositionSingleResponse, *http.Response, error) {
     body := ServiceContractPositionSingleResponse{}
-    res, j, err := c.Request("GET", "/service-contract-positions/"+id, nil)
+    res, j, err := c.Request("GET", "/service-contract-positions/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) DeleteServiceContractPosition(id string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
-    res, j, err := c.Request("DELETE", "/service-contract-positions/"+id, nil)
+    res, j, err := c.Request("DELETE", "/service-contract-positions/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) UpdateServiceContractPosition(in ServiceContractPositionUpdateRequest, id string) (ServiceContractPositionSingleResponse, *http.Response, error) {
     body := ServiceContractPositionSingleResponse{}
     inJson, err := json.Marshal(in)
-    res, j, err := c.Request("PUT", "/service-contract-positions/"+id, bytes.NewBuffer(inJson))
+    res, j, err := c.Request("PUT", "/service-contract-positions/"+c.toStr(id), bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) GetPaymentReminder(id string) (PaymentReminderSingleResponse, *http.Response, error) {
     body := PaymentReminderSingleResponse{}
-    res, j, err := c.Request("GET", "/payment-reminders/"+id, nil)
+    res, j, err := c.Request("GET", "/payment-reminders/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) UpdatePaymentReminder(in PaymentReminderUpdateRequest, id string) (PaymentReminderSingleResponse, *http.Response, error) {
     body := PaymentReminderSingleResponse{}
     inJson, err := json.Marshal(in)
-    res, j, err := c.Request("PUT", "/payment-reminders/"+id, bytes.NewBuffer(inJson))
+    res, j, err := c.Request("PUT", "/payment-reminders/"+c.toStr(id), bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1179,6 +1378,12 @@ func (c BillingClient) CreateDebitMandate(in DebitMandateCreateRequest) (DebitMa
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1193,6 +1398,12 @@ func (c BillingClient) GetDebitMandates(qParams QueryParams) (DebitMandateListRe
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1207,78 +1418,126 @@ func (c BillingClient) GetBankTransactions(qParams QueryParams) (BankTransaction
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) GetDebitMandate(id string) (DebitMandateSingleResponse, *http.Response, error) {
     body := DebitMandateSingleResponse{}
-    res, j, err := c.Request("GET", "/debit-mandates/"+id, nil)
+    res, j, err := c.Request("GET", "/debit-mandates/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) GetBankAccount(id string) (BankAccountSingleResponse, *http.Response, error) {
     body := BankAccountSingleResponse{}
-    res, j, err := c.Request("GET", "/bank-accounts/"+id, nil)
+    res, j, err := c.Request("GET", "/bank-accounts/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) DeleteBankAccount(id string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
-    res, j, err := c.Request("DELETE", "/bank-accounts/"+id, nil)
+    res, j, err := c.Request("DELETE", "/bank-accounts/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) UpdateBankAccount(in BankAccountUpdateRequest, id string) (BankAccountSingleResponse, *http.Response, error) {
     body := BankAccountSingleResponse{}
     inJson, err := json.Marshal(in)
-    res, j, err := c.Request("PUT", "/bank-accounts/"+id, bytes.NewBuffer(inJson))
+    res, j, err := c.Request("PUT", "/bank-accounts/"+c.toStr(id), bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) GetBankTransaction(id string) (BankTransactionSingleResponse, *http.Response, error) {
     body := BankTransactionSingleResponse{}
-    res, j, err := c.Request("GET", "/bank-transactions/"+id, nil)
+    res, j, err := c.Request("GET", "/bank-transactions/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) GetOffer(id string) (OfferSingleResponse, *http.Response, error) {
     body := OfferSingleResponse{}
-    res, j, err := c.Request("GET", "/offers/"+id, nil)
+    res, j, err := c.Request("GET", "/offers/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) UpdateOffer(in OfferUpdateRequest, id string) (OfferSingleResponse, *http.Response, error) {
     body := OfferSingleResponse{}
     inJson, err := json.Marshal(in)
-    res, j, err := c.Request("PUT", "/offers/"+id, bytes.NewBuffer(inJson))
+    res, j, err := c.Request("PUT", "/offers/"+c.toStr(id), bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1293,6 +1552,12 @@ func (c BillingClient) GetFiles(qParams QueryParams) (FileListResponse, *http.Re
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1304,6 +1569,12 @@ func (c BillingClient) CreateServiceContract(in ServiceContractCreateRequest) (S
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1318,47 +1589,77 @@ func (c BillingClient) GetServiceContracts(qParams QueryParams) (ServiceContract
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) GetInvoice(id string) (InvoiceSingleResponse, *http.Response, error) {
     body := InvoiceSingleResponse{}
-    res, j, err := c.Request("GET", "/invoices/"+id, nil)
+    res, j, err := c.Request("GET", "/invoices/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) UpdateInvoice(in InvoiceUpdateRequest, id string) (InvoiceSingleResponse, *http.Response, error) {
     body := InvoiceSingleResponse{}
     inJson, err := json.Marshal(in)
-    res, j, err := c.Request("PUT", "/invoices/"+id, bytes.NewBuffer(inJson))
+    res, j, err := c.Request("PUT", "/invoices/"+c.toStr(id), bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) GetOnlinePayment(id string) (OnlinePaymentSingleResponse, *http.Response, error) {
     body := OnlinePaymentSingleResponse{}
-    res, j, err := c.Request("GET", "/online-payments/"+id, nil)
+    res, j, err := c.Request("GET", "/online-payments/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) GetCustomerTransaction(id string) (CustomerTransactionSingleResponse, *http.Response, error) {
     body := CustomerTransactionSingleResponse{}
-    res, j, err := c.Request("GET", "/customer-transactions/"+id, nil)
+    res, j, err := c.Request("GET", "/customer-transactions/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1370,6 +1671,12 @@ func (c BillingClient) CreateInvoicePosition(in InvoicePositionCreateRequest) (I
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1384,16 +1691,28 @@ func (c BillingClient) GetInvoicePositions(qParams QueryParams) (InvoicePosition
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) GetDebit(id string) (DebitSingleResponse, *http.Response, error) {
     body := DebitSingleResponse{}
-    res, j, err := c.Request("GET", "/debits/"+id, nil)
+    res, j, err := c.Request("GET", "/debits/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1405,6 +1724,12 @@ func (c BillingClient) CreateOffer(in OfferCreateRequest) (OfferSingleResponse, 
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1419,37 +1744,61 @@ func (c BillingClient) GetOffers(qParams QueryParams) (OfferListResponse, *http.
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) GetServiceContract(id string) (ServiceContractSingleResponse, *http.Response, error) {
     body := ServiceContractSingleResponse{}
-    res, j, err := c.Request("GET", "/service-contracts/"+id, nil)
+    res, j, err := c.Request("GET", "/service-contracts/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) DeleteServiceContract(id string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
-    res, j, err := c.Request("DELETE", "/service-contracts/"+id, nil)
+    res, j, err := c.Request("DELETE", "/service-contracts/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
 func (c BillingClient) UpdateServiceContract(in ServiceContractUpdateRequest, id string) (ServiceContractSingleResponse, *http.Response, error) {
     body := ServiceContractSingleResponse{}
     inJson, err := json.Marshal(in)
-    res, j, err := c.Request("PUT", "/service-contracts/"+id, bytes.NewBuffer(inJson))
+    res, j, err := c.Request("PUT", "/service-contracts/"+c.toStr(id), bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1464,6 +1813,12 @@ func (c BillingClient) GetCustomerTransactions(qParams QueryParams) (CustomerTra
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1475,6 +1830,12 @@ func (c BillingClient) CreateOfferPosition(in OfferPositionCreateRequest) (Offer
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1489,6 +1850,12 @@ func (c BillingClient) GetOfferPositions(qParams QueryParams) (OfferPositionList
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1500,6 +1867,12 @@ func (c BillingClient) CreatePaymentReminder(in PaymentReminderCreateRequest) (P
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
@@ -1514,6 +1887,12 @@ func (c BillingClient) GetPaymentReminders(qParams QueryParams) (PaymentReminder
         return body, res, err
     }
     err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        return body, res, errors.New("response body success is false!")
+    }
     return body, res, err
 }
 
