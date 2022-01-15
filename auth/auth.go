@@ -588,10 +588,10 @@ func (c AuthClient) GetUserProjectMemberships(id string) (ProjectMemberListRespo
 }
 
 type QueryParams struct {
-    Search string `url:"search,omitempty"`
-    Page int `url:"page,omitempty"`
-    Detail bool `url:"detail,omitempty"`
-    PageSize int `url:"page_size,omitempty"`
+    Search *string `json:"search"`
+    Page *int `json:"page"`
+    Detail *bool `json:"detail"`
+    PageSize *int `json:"page_size"`
 }
 
 

@@ -1897,9 +1897,9 @@ func (c BillingClient) GetPaymentReminders(qParams QueryParams) (PaymentReminder
 }
 
 type QueryParams struct {
-    Search string `url:"search,omitempty"`
-    Page int `url:"page,omitempty"`
-    PageSize int `url:"page_size,omitempty"`
+    Search *string `json:"search"`
+    Page *int `json:"page"`
+    PageSize *int `json:"page_size"`
 }
 
 

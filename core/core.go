@@ -3162,37 +3162,37 @@ func (c CoreClient) DetachServerVolume(id string) (ServerVolumeSingleResponse, *
 }
 
 type QueryParams struct {
-    Search string `url:"search,omitempty"`
-    WithLabels bool `url:"with_labels,omitempty"`
-    ProjectId string `url:"project_id,omitempty"`
-    Filter QueryParamsFilter `url:"filter,omitempty"`
-    Limit int `url:"limit,omitempty"`
-    Resources string `url:"resources,omitempty"`
-    Force bool `url:"force,omitempty"`
-    Labels QueryParamsLabels `url:"labels,omitempty"`
-    Page int `url:"page,omitempty"`
-    PageSize int `url:"page_size,omitempty"`
+    Search *string `json:"search"`
+    WithLabels *bool `json:"with_labels"`
+    ProjectId *string `json:"project_id"`
+    Filter *QueryParamsFilter `json:"filter"`
+    Limit *int `json:"limit"`
+    Resources *string `json:"resources"`
+    Force *bool `json:"force"`
+    Labels *QueryParamsLabels `json:"labels"`
+    Page *int `json:"page"`
+    PageSize *int `json:"page_size"`
 }
 
 
 type QueryParamsFilter struct {
-    OrganisationId string `url:"organisation_id,omitempty"`
-    ProjectId string `url:"project_id,omitempty"`
-    TypeId string `url:"type_id,omitempty"`
-    AdminHandleCode string `url:"admin_handle_code,omitempty"`
-    OwnerHandleCode string `url:"owner_handle_code,omitempty"`
-    TechHandleCode string `url:"tech_handle_code,omitempty"`
-    AdminContactId string `url:"admin_contact_id,omitempty"`
-    TechContactId string `url:"tech_contact_id,omitempty"`
-    ServerId string `url:"server_id,omitempty"`
-    Tld string `url:"tld,omitempty"`
-    Labels string `url:"labels,omitempty"`
-    ZoneHandleCode string `url:"zone_handle_code,omitempty"`
+    OrganisationId *string `json:"organisation_id"`
+    ProjectId *string `json:"project_id"`
+    TypeId *string `json:"type_id"`
+    AdminHandleCode *string `json:"admin_handle_code"`
+    OwnerHandleCode *string `json:"owner_handle_code"`
+    TechHandleCode *string `json:"tech_handle_code"`
+    AdminContactId *string `json:"admin_contact_id"`
+    TechContactId *string `json:"tech_contact_id"`
+    ServerId *string `json:"server_id"`
+    Tld *string `json:"tld"`
+    Labels *string `json:"labels"`
+    ZoneHandleCode *string `json:"zone_handle_code"`
 }
 
 
 type QueryParamsLabels struct {
-    Name interface{} `url:"name,omitempty"`
+    Name *interface{} `json:"name"`
 }
 
 
