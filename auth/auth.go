@@ -225,10 +225,10 @@ type UserListResponse struct {
 }
 
 type TokenValidationResponse struct {
-    Metadata *ResponseMetadata `json:"metadata"`
-    Data *TokenValidationInfo `json:"data"`
-    Success *bool `json:"success"`
-    Messages *ResponseMessages `json:"messages"`
+    Metadata ResponseMetadata `json:"metadata"`
+    Data TokenValidationInfo `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
 }
 
 type RequestPasswordResetRequest struct {
