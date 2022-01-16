@@ -16,6 +16,7 @@ type CoreClient struct {
     baseUrl string
     apiKey  string
     client  *http.Client
+    currentProject string
 }
 
 func NewClient (apiKey string) CoreClient {
@@ -31,6 +32,14 @@ func NewClientWithUrl (apiKey string, baseUrl string) CoreClient {
         apiKey: apiKey,
         baseUrl: baseUrl,
     }
+}
+
+func (c *CoreClient) SetProject (project string) {
+    c.currentProject = project
+}
+
+func (c *CoreClient) GetProject () string {
+    return c.currentProject
 }
 
 func (c *CoreClient) SetHttpClient(client *http.Client) {
@@ -86,7 +95,7 @@ type SSHKey struct {
     CreatedAt string `json:"created_at"`
     Id string `json:"id"`
     Title string `json:"title"`
-    Labels interface{} `json:"labels"`
+    Labels *interface{} `json:"labels"`
 }
 
 type DomainVerificationStatus struct {
@@ -94,27 +103,26 @@ type DomainVerificationStatus struct {
 }
 
 type Server struct {
-    VariantId int `json:"variant_id"`
+    VariantId string `json:"variant_id"`
     ProjectId string `json:"project_id"`
     Name string `json:"name"`
-    MediaId string `json:"media_id"`
+    MediaId *string `json:"media_id"`
     CreatedAt string `json:"created_at"`
-    LegacyId int `json:"legacy_id"`
     TemplateId string `json:"template_id"`
     Id string `json:"id"`
-    Labels interface{} `json:"labels"`
+    Labels *interface{} `json:"labels"`
 }
 
 type Address struct {
     Address string `json:"address"`
-    ProjectId string `json:"project_id"`
+    ProjectId *string `json:"project_id"`
     SubnetId string `json:"subnet_id"`
     CreatedAt string `json:"created_at"`
     Id string `json:"id"`
 }
 
 type DomainRequestNameserver struct {
-    Addresses []string `json:"addresses"`
+    Addresses *[]string `json:"addresses"`
     Name string `json:"name"`
 }
 
@@ -124,47 +132,47 @@ type PleskLicenseType struct {
 }
 
 type SearchResults struct {
-    Domains []Domain `json:"domains"`
-    DomainHandles []DomainHandle `json:"domain_handles"`
+    Domains *[]Domain `json:"domains"`
+    DomainHandles *[]DomainHandle `json:"domain_handles"`
 }
 
 type DomainPricing struct {
-    Restore float32 `json:"restore"`
-    Create float32 `json:"create"`
-    Renew float32 `json:"renew"`
+    Restore *float32 `json:"restore"`
+    Create *float32 `json:"create"`
+    Renew *float32 `json:"renew"`
     Tld string `json:"tld"`
 }
 
 type DomainHandle struct {
     Code string `json:"code"`
-    BirthRegion string `json:"birth_region"`
+    BirthRegion *string `json:"birth_region"`
     Gender string `json:"gender"`
     City string `json:"city"`
-    VatNumber string `json:"vat_number"`
-    BirthDate string `json:"birth_date"`
-    IdCard string `json:"id_card"`
-    Organisation string `json:"organisation"`
+    VatNumber *string `json:"vat_number"`
+    BirthDate *string `json:"birth_date"`
+    IdCard *string `json:"id_card"`
+    Organisation *string `json:"organisation"`
     CreatedAt string `json:"created_at"`
     Type string `json:"type"`
-    BirthCountryCode string `json:"birth_country_code"`
+    BirthCountryCode *string `json:"birth_country_code"`
     ProjectId string `json:"project_id"`
     Street string `json:"street"`
-    TaxNumber string `json:"tax_number"`
-    Fax string `json:"fax"`
-    IdCardAuthority string `json:"id_card_authority"`
+    TaxNumber *string `json:"tax_number"`
+    Fax *string `json:"fax"`
+    IdCardAuthority *string `json:"id_card_authority"`
     FirstName string `json:"first_name"`
     Email string `json:"email"`
-    AdditionalAddress string `json:"additional_address"`
+    AdditionalAddress *string `json:"additional_address"`
     LastName string `json:"last_name"`
-    BirthPlace string `json:"birth_place"`
-    IdCardIssueDate string `json:"id_card_issue_date"`
-    Labels interface{} `json:"labels"`
+    BirthPlace *string `json:"birth_place"`
+    IdCardIssueDate *string `json:"id_card_issue_date"`
+    Labels *interface{} `json:"labels"`
     CountryCode string `json:"country_code"`
-    CompanyRegistrationNumber string `json:"company_registration_number"`
-    Phone string `json:"phone"`
+    CompanyRegistrationNumber *string `json:"company_registration_number"`
+    Phone *string `json:"phone"`
     StreetNumber string `json:"street_number"`
     PostalCode string `json:"postal_code"`
-    Region string `json:"region"`
+    Region *string `json:"region"`
     PrivacyProtection bool `json:"privacy_protection"`
 }
 
@@ -172,26 +180,26 @@ type S3AccessKey struct {
     ProjectId string `json:"project_id"`
     Id string `json:"id"`
     Title string `json:"title"`
-    Labels interface{} `json:"labels"`
+    Labels *interface{} `json:"labels"`
 }
 
 type S3Bucket struct {
     ProjectId string `json:"project_id"`
     Id string `json:"id"`
     Title string `json:"title"`
-    Labels interface{} `json:"labels"`
+    Labels *interface{} `json:"labels"`
 }
 
 type S3AccessGrant struct {
-    BucketId string `json:"bucket_id"`
-    Path string `json:"path"`
+    BucketId *string `json:"bucket_id"`
+    Path *string `json:"path"`
     Role string `json:"role"`
     Id string `json:"id"`
-    Labels interface{} `json:"labels"`
+    Labels *interface{} `json:"labels"`
 }
 
 type DomainAuthinfo struct {
-    ValidUntil string `json:"valid_until"`
+    ValidUntil *string `json:"valid_until"`
     Authinfo string `json:"authinfo"`
 }
 
@@ -207,18 +215,18 @@ type Network struct {
     ProjectId string `json:"project_id"`
     CreatedAt string `json:"created_at"`
     Id string `json:"id"`
-    Tag int `json:"tag"`
+    Tag *int `json:"tag"`
     Title string `json:"title"`
-    Type NetworkType `json:"type"`
-    Labels interface{} `json:"labels"`
+    Type *NetworkType `json:"type"`
+    Labels *interface{} `json:"labels"`
 }
 
 type ServerStatus struct {
-    Memory int `json:"memory"`
+    Memory *int `json:"memory"`
     Online bool `json:"online"`
-    MemoryUsage float32 `json:"memory_usage"`
-    CpuUsage float32 `json:"cpu_usage"`
-    Uptime int `json:"uptime"`
+    MemoryUsage *float32 `json:"memory_usage"`
+    CpuUsage *float32 `json:"cpu_usage"`
+    Uptime *int `json:"uptime"`
 }
 
 type SSLType struct {
@@ -237,21 +245,21 @@ type ResponseMessages struct {
 }
 
 type SSLContact struct {
-    AdditionalAddress string `json:"additional_address"`
+    AdditionalAddress *string `json:"additional_address"`
     Address string `json:"address"`
     City string `json:"city"`
     LastName string `json:"last_name"`
     Organisation string `json:"organisation"`
     CreatedAt string `json:"created_at"`
-    Title string `json:"title"`
-    Labels interface{} `json:"labels"`
+    Title *string `json:"title"`
+    Labels *interface{} `json:"labels"`
     CountryCode string `json:"country_code"`
     ProjectId string `json:"project_id"`
     Phone string `json:"phone"`
     Id string `json:"id"`
-    Fax string `json:"fax"`
+    Fax *string `json:"fax"`
     PostalCode string `json:"postal_code"`
-    Region string `json:"region"`
+    Region *string `json:"region"`
     FirstName string `json:"first_name"`
     Email string `json:"email"`
 }
@@ -269,12 +277,12 @@ type PleskLicense struct {
     CreatedAt string `json:"created_at"`
     Id string `json:"id"`
     Key string `json:"key"`
-    Labels interface{} `json:"labels"`
+    Labels *interface{} `json:"labels"`
 }
 
 type SSLCertificate struct {
     OrganisationId string `json:"organisation_id"`
-    ValidUntil string `json:"valid_until"`
+    ValidUntil *string `json:"valid_until"`
     ProjectId string `json:"project_id"`
     TypeId string `json:"type_id"`
     ApproverEmail string `json:"approver_email"`
@@ -282,19 +290,19 @@ type SSLCertificate struct {
     AdminContactId string `json:"admin_contact_id"`
     Id string `json:"id"`
     TechContactId string `json:"tech_contact_id"`
-    Labels interface{} `json:"labels"`
+    Labels *interface{} `json:"labels"`
 }
 
 type ServerVolume struct {
     Size int `json:"size"`
     ProjectId string `json:"project_id"`
-    ClassId string `json:"class_id"`
-    Root bool `json:"root"`
+    ClassId *string `json:"class_id"`
+    Root *bool `json:"root"`
     CreatedAt string `json:"created_at"`
     Id string `json:"id"`
     Title string `json:"title"`
-    ServerId string `json:"server_id"`
-    Labels interface{} `json:"labels"`
+    ServerId *string `json:"server_id"`
+    Labels *interface{} `json:"labels"`
 }
 
 type DNSRecord struct {
@@ -302,7 +310,7 @@ type DNSRecord struct {
     Name string `json:"name"`
     Id string `json:"id"`
     Type string `json:"type"`
-    Ttl int `json:"ttl"`
+    Ttl *int `json:"ttl"`
 }
 
 type ServerVNC struct {
@@ -319,25 +327,25 @@ type DNSZone struct {
     Type string `json:"type"`
     Ns2 string `json:"ns2"`
     Ns1 string `json:"ns1"`
-    Labels interface{} `json:"labels"`
+    Labels *interface{} `json:"labels"`
 }
 
 type AvailabilityZone struct {
     Id string `json:"id"`
     Title string `json:"title"`
-    Config interface{} `json:"config"`
+    Config *interface{} `json:"config"`
 }
 
 type ServerNetwork struct {
     Default bool `json:"default"`
     NetworkId string `json:"network_id"`
-    AddressV6Id string `json:"address_v6_id"`
+    AddressV6Id *string `json:"address_v6_id"`
     CreatedAt string `json:"created_at"`
-    ExternalId string `json:"external_id"`
+    ExternalId *string `json:"external_id"`
     Id string `json:"id"`
-    AddressV4Id string `json:"address_v4_id"`
-    HostId string `json:"host_id"`
-    Labels interface{} `json:"labels"`
+    AddressV4Id *string `json:"address_v4_id"`
+    HostId *string `json:"host_id"`
+    Labels *interface{} `json:"labels"`
 }
 
 type ServerStorage struct {
@@ -352,13 +360,13 @@ type ResponseMessage struct {
 }
 
 type ServerMedia struct {
-    ZoneId string `json:"zone_id"`
+    ZoneId *string `json:"zone_id"`
     ProjectId string `json:"project_id"`
     CreatedAt string `json:"created_at"`
-    ExternalId string `json:"external_id"`
+    ExternalId *string `json:"external_id"`
     Id string `json:"id"`
     Title string `json:"title"`
-    Labels interface{} `json:"labels"`
+    Labels *interface{} `json:"labels"`
 }
 
 type ResponsePagination struct {
@@ -368,22 +376,22 @@ type ResponsePagination struct {
 }
 
 type SSLOrganisation struct {
-    AdditionalAddress string `json:"additional_address"`
+    AdditionalAddress *string `json:"additional_address"`
     Address string `json:"address"`
     City string `json:"city"`
-    RegistrationNumber string `json:"registration_number"`
+    RegistrationNumber *string `json:"registration_number"`
     CreatedAt string `json:"created_at"`
-    Labels interface{} `json:"labels"`
-    Division string `json:"division"`
+    Labels *interface{} `json:"labels"`
+    Division *string `json:"division"`
     CountryCode string `json:"country_code"`
     ProjectId string `json:"project_id"`
     Phone string `json:"phone"`
     Name string `json:"name"`
-    Duns string `json:"duns"`
+    Duns *string `json:"duns"`
     Id string `json:"id"`
     PostalCode string `json:"postal_code"`
-    Region string `json:"region"`
-    Fax string `json:"fax"`
+    Region *string `json:"region"`
+    Fax *string `json:"fax"`
 }
 
 type Domain struct {
@@ -394,7 +402,7 @@ type Domain struct {
     TechHandleCode string `json:"tech_handle_code"`
     CreatedAt string `json:"created_at"`
     ZoneHandleCode string `json:"zone_handle_code"`
-    Labels interface{} `json:"labels"`
+    Labels *interface{} `json:"labels"`
 }
 
 type ServerVariant struct {
@@ -426,7 +434,7 @@ type ServerAction struct {
     State string `json:"state"`
     Type string `json:"type"`
     Cancellable bool `json:"cancellable"`
-    EndedAt string `json:"ended_at"`
+    EndedAt *string `json:"ended_at"`
 }
 
 type ResponseMetadata struct {
@@ -437,7 +445,7 @@ type ResponseMetadata struct {
 
 type S3AccessGrantListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []S3AccessGrant `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -459,7 +467,7 @@ type DomainHandleSingleResponse struct {
 
 type DomainListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []Domain `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -474,7 +482,7 @@ type S3AccessGrantSingleResponse struct {
 
 type ServerHostListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []ServerHost `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -489,7 +497,7 @@ type SSLCertificateSingleResponse struct {
 
 type ServerVariantListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []ServerVariant `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -497,7 +505,7 @@ type ServerVariantListResponse struct {
 
 type SubnetListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []Subnet `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -512,7 +520,7 @@ type PleskLicenseSingleResponse struct {
 
 type ServerNetworkListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []ServerNetwork `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -548,7 +556,7 @@ type DomainPriceListResponse struct {
 
 type S3AccessKeyListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []S3AccessKey `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -577,7 +585,7 @@ type AddressSingleResponse struct {
 
 type ServerActionListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []ServerAction `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -585,7 +593,7 @@ type ServerActionListResponse struct {
 
 type NetworkListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []Network `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -593,7 +601,7 @@ type NetworkListResponse struct {
 
 type S3BucketListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []S3Bucket `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -615,7 +623,7 @@ type ServerSingleResponse struct {
 
 type ServerStorageClassListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []ServerStorageClass `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -623,7 +631,7 @@ type ServerStorageClassListResponse struct {
 
 type ServerMediaListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []ServerMedia `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -645,7 +653,7 @@ type SearchResponse struct {
 
 type ServerTemplateListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []ServerTemplate `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -674,7 +682,7 @@ type DNSZoneSingleResponse struct {
 
 type SubnetSingleResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data Subnet `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -682,7 +690,7 @@ type SubnetSingleResponse struct {
 
 type DNSZoneListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []DNSZone `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -690,7 +698,7 @@ type DNSZoneListResponse struct {
 
 type SSLTypeListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []SSLType `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -712,7 +720,7 @@ type EmptyResponse struct {
 
 type PleskLicenseTypeListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []PleskLicenseType `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -727,7 +735,7 @@ type ServerActionSingleResponse struct {
 
 type DomainHandleListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []DomainHandle `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -749,7 +757,7 @@ type DomainCheckVerificationResponse struct {
 
 type InvalidRequestResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Data interface{} `json:"data"`
+    Data *interface{} `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
 }
@@ -763,7 +771,7 @@ type PleskLicenseTypeSingleResponse struct {
 
 type AddressListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []Address `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -785,7 +793,7 @@ type DomainCheckResponse struct {
 
 type SSHKeyListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []SSHKey `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -814,7 +822,7 @@ type DNSRecordSingleResponse struct {
 
 type PleskLicenseListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []PleskLicense `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -829,7 +837,7 @@ type ServerStatusResponse struct {
 
 type ServerListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []Server `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -844,7 +852,7 @@ type ServerMediaSingleResponse struct {
 
 type DNSRecordListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []DNSRecord `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -852,7 +860,7 @@ type DNSRecordListResponse struct {
 
 type SSLOrganisationListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []SSLOrganisation `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -868,7 +876,7 @@ type ServerNetworkSingleResponse struct {
 
 type SSLContactListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []SSLContact `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -876,7 +884,7 @@ type SSLContactListResponse struct {
 
 type SSLCertificateListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []SSLCertificate `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -891,7 +899,7 @@ type S3AccessKeySingleResponse struct {
 
 type AvailabilityZoneListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []AvailabilityZone `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -899,7 +907,7 @@ type AvailabilityZoneListResponse struct {
 
 type ServerVolumeListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []ServerVolume `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -920,58 +928,58 @@ type DomainAuthinfoResponse struct {
 }
 
 type DomainHandleCreateRequest struct {
-    BirthRegion string `json:"birth_region"`
+    BirthRegion *string `json:"birth_region"`
     Gender string `json:"gender"`
     City string `json:"city"`
-    VatNumber string `json:"vat_number"`
-    BirthDate string `json:"birth_date"`
-    IdCard string `json:"id_card"`
-    Organisation string `json:"organisation"`
+    VatNumber *string `json:"vat_number"`
+    BirthDate *string `json:"birth_date"`
+    IdCard *string `json:"id_card"`
+    Organisation *string `json:"organisation"`
     Type string `json:"type"`
-    BirthCountryCode string `json:"birth_country_code"`
+    BirthCountryCode *string `json:"birth_country_code"`
     ProjectId string `json:"project_id"`
     Street string `json:"street"`
-    TaxNumber string `json:"tax_number"`
-    Fax string `json:"fax"`
-    IdCardAuthority string `json:"id_card_authority"`
+    TaxNumber *string `json:"tax_number"`
+    Fax *string `json:"fax"`
+    IdCardAuthority *string `json:"id_card_authority"`
     FirstName string `json:"first_name"`
     Email string `json:"email"`
-    AdditionalAddress string `json:"additional_address"`
+    AdditionalAddress *string `json:"additional_address"`
     LastName string `json:"last_name"`
-    BirthPlace string `json:"birth_place"`
-    IdCardIssueDate string `json:"id_card_issue_date"`
-    Labels interface{} `json:"labels"`
+    BirthPlace *string `json:"birth_place"`
+    IdCardIssueDate *string `json:"id_card_issue_date"`
+    Labels *interface{} `json:"labels"`
     CountryCode string `json:"country_code"`
-    CompanyRegistrationNumber string `json:"company_registration_number"`
-    Phone string `json:"phone"`
+    CompanyRegistrationNumber *string `json:"company_registration_number"`
+    Phone *string `json:"phone"`
     StreetNumber string `json:"street_number"`
     PostalCode string `json:"postal_code"`
-    Region string `json:"region"`
-    PrivacyProtection bool `json:"privacy_protection"`
+    Region *string `json:"region"`
+    PrivacyProtection *bool `json:"privacy_protection"`
 }
 
 type ServerCreateRequest struct {
     ZoneId string `json:"zone_id"`
-    VariantId string `json:"variant_id"`
+    VariantId *string `json:"variant_id"`
     SshKeys []string `json:"ssh_keys"`
     ProjectId string `json:"project_id"`
     Name string `json:"name"`
     TemplateId string `json:"template_id"`
-    Labels interface{} `json:"labels"`
+    Labels *interface{} `json:"labels"`
 }
 
 type DNSZoneUpdateRequest struct {
-    Hostmaster string `json:"hostmaster"`
-    Ns2 string `json:"ns2"`
-    Ns1 string `json:"ns1"`
-    Labels interface{} `json:"labels"`
+    Hostmaster *string `json:"hostmaster"`
+    Ns2 *string `json:"ns2"`
+    Ns1 *string `json:"ns1"`
+    Labels *interface{} `json:"labels"`
 }
 
 type DNSRecordCreateRequest struct {
     Data string `json:"data"`
     Name string `json:"name"`
     Type string `json:"type"`
-    Ttl int `json:"ttl"`
+    Ttl *int `json:"ttl"`
 }
 
 type ServerTemplateCreateRequest struct {
@@ -981,29 +989,29 @@ type ServerTemplateCreateRequest struct {
 }
 
 type SSLContactCreateRequest struct {
-    AdditionalAddress string `json:"additional_address"`
+    AdditionalAddress *string `json:"additional_address"`
     Address string `json:"address"`
     City string `json:"city"`
     LastName string `json:"last_name"`
     Organisation string `json:"organisation"`
-    Title string `json:"title"`
-    Labels interface{} `json:"labels"`
+    Title *string `json:"title"`
+    Labels *interface{} `json:"labels"`
     CountryCode string `json:"country_code"`
     ProjectId string `json:"project_id"`
     Phone string `json:"phone"`
-    Fax string `json:"fax"`
+    Fax *string `json:"fax"`
     PostalCode string `json:"postal_code"`
-    Region string `json:"region"`
+    Region *string `json:"region"`
     FirstName string `json:"first_name"`
     Email string `json:"email"`
 }
 
 type NetworkCreateRequest struct {
     ZoneId string `json:"zone_id"`
-    ProjectId string `json:"project_id"`
-    Tag int `json:"tag"`
+    ProjectId *string `json:"project_id"`
+    Tag *int `json:"tag"`
     Title string `json:"title"`
-    Type NetworkType `json:"type"`
+    Type *NetworkType `json:"type"`
 }
 
 type ServerVariantCreateRequest struct {
@@ -1011,44 +1019,44 @@ type ServerVariantCreateRequest struct {
     Disk int `json:"disk"`
     Cores int `json:"cores"`
     Memory int `json:"memory"`
-    Legacy bool `json:"legacy"`
+    Legacy *bool `json:"legacy"`
     StorageClassId string `json:"storage_class_id"`
     Title string `json:"title"`
 }
 
 type DomainCreateRequest struct {
-    Duration int `json:"duration"`
+    Duration *int `json:"duration"`
     ProjectId string `json:"project_id"`
     AdminHandleCode string `json:"admin_handle_code"`
     Name string `json:"name"`
     OwnerHandleCode string `json:"owner_handle_code"`
     TechHandleCode string `json:"tech_handle_code"`
     Nameserver []DomainRequestNameserver `json:"nameserver"`
-    Authinfo string `json:"authinfo"`
+    Authinfo *string `json:"authinfo"`
     ZoneHandleCode string `json:"zone_handle_code"`
-    Labels interface{} `json:"labels"`
+    Labels *interface{} `json:"labels"`
 }
 
 type SSLCertificateCreateRequest struct {
-    OrganisationId string `json:"organisation_id"`
-    TechContact interface{} `json:"tech_contact"`
+    OrganisationId *string `json:"organisation_id"`
+    TechContact *interface{} `json:"tech_contact"`
     Csr string `json:"csr"`
     ProjectId string `json:"project_id"`
     TypeId string `json:"type_id"`
-    AdminContact interface{} `json:"admin_contact"`
-    Organisation interface{} `json:"organisation"`
+    AdminContact *interface{} `json:"admin_contact"`
+    Organisation *interface{} `json:"organisation"`
     ApproverEmail string `json:"approver_email"`
-    AdminContactId string `json:"admin_contact_id"`
-    TechContactId string `json:"tech_contact_id"`
+    AdminContactId *string `json:"admin_contact_id"`
+    TechContactId *string `json:"tech_contact_id"`
     ValidationMethod string `json:"validation_method"`
-    Labels interface{} `json:"labels"`
+    Labels *interface{} `json:"labels"`
 }
 
 type SSHKeyCreateRequest struct {
     PublicKey string `json:"public_key"`
     ProjectId string `json:"project_id"`
     Title string `json:"title"`
-    Labels interface{} `json:"labels"`
+    Labels *interface{} `json:"labels"`
 }
 
 type ServerStorageCreateRequest struct {
@@ -1066,15 +1074,15 @@ type ServerNetworkCreateRequest struct {
 }
 
 type AvailabilityZoneUpdateRequest struct {
-    Title string `json:"title"`
-    Config interface{} `json:"config"`
+    Title *string `json:"title"`
+    Config *interface{} `json:"config"`
 }
 
 type S3AccessKeyCreateRequest struct {
     SecretKey string `json:"secret_key"`
     ProjectId string `json:"project_id"`
     Title string `json:"title"`
-    Labels interface{} `json:"labels"`
+    Labels *interface{} `json:"labels"`
 }
 
 type SubnetAddressCreateRequest struct {
@@ -1082,20 +1090,20 @@ type SubnetAddressCreateRequest struct {
 }
 
 type SSLOrganisationCreateRequest struct {
-    AdditionalAddress string `json:"additional_address"`
+    AdditionalAddress *string `json:"additional_address"`
     Address string `json:"address"`
     City string `json:"city"`
-    RegistrationNumber string `json:"registration_number"`
-    Labels interface{} `json:"labels"`
-    Division string `json:"division"`
+    RegistrationNumber *string `json:"registration_number"`
+    Labels *interface{} `json:"labels"`
+    Division *string `json:"division"`
     CountryCode string `json:"country_code"`
     ProjectId string `json:"project_id"`
     Phone string `json:"phone"`
     Name string `json:"name"`
-    Duns string `json:"duns"`
+    Duns *string `json:"duns"`
     PostalCode string `json:"postal_code"`
-    Region string `json:"region"`
-    Fax string `json:"fax"`
+    Region *string `json:"region"`
+    Fax *string `json:"fax"`
 }
 
 type ServerMediaCreateRequest struct {
@@ -1105,51 +1113,51 @@ type ServerMediaCreateRequest struct {
 }
 
 type DomainUpdateRequest struct {
-    AdminHandleCode string `json:"admin_handle_code"`
-    OwnerHandleCode string `json:"owner_handle_code"`
-    TechHandleCode string `json:"tech_handle_code"`
-    Nameserver []DomainRequestNameserver `json:"nameserver"`
-    ZoneHandleCode string `json:"zone_handle_code"`
-    Labels interface{} `json:"labels"`
+    AdminHandleCode *string `json:"admin_handle_code"`
+    OwnerHandleCode *string `json:"owner_handle_code"`
+    TechHandleCode *string `json:"tech_handle_code"`
+    Nameserver *[]DomainRequestNameserver `json:"nameserver"`
+    ZoneHandleCode *string `json:"zone_handle_code"`
+    Labels *interface{} `json:"labels"`
 }
 
 type S3AccessGrantCreateRequest struct {
-    BucketId string `json:"bucket_id"`
-    Path string `json:"path"`
+    BucketId *string `json:"bucket_id"`
+    Path *string `json:"path"`
     Role string `json:"role"`
-    Labels interface{} `json:"labels"`
+    Labels *interface{} `json:"labels"`
 }
 
 type DNSRecordUpdateRequest struct {
     Data string `json:"data"`
     Name string `json:"name"`
     Type string `json:"type"`
-    Ttl int `json:"ttl"`
+    Ttl *int `json:"ttl"`
 }
 
 type DomainHandleUpdateRequest struct {
-    AdditionalAddress string `json:"additional_address"`
-    BirthRegion string `json:"birth_region"`
-    City string `json:"city"`
-    VatNumber string `json:"vat_number"`
-    BirthDate string `json:"birth_date"`
-    IdCard string `json:"id_card"`
-    BirthPlace string `json:"birth_place"`
-    IdCardIssueDate string `json:"id_card_issue_date"`
-    Labels interface{} `json:"labels"`
-    BirthCountryCode string `json:"birth_country_code"`
-    CountryCode string `json:"country_code"`
-    CompanyRegistrationNumber string `json:"company_registration_number"`
-    Phone string `json:"phone"`
-    Street string `json:"street"`
-    TaxNumber string `json:"tax_number"`
-    StreetNumber string `json:"street_number"`
-    PostalCode string `json:"postal_code"`
-    Region string `json:"region"`
-    Fax string `json:"fax"`
-    IdCardAuthority string `json:"id_card_authority"`
-    PrivacyProtection bool `json:"privacy_protection"`
-    Email string `json:"email"`
+    AdditionalAddress *string `json:"additional_address"`
+    BirthRegion *string `json:"birth_region"`
+    City *string `json:"city"`
+    VatNumber *string `json:"vat_number"`
+    BirthDate *string `json:"birth_date"`
+    IdCard *string `json:"id_card"`
+    BirthPlace *string `json:"birth_place"`
+    IdCardIssueDate *string `json:"id_card_issue_date"`
+    Labels *interface{} `json:"labels"`
+    BirthCountryCode *string `json:"birth_country_code"`
+    CountryCode *string `json:"country_code"`
+    CompanyRegistrationNumber *string `json:"company_registration_number"`
+    Phone *string `json:"phone"`
+    Street *string `json:"street"`
+    TaxNumber *string `json:"tax_number"`
+    StreetNumber *string `json:"street_number"`
+    PostalCode *string `json:"postal_code"`
+    Region *string `json:"region"`
+    Fax *string `json:"fax"`
+    IdCardAuthority *string `json:"id_card_authority"`
+    PrivacyProtection *bool `json:"privacy_protection"`
+    Email *string `json:"email"`
 }
 
 type ServerHostCreateRequest struct {
@@ -1159,10 +1167,10 @@ type ServerHostCreateRequest struct {
 }
 
 type PleskLicenseCreateRequest struct {
-    Address string `json:"address"`
+    Address *string `json:"address"`
     ProjectId string `json:"project_id"`
     TypeId string `json:"type_id"`
-    Labels interface{} `json:"labels"`
+    Labels *interface{} `json:"labels"`
 }
 
 type ServerStorageClassCreateRequest struct {
@@ -1172,14 +1180,14 @@ type ServerStorageClassCreateRequest struct {
 }
 
 type PleskLicenseUpdateRequest struct {
-    Address string `json:"address"`
-    Labels interface{} `json:"labels"`
+    Address *string `json:"address"`
+    Labels *interface{} `json:"labels"`
 }
 
 type S3BucketCreateRequest struct {
     ProjectId string `json:"project_id"`
     Title string `json:"title"`
-    Labels interface{} `json:"labels"`
+    Labels *interface{} `json:"labels"`
 }
 
 type DomainScheduleDeleteRequest struct {
@@ -1189,8 +1197,8 @@ type DomainScheduleDeleteRequest struct {
 type SubnetCreateRequest struct {
     NetworkId string `json:"network_id"`
     Address string `json:"address"`
-    Public bool `json:"public"`
-    ProjectId string `json:"project_id"`
+    Public *bool `json:"public"`
+    ProjectId *string `json:"project_id"`
     Prefix int `json:"prefix"`
 }
 
@@ -1199,10 +1207,10 @@ type ServerVolumeAttachRequest struct {
 }
 
 type DNSRecordsUpdateRequest []struct {
-        Data string `json:"data"`
-        Name string `json:"name"`
-        Type string `json:"type"`
-        Ttl int `json:"ttl"`
+        Data string `url:"data,omitempty"`
+        Name string `url:"name,omitempty"`
+        Type string `url:"type,omitempty"`
+        Ttl int `url:"ttl,omitempty"`
     }
 
 func (c CoreClient) CreateSSHKey(in SSHKeyCreateRequest) (SSHKeySingleResponse, *http.Response, error) {
@@ -1217,12 +1225,27 @@ func (c CoreClient) CreateSSHKey(in SSHKeyCreateRequest) (SSHKeySingleResponse, 
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c CoreClient) GetSSHKeys(qParams QueryParams) (SSHKeyListResponse, *http.Response, error) {
+type GetSSHKeysQueryParamsFilter struct {
+    ProjectId *string `url:"project_id,omitempty"`
+    Title *string `url:"title,omitempty"`
+    Labels *string `url:"labels,omitempty"`
+}
+
+type GetSSHKeysQueryParams struct {
+    Filter *GetSSHKeysQueryParamsFilter `url:"filter,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+    WithLabels *bool `url:"with_labels,omitempty"`
+}
+
+func (c CoreClient) GetSSHKeys(qParams GetSSHKeysQueryParams) (SSHKeyListResponse, *http.Response, error) {
     body := SSHKeyListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -1237,7 +1260,8 @@ func (c CoreClient) GetSSHKeys(qParams QueryParams) (SSHKeyListResponse, *http.R
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1253,7 +1277,8 @@ func (c CoreClient) StartServer(id string) (EmptyResponse, *http.Response, error
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1270,12 +1295,24 @@ func (c CoreClient) CreateAvailabilityZone(in AvailabilityZoneCreateRequest) (Av
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c CoreClient) GetAvailabilityZones(qParams QueryParams) (AvailabilityZoneListResponse, *http.Response, error) {
+type GetAvailabilityZonesQueryParamsFilter struct {
+    Title *string `url:"title,omitempty"`
+}
+
+type GetAvailabilityZonesQueryParams struct {
+    Filter *GetAvailabilityZonesQueryParamsFilter `url:"filter,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+}
+
+func (c CoreClient) GetAvailabilityZones(qParams GetAvailabilityZonesQueryParams) (AvailabilityZoneListResponse, *http.Response, error) {
     body := AvailabilityZoneListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -1290,7 +1327,8 @@ func (c CoreClient) GetAvailabilityZones(qParams QueryParams) (AvailabilityZoneL
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1306,12 +1344,17 @@ func (c CoreClient) GetServerTemplate(id string) (ServerTemplateSingleResponse, 
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c CoreClient) ShutdownServer(id string, qParams QueryParams) (EmptyResponse, *http.Response, error) {
+type ShutdownServerQueryParams struct {
+    Force *bool `url:"force,omitempty"`
+}
+
+func (c CoreClient) ShutdownServer(id string, qParams ShutdownServerQueryParams) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -1326,7 +1369,8 @@ func (c CoreClient) ShutdownServer(id string, qParams QueryParams) (EmptyRespons
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1342,7 +1386,8 @@ func (c CoreClient) GetServer(id string) (ServerSingleResponse, *http.Response, 
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1358,7 +1403,8 @@ func (c CoreClient) DeleteServer(id string) (EmptyResponse, *http.Response, erro
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1374,7 +1420,8 @@ func (c CoreClient) GetServerStorageClass(id string) (ServerStorageClassSingleRe
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1390,7 +1437,8 @@ func (c CoreClient) GetSSLOrganisation(id string) (SSLOrganisationSingleResponse
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1406,7 +1454,8 @@ func (c CoreClient) DeleteSSLOrganisation(id string) (EmptyResponse, *http.Respo
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1422,7 +1471,8 @@ func (c CoreClient) GetServerAction(id string, action_id string) (ServerActionSi
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1438,7 +1488,8 @@ func (c CoreClient) GetSSLContact(id string) (SSLContactSingleResponse, *http.Re
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1454,12 +1505,26 @@ func (c CoreClient) DeleteSSLContact(id string) (EmptyResponse, *http.Response, 
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c CoreClient) GetDNSZones(qParams QueryParams) (DNSZoneListResponse, *http.Response, error) {
+type GetDNSZonesQueryParamsFilter struct {
+    ProjectId *string `url:"project_id,omitempty"`
+    Labels *string `url:"labels,omitempty"`
+}
+
+type GetDNSZonesQueryParams struct {
+    Filter *GetDNSZonesQueryParamsFilter `url:"filter,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+    WithLabels *bool `url:"with_labels,omitempty"`
+}
+
+func (c CoreClient) GetDNSZones(qParams GetDNSZonesQueryParams) (DNSZoneListResponse, *http.Response, error) {
     body := DNSZoneListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -1474,7 +1539,8 @@ func (c CoreClient) GetDNSZones(qParams QueryParams) (DNSZoneListResponse, *http
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1490,7 +1556,8 @@ func (c CoreClient) RecreateServer(id string) (EmptyResponse, *http.Response, er
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1506,7 +1573,8 @@ func (c CoreClient) SendDomainVerification(name string) (EmptyResponse, *http.Re
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1522,7 +1590,8 @@ func (c CoreClient) CheckDomainVerification(name string) (DomainCheckVerificatio
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1539,12 +1608,19 @@ func (c CoreClient) CreateServerHost(in ServerHostCreateRequest) (ServerHostSing
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c CoreClient) GetServerHosts(qParams QueryParams) (ServerHostListResponse, *http.Response, error) {
+type GetServerHostsQueryParams struct {
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+}
+
+func (c CoreClient) GetServerHosts(qParams GetServerHostsQueryParams) (ServerHostListResponse, *http.Response, error) {
     body := ServerHostListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -1559,7 +1635,8 @@ func (c CoreClient) GetServerHosts(qParams QueryParams) (ServerHostListResponse,
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1576,12 +1653,27 @@ func (c CoreClient) CreateServer(in ServerCreateRequest) (ServerSingleResponse, 
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c CoreClient) GetServers(qParams QueryParams) (ServerListResponse, *http.Response, error) {
+type GetServersQueryParamsFilter struct {
+    ProjectId *string `url:"project_id,omitempty"`
+    Labels *string `url:"labels,omitempty"`
+    Name *string `url:"name,omitempty"`
+}
+
+type GetServersQueryParams struct {
+    Filter *GetServersQueryParamsFilter `url:"filter,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+    WithLabels *bool `url:"with_labels,omitempty"`
+}
+
+func (c CoreClient) GetServers(qParams GetServersQueryParams) (ServerListResponse, *http.Response, error) {
     body := ServerListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -1596,7 +1688,8 @@ func (c CoreClient) GetServers(qParams QueryParams) (ServerListResponse, *http.R
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1612,7 +1705,8 @@ func (c CoreClient) DeleteServerNetwork(id string, network_id string) (EmptyResp
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1628,7 +1722,8 @@ func (c CoreClient) CheckDomain(name string) (DomainCheckResponse, *http.Respons
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1644,7 +1739,8 @@ func (c CoreClient) GetDomain(name string) (DomainSingleResponse, *http.Response
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1660,7 +1756,8 @@ func (c CoreClient) DeleteDomain(name string) (EmptyResponse, *http.Response, er
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1677,7 +1774,8 @@ func (c CoreClient) UpdateDomain(in DomainUpdateRequest, name string) (DomainSin
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1693,7 +1791,8 @@ func (c CoreClient) GetDomainHandle(code string) (DomainHandleSingleResponse, *h
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1709,7 +1808,8 @@ func (c CoreClient) DeleteDomainHandle(code string) (EmptyResponse, *http.Respon
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1726,7 +1826,8 @@ func (c CoreClient) UpdateDomainHandle(in DomainHandleUpdateRequest, code string
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1743,7 +1844,8 @@ func (c CoreClient) GetAvailabilityZone(in AvailabilityZoneUpdateRequest, id str
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1759,7 +1861,8 @@ func (c CoreClient) UpdateAvailabilityZone(id string) (AvailabilityZoneSingleRes
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1776,12 +1879,26 @@ func (c CoreClient) CreateSubnet(in SubnetCreateRequest) (SubnetSingleResponse, 
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c CoreClient) GetSubnets(qParams QueryParams) (SubnetListResponse, *http.Response, error) {
+type GetSubnetsQueryParamsFilter struct {
+    ProjectId *string `url:"project_id,omitempty"`
+    Labels *string `url:"labels,omitempty"`
+}
+
+type GetSubnetsQueryParams struct {
+    Filter *GetSubnetsQueryParamsFilter `url:"filter,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+    WithLabels *bool `url:"with_labels,omitempty"`
+}
+
+func (c CoreClient) GetSubnets(qParams GetSubnetsQueryParams) (SubnetListResponse, *http.Response, error) {
     body := SubnetListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -1796,12 +1913,27 @@ func (c CoreClient) GetSubnets(qParams QueryParams) (SubnetListResponse, *http.R
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c CoreClient) GetServerVolumes(qParams QueryParams) (ServerVolumeListResponse, *http.Response, error) {
+type GetServerVolumesQueryParamsFilter struct {
+    ProjectId *string `url:"project_id,omitempty"`
+    Labels *string `url:"labels,omitempty"`
+    ServerId *string `url:"server_id,omitempty"`
+}
+
+type GetServerVolumesQueryParams struct {
+    Filter *GetServerVolumesQueryParamsFilter `url:"filter,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+    WithLabels *bool `url:"with_labels,omitempty"`
+}
+
+func (c CoreClient) GetServerVolumes(qParams GetServerVolumesQueryParams) (ServerVolumeListResponse, *http.Response, error) {
     body := ServerVolumeListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -1816,7 +1948,8 @@ func (c CoreClient) GetServerVolumes(qParams QueryParams) (ServerVolumeListRespo
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1832,7 +1965,8 @@ func (c CoreClient) GetPleskLicenseType(id string) (PleskLicenseTypeSingleRespon
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1849,12 +1983,19 @@ func (c CoreClient) CreateServerStorageClass(in ServerStorageClassCreateRequest)
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c CoreClient) GetServerVolumeClasses(qParams QueryParams) (ServerStorageClassListResponse, *http.Response, error) {
+type GetServerVolumeClassesQueryParams struct {
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+}
+
+func (c CoreClient) GetServerVolumeClasses(qParams GetServerVolumeClassesQueryParams) (ServerStorageClassListResponse, *http.Response, error) {
     body := ServerStorageClassListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -1869,12 +2010,26 @@ func (c CoreClient) GetServerVolumeClasses(qParams QueryParams) (ServerStorageCl
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c CoreClient) Search(qParams QueryParams) (SearchResponse, *http.Response, error) {
+type SearchQueryParamsLabels struct {
+    Name *map[string]string `url:"name,omitempty"`
+}
+
+type SearchQueryParams struct {
+    Search *string `url:"search,omitempty"`
+    ProjectId *string `url:"project_id,omitempty"`
+    Resources *string `url:"resources,omitempty"`
+    Limit *int `url:"limit,omitempty"`
+    WithLabels *bool `url:"with_labels,omitempty"`
+    Labels *SearchQueryParamsLabels `url:"labels,omitempty"`
+}
+
+func (c CoreClient) Search(qParams SearchQueryParams) (SearchResponse, *http.Response, error) {
     body := SearchResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -1889,7 +2044,8 @@ func (c CoreClient) Search(qParams QueryParams) (SearchResponse, *http.Response,
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1906,12 +2062,26 @@ func (c CoreClient) CreateS3Bucket(in S3BucketCreateRequest) (S3BucketSingleResp
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c CoreClient) GetS3Buckets(qParams QueryParams) (S3BucketListResponse, *http.Response, error) {
+type GetS3BucketsQueryParamsFilter struct {
+    ProjectId *string `url:"project_id,omitempty"`
+    Labels *string `url:"labels,omitempty"`
+}
+
+type GetS3BucketsQueryParams struct {
+    Filter *GetS3BucketsQueryParamsFilter `url:"filter,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+    WithLabels *bool `url:"with_labels,omitempty"`
+}
+
+func (c CoreClient) GetS3Buckets(qParams GetS3BucketsQueryParams) (S3BucketListResponse, *http.Response, error) {
     body := S3BucketListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -1926,12 +2096,19 @@ func (c CoreClient) GetS3Buckets(qParams QueryParams) (S3BucketListResponse, *ht
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c CoreClient) GetPleskLicenseTypes(qParams QueryParams) (PleskLicenseTypeListResponse, *http.Response, error) {
+type GetPleskLicenseTypesQueryParams struct {
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+}
+
+func (c CoreClient) GetPleskLicenseTypes(qParams GetPleskLicenseTypesQueryParams) (PleskLicenseTypeListResponse, *http.Response, error) {
     body := PleskLicenseTypeListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -1946,12 +2123,19 @@ func (c CoreClient) GetPleskLicenseTypes(qParams QueryParams) (PleskLicenseTypeL
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c CoreClient) GetServerActions(id string, qParams QueryParams) (ServerActionListResponse, *http.Response, error) {
+type GetServerActionsQueryParams struct {
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+}
+
+func (c CoreClient) GetServerActions(id string, qParams GetServerActionsQueryParams) (ServerActionListResponse, *http.Response, error) {
     body := ServerActionListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -1966,7 +2150,8 @@ func (c CoreClient) GetServerActions(id string, qParams QueryParams) (ServerActi
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1982,7 +2167,8 @@ func (c CoreClient) GetServerStatus(id string) (ServerStatusResponse, *http.Resp
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -1999,12 +2185,26 @@ func (c CoreClient) CreateSSLOrganisation(in SSLOrganisationCreateRequest) (SSLO
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c CoreClient) GetSSLOrganisations(qParams QueryParams) (SSLOrganisationListResponse, *http.Response, error) {
+type GetSSLOrganisationsQueryParamsFilter struct {
+    ProjectId *string `url:"project_id,omitempty"`
+    Labels *string `url:"labels,omitempty"`
+}
+
+type GetSSLOrganisationsQueryParams struct {
+    Filter *GetSSLOrganisationsQueryParamsFilter `url:"filter,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+    WithLabels *bool `url:"with_labels,omitempty"`
+}
+
+func (c CoreClient) GetSSLOrganisations(qParams GetSSLOrganisationsQueryParams) (SSLOrganisationListResponse, *http.Response, error) {
     body := SSLOrganisationListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -2019,7 +2219,8 @@ func (c CoreClient) GetSSLOrganisations(qParams QueryParams) (SSLOrganisationLis
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2035,12 +2236,19 @@ func (c CoreClient) GetSSLType(id string) (SSLTypeSingleResponse, *http.Response
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c CoreClient) GetSSLTypes(qParams QueryParams) (SSLTypeListResponse, *http.Response, error) {
+type GetSSLTypesQueryParams struct {
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+}
+
+func (c CoreClient) GetSSLTypes(qParams GetSSLTypesQueryParams) (SSLTypeListResponse, *http.Response, error) {
     body := SSLTypeListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -2055,7 +2263,8 @@ func (c CoreClient) GetSSLTypes(qParams QueryParams) (SSLTypeListResponse, *http
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2071,7 +2280,8 @@ func (c CoreClient) DeleteDNSRecord(name string, id string) (EmptyResponse, *htt
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2088,7 +2298,8 @@ func (c CoreClient) UpdateDNSRecord(in DNSRecordUpdateRequest, name string, id s
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2104,7 +2315,8 @@ func (c CoreClient) GetPleskLicense(id string) (PleskLicenseSingleResponse, *htt
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2121,7 +2333,8 @@ func (c CoreClient) UpdatePleskLicense(in PleskLicenseUpdateRequest, id string) 
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2138,12 +2351,24 @@ func (c CoreClient) CreateServerTemplate(in ServerTemplateCreateRequest) (Server
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c CoreClient) GetServerTemplates(qParams QueryParams) (ServerTemplateListResponse, *http.Response, error) {
+type GetServerTemplatesQueryParamsFilter struct {
+    Title *string `url:"title,omitempty"`
+}
+
+type GetServerTemplatesQueryParams struct {
+    Filter *GetServerTemplatesQueryParamsFilter `url:"filter,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+}
+
+func (c CoreClient) GetServerTemplates(qParams GetServerTemplatesQueryParams) (ServerTemplateListResponse, *http.Response, error) {
     body := ServerTemplateListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -2158,7 +2383,8 @@ func (c CoreClient) GetServerTemplates(qParams QueryParams) (ServerTemplateListR
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2174,7 +2400,8 @@ func (c CoreClient) GetServerHost(id string) (ServerHostSingleResponse, *http.Re
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2190,7 +2417,8 @@ func (c CoreClient) UnscheduleDomainDelete(name string) (DomainSingleResponse, *
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2206,7 +2434,8 @@ func (c CoreClient) StopServer(id string) (EmptyResponse, *http.Response, error)
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2223,12 +2452,18 @@ func (c CoreClient) CreateDNSZoneRecord(in DNSRecordCreateRequest, name string) 
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c CoreClient) GetDNSZoneRecords(name string, qParams QueryParams) (DNSRecordListResponse, *http.Response, error) {
+type GetDNSZoneRecordsQueryParams struct {
+    PageSize *int `url:"page_size,omitempty"`
+    Page *int `url:"page,omitempty"`
+}
+
+func (c CoreClient) GetDNSZoneRecords(name string, qParams GetDNSZoneRecordsQueryParams) (DNSRecordListResponse, *http.Response, error) {
     body := DNSRecordListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -2243,7 +2478,8 @@ func (c CoreClient) GetDNSZoneRecords(name string, qParams QueryParams) (DNSReco
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2260,7 +2496,8 @@ func (c CoreClient) UpdateDNSZoneRecords(in DNSRecordsUpdateRequest, name string
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2276,7 +2513,8 @@ func (c CoreClient) GetServerVolume(id string) (ServerVolumeSingleResponse, *htt
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2293,12 +2531,19 @@ func (c CoreClient) CreateServerNetwork(in ServerNetworkCreateRequest, id string
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c CoreClient) GetServerNetworks(id string, qParams QueryParams) (ServerNetworkListResponse, *http.Response, error) {
+type GetServerNetworksQueryParams struct {
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+}
+
+func (c CoreClient) GetServerNetworks(id string, qParams GetServerNetworksQueryParams) (ServerNetworkListResponse, *http.Response, error) {
     body := ServerNetworkListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -2313,7 +2558,8 @@ func (c CoreClient) GetServerNetworks(id string, qParams QueryParams) (ServerNet
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2330,12 +2576,24 @@ func (c CoreClient) CreateServerVariant(in ServerVariantCreateRequest) (ServerVa
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c CoreClient) GetServerVariants(qParams QueryParams) (ServerVariantListResponse, *http.Response, error) {
+type GetServerVariantsQueryParamsFilter struct {
+    Title *string `url:"title,omitempty"`
+}
+
+type GetServerVariantsQueryParams struct {
+    Filter *GetServerVariantsQueryParamsFilter `url:"filter,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+}
+
+func (c CoreClient) GetServerVariants(qParams GetServerVariantsQueryParams) (ServerVariantListResponse, *http.Response, error) {
     body := ServerVariantListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -2350,7 +2608,8 @@ func (c CoreClient) GetServerVariants(qParams QueryParams) (ServerVariantListRes
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2366,7 +2625,8 @@ func (c CoreClient) GetServerStorage(id string) (ServerStorageSingleResponse, *h
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2382,7 +2642,8 @@ func (c CoreClient) GetSSHKey(id string) (SSHKeySingleResponse, *http.Response, 
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2398,7 +2659,8 @@ func (c CoreClient) DeleteSSHKey(id string) (EmptyResponse, *http.Response, erro
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2414,7 +2676,8 @@ func (c CoreClient) GetServerVariant(id string) (ServerVariantSingleResponse, *h
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2430,7 +2693,8 @@ func (c CoreClient) DeleteServerVariant(id string) (EmptyResponse, *http.Respons
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2446,7 +2710,8 @@ func (c CoreClient) DeleteS3AccessKeyGrant(access_key_id string, id string) (Emp
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2463,12 +2728,27 @@ func (c CoreClient) CreateServerMedia(in ServerMediaCreateRequest) (ServerMediaS
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c CoreClient) GetServerMedias(qParams QueryParams) (ServerMediaListResponse, *http.Response, error) {
+type GetServerMediasQueryParamsFilter struct {
+    ProjectId *string `url:"project_id,omitempty"`
+    Title *string `url:"title,omitempty"`
+    Labels *string `url:"labels,omitempty"`
+}
+
+type GetServerMediasQueryParams struct {
+    Filter *GetServerMediasQueryParamsFilter `url:"filter,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+    WithLabels *bool `url:"with_labels,omitempty"`
+}
+
+func (c CoreClient) GetServerMedias(qParams GetServerMediasQueryParams) (ServerMediaListResponse, *http.Response, error) {
     body := ServerMediaListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -2483,7 +2763,8 @@ func (c CoreClient) GetServerMedias(qParams QueryParams) (ServerMediaListRespons
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2499,7 +2780,8 @@ func (c CoreClient) GetSubnet(id string) (SubnetSingleResponse, *http.Response, 
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2515,7 +2797,8 @@ func (c CoreClient) DeleteSubnet(id string) (EmptyResponse, *http.Response, erro
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2532,7 +2815,8 @@ func (c CoreClient) AttachServerVolume(in ServerVolumeAttachRequest, id string) 
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2549,12 +2833,27 @@ func (c CoreClient) CreatePleskLicense(in PleskLicenseCreateRequest) (PleskLicen
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c CoreClient) GetPleskLicenses(qParams QueryParams) (PleskLicenseListResponse, *http.Response, error) {
+type GetPleskLicensesQueryParamsFilter struct {
+    ProjectId *string `url:"project_id,omitempty"`
+    Labels *string `url:"labels,omitempty"`
+    TypeId *string `url:"type_id,omitempty"`
+}
+
+type GetPleskLicensesQueryParams struct {
+    Filter *GetPleskLicensesQueryParamsFilter `url:"filter,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+    WithLabels *bool `url:"with_labels,omitempty"`
+}
+
+func (c CoreClient) GetPleskLicenses(qParams GetPleskLicensesQueryParams) (PleskLicenseListResponse, *http.Response, error) {
     body := PleskLicenseListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -2569,7 +2868,8 @@ func (c CoreClient) GetPleskLicenses(qParams QueryParams) (PleskLicenseListRespo
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2585,7 +2885,8 @@ func (c CoreClient) GetS3AccessKey(id string) (S3AccessKeySingleResponse, *http.
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2601,7 +2902,8 @@ func (c CoreClient) DeleteS3AccessKey(id string) (EmptyResponse, *http.Response,
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2618,12 +2920,26 @@ func (c CoreClient) CreateS3AccessKey(in S3AccessKeyCreateRequest) (S3AccessKeyS
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c CoreClient) GetS3AccessKeys(qParams QueryParams) (S3AccessKeyListResponse, *http.Response, error) {
+type GetS3AccessKeysQueryParamsFilter struct {
+    ProjectId *string `url:"project_id,omitempty"`
+    Labels *string `url:"labels,omitempty"`
+}
+
+type GetS3AccessKeysQueryParams struct {
+    Filter *GetS3AccessKeysQueryParamsFilter `url:"filter,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+    WithLabels *bool `url:"with_labels,omitempty"`
+}
+
+func (c CoreClient) GetS3AccessKeys(qParams GetS3AccessKeysQueryParams) (S3AccessKeyListResponse, *http.Response, error) {
     body := S3AccessKeyListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -2638,7 +2954,8 @@ func (c CoreClient) GetS3AccessKeys(qParams QueryParams) (S3AccessKeyListRespons
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2654,7 +2971,8 @@ func (c CoreClient) GetDNSZone(name string) (DNSZoneSingleResponse, *http.Respon
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2671,7 +2989,8 @@ func (c CoreClient) UpdateDNSZone(in DNSZoneUpdateRequest, name string) (DNSZone
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2688,12 +3007,26 @@ func (c CoreClient) CreateDomainHandle(in DomainHandleCreateRequest) (DomainHand
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c CoreClient) GetDomainHandles(qParams QueryParams) (DomainHandleListResponse, *http.Response, error) {
+type GetDomainHandlesQueryParamsFilter struct {
+    ProjectId *string `url:"project_id,omitempty"`
+    Labels *string `url:"labels,omitempty"`
+}
+
+type GetDomainHandlesQueryParams struct {
+    Filter *GetDomainHandlesQueryParamsFilter `url:"filter,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+    WithLabels *bool `url:"with_labels,omitempty"`
+}
+
+func (c CoreClient) GetDomainHandles(qParams GetDomainHandlesQueryParams) (DomainHandleListResponse, *http.Response, error) {
     body := DomainHandleListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -2708,7 +3041,8 @@ func (c CoreClient) GetDomainHandles(qParams QueryParams) (DomainHandleListRespo
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2725,12 +3059,30 @@ func (c CoreClient) CreateSSLCertificate(in SSLCertificateCreateRequest) (SSLCer
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c CoreClient) GetSSLCertificates(qParams QueryParams) (SSLCertificateListResponse, *http.Response, error) {
+type GetSSLCertificatesQueryParamsFilter struct {
+    OrganisationId *string `url:"organisation_id,omitempty"`
+    ProjectId *string `url:"project_id,omitempty"`
+    TechContactId *string `url:"tech_contact_id,omitempty"`
+    Labels *string `url:"labels,omitempty"`
+    TypeId *string `url:"type_id,omitempty"`
+    AdminContactId *string `url:"admin_contact_id,omitempty"`
+}
+
+type GetSSLCertificatesQueryParams struct {
+    Filter *GetSSLCertificatesQueryParamsFilter `url:"filter,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+    WithLabels *bool `url:"with_labels,omitempty"`
+}
+
+func (c CoreClient) GetSSLCertificates(qParams GetSSLCertificatesQueryParams) (SSLCertificateListResponse, *http.Response, error) {
     body := SSLCertificateListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -2745,7 +3097,8 @@ func (c CoreClient) GetSSLCertificates(qParams QueryParams) (SSLCertificateListR
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2762,12 +3115,17 @@ func (c CoreClient) ScheduleDomainDelete(in DomainScheduleDeleteRequest, name st
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c CoreClient) GetDomainPricingList(qParams QueryParams) (DomainPriceListResponse, *http.Response, error) {
+type GetDomainPricingListQueryParams struct {
+    ProjectId *string `url:"project_id,omitempty"`
+}
+
+func (c CoreClient) GetDomainPricingList(qParams GetDomainPricingListQueryParams) (DomainPriceListResponse, *http.Response, error) {
     body := DomainPriceListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -2782,7 +3140,8 @@ func (c CoreClient) GetDomainPricingList(qParams QueryParams) (DomainPriceListRe
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2798,7 +3157,8 @@ func (c CoreClient) GetSSLCertificate(id string) (SSLCertificateSingleResponse, 
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2815,7 +3175,8 @@ func (c CoreClient) CreateSubnetAddress(in SubnetAddressCreateRequest, id string
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2832,12 +3193,27 @@ func (c CoreClient) CreateNetwork(in NetworkCreateRequest) (NetworkSingleRespons
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c CoreClient) GetNetworks(qParams QueryParams) (NetworkListResponse, *http.Response, error) {
+type GetNetworksQueryParamsFilter struct {
+    ProjectId *string `url:"project_id,omitempty"`
+    Title *string `url:"title,omitempty"`
+    Labels *string `url:"labels,omitempty"`
+}
+
+type GetNetworksQueryParams struct {
+    Filter *GetNetworksQueryParamsFilter `url:"filter,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+    WithLabels *bool `url:"with_labels,omitempty"`
+}
+
+func (c CoreClient) GetNetworks(qParams GetNetworksQueryParams) (NetworkListResponse, *http.Response, error) {
     body := NetworkListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -2852,7 +3228,8 @@ func (c CoreClient) GetNetworks(qParams QueryParams) (NetworkListResponse, *http
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2868,7 +3245,8 @@ func (c CoreClient) GetDomainAuthinfo(name string) (DomainAuthinfoResponse, *htt
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2884,7 +3262,8 @@ func (c CoreClient) RemoveDomainAuthinfo(name string) (EmptyResponse, *http.Resp
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2901,7 +3280,8 @@ func (c CoreClient) CreateServerStorage(in ServerStorageCreateRequest) (ServerSt
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2917,7 +3297,8 @@ func (c CoreClient) GetServerStorages() (ServerStorageListResponse, *http.Respon
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2933,7 +3314,8 @@ func (c CoreClient) RestoreDomain(name string) (EmptyResponse, *http.Response, e
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2950,12 +3332,26 @@ func (c CoreClient) CreateSSLContact(in SSLContactCreateRequest) (SSLContactSing
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c CoreClient) GetSSLContacts(qParams QueryParams) (SSLContactListResponse, *http.Response, error) {
+type GetSSLContactsQueryParamsFilter struct {
+    ProjectId *string `url:"project_id,omitempty"`
+    Labels *string `url:"labels,omitempty"`
+}
+
+type GetSSLContactsQueryParams struct {
+    Filter *GetSSLContactsQueryParamsFilter `url:"filter,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+    WithLabels *bool `url:"with_labels,omitempty"`
+}
+
+func (c CoreClient) GetSSLContacts(qParams GetSSLContactsQueryParams) (SSLContactListResponse, *http.Response, error) {
     body := SSLContactListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -2970,7 +3366,8 @@ func (c CoreClient) GetSSLContacts(qParams QueryParams) (SSLContactListResponse,
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -2986,7 +3383,8 @@ func (c CoreClient) GetServerMedia(id string) (ServerMediaSingleResponse, *http.
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -3002,7 +3400,8 @@ func (c CoreClient) DeleteServerMedia(id string) (EmptyResponse, *http.Response,
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -3019,12 +3418,25 @@ func (c CoreClient) CreateS3AccessKeyGrant(in S3AccessGrantCreateRequest, access
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c CoreClient) GetS3AccessKeyGrants(access_key_id string, qParams QueryParams) (S3AccessGrantListResponse, *http.Response, error) {
+type GetS3AccessKeyGrantsQueryParamsFilter struct {
+    Labels *string `url:"labels,omitempty"`
+}
+
+type GetS3AccessKeyGrantsQueryParams struct {
+    Filter *GetS3AccessKeyGrantsQueryParamsFilter `url:"filter,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+    WithLabels *bool `url:"with_labels,omitempty"`
+}
+
+func (c CoreClient) GetS3AccessKeyGrants(access_key_id string, qParams GetS3AccessKeyGrantsQueryParams) (S3AccessGrantListResponse, *http.Response, error) {
     body := S3AccessGrantListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -3039,7 +3451,8 @@ func (c CoreClient) GetS3AccessKeyGrants(access_key_id string, qParams QueryPara
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -3055,7 +3468,8 @@ func (c CoreClient) GetServerVNC(id string) (ServerVNCResponse, *http.Response, 
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -3071,7 +3485,8 @@ func (c CoreClient) GetNetwork(id string) (NetworkSingleResponse, *http.Response
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -3087,7 +3502,8 @@ func (c CoreClient) GetS3Bucket(id string) (S3BucketSingleResponse, *http.Respon
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -3103,7 +3519,8 @@ func (c CoreClient) DeleteS3Bucket(id string) (EmptyResponse, *http.Response, er
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -3120,12 +3537,31 @@ func (c CoreClient) CreateDomain(in DomainCreateRequest) (DomainSingleResponse, 
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c CoreClient) GetDomains(qParams QueryParams) (DomainListResponse, *http.Response, error) {
+type GetDomainsQueryParamsFilter struct {
+    AdminHandleCode *string `url:"admin_handle_code,omitempty"`
+    ZoneHandleCode *string `url:"zone_handle_code,omitempty"`
+    ProjectId *string `url:"project_id,omitempty"`
+    Labels *string `url:"labels,omitempty"`
+    OwnerHandleCode *string `url:"owner_handle_code,omitempty"`
+    TechHandleCode *string `url:"tech_handle_code,omitempty"`
+    Tld *string `url:"tld,omitempty"`
+}
+
+type GetDomainsQueryParams struct {
+    Filter *GetDomainsQueryParamsFilter `url:"filter,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+    WithLabels *bool `url:"with_labels,omitempty"`
+}
+
+func (c CoreClient) GetDomains(qParams GetDomainsQueryParams) (DomainListResponse, *http.Response, error) {
     body := DomainListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -3140,7 +3576,8 @@ func (c CoreClient) GetDomains(qParams QueryParams) (DomainListResponse, *http.R
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -3156,43 +3593,9 @@ func (c CoreClient) DetachServerVolume(id string) (ServerVolumeSingleResponse, *
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
-
-type QueryParams struct {
-    Search *string `json:"search"`
-    WithLabels *bool `json:"with_labels"`
-    ProjectId *string `json:"project_id"`
-    Filter *QueryParamsFilter `json:"filter"`
-    Limit *int `json:"limit"`
-    Resources *string `json:"resources"`
-    Force *bool `json:"force"`
-    Labels *QueryParamsLabels `json:"labels"`
-    Page *int `json:"page"`
-    PageSize *int `json:"page_size"`
-}
-
-
-type QueryParamsFilter struct {
-    OrganisationId *string `json:"organisation_id"`
-    ProjectId *string `json:"project_id"`
-    TypeId *string `json:"type_id"`
-    AdminHandleCode *string `json:"admin_handle_code"`
-    OwnerHandleCode *string `json:"owner_handle_code"`
-    TechHandleCode *string `json:"tech_handle_code"`
-    AdminContactId *string `json:"admin_contact_id"`
-    TechContactId *string `json:"tech_contact_id"`
-    ServerId *string `json:"server_id"`
-    Tld *string `json:"tld"`
-    Labels *string `json:"labels"`
-    ZoneHandleCode *string `json:"zone_handle_code"`
-}
-
-
-type QueryParamsLabels struct {
-    Name *interface{} `json:"name"`
-}
-
 

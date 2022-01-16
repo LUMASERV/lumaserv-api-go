@@ -82,7 +82,7 @@ func (c AuthClient) toStr(in interface{}) string {
 }
 type Project struct {
     Id string `json:"id"`
-    Detail struct {
+    Detail *struct {
         DomainCount int `json:"domain_count"`
         PleskLicenseCount int `json:"plesk_license_count"`
         ServerCount int `json:"server_count"`
@@ -93,12 +93,12 @@ type Project struct {
 }
 
 type User struct {
-    Gender string `json:"gender"`
+    Gender *string `json:"gender"`
     LastName string `json:"last_name"`
     Id string `json:"id"`
-    State string `json:"state"`
-    CustomerId int `json:"customer_id"`
-    Type string `json:"type"`
+    State *string `json:"state"`
+    CustomerId *int `json:"customer_id"`
+    Type *string `json:"type"`
     FirstName string `json:"first_name"`
     Email string `json:"email"`
 }
@@ -116,16 +116,16 @@ type ResponsePagination struct {
 }
 
 type TokenScope struct {
-    ProjectId string `json:"project_id"`
+    ProjectId *string `json:"project_id"`
 }
 
 type Token struct {
     UserId string `json:"user_id"`
     Scope TokenScope `json:"scope"`
-    ValidUntil string `json:"validuntil"`
+    ValidUntil *string `json:"validuntil"`
     CreatedAt string `json:"created_at"`
     Type string `json:"type"`
-    Token string `json:"token"`
+    Token *string `json:"token"`
 }
 
 type ResponseMessages struct {
@@ -141,8 +141,8 @@ type ResponseMessage struct {
 
 type ProjectMember struct {
     Role string `json:"role"`
-    UserId string `json:"user_id"`
-    ProjectId string `json:"project_id"`
+    UserId *string `json:"user_id"`
+    ProjectId *string `json:"project_id"`
 }
 
 type ResponseMetadata struct {
@@ -153,7 +153,7 @@ type ResponseMetadata struct {
 
 type ProjectMemberListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []ProjectMember `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -161,7 +161,7 @@ type ProjectMemberListResponse struct {
 
 type TokenListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []Token `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -183,7 +183,7 @@ type UserSingleResponse struct {
 
 type InvalidRequestResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Data interface{} `json:"data"`
+    Data *interface{} `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
 }
@@ -197,7 +197,7 @@ type ProjectSingleResponse struct {
 
 type ProjectListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []Project `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -218,17 +218,17 @@ type EmptyResponse struct {
 
 type UserListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []User `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
 }
 
 type TokenValidationResponse struct {
-    Metadata ResponseMetadata `json:"metadata"`
-    Data TokenValidationInfo `json:"data"`
-    Success bool `json:"success"`
-    Messages ResponseMessages `json:"messages"`
+    Metadata *ResponseMetadata `json:"metadata"`
+    Data *TokenValidationInfo `json:"data"`
+    Success *bool `json:"success"`
+    Messages *ResponseMessages `json:"messages"`
 }
 
 type RequestPasswordResetRequest struct {
@@ -241,8 +241,8 @@ type ExecutePasswordResetRequest struct {
 }
 
 type TokenCreateRequest struct {
-    UserId string `json:"user_id"`
-    Scope TokenScope `json:"scope"`
+    UserId *string `json:"user_id"`
+    Scope *TokenScope `json:"scope"`
     Title string `json:"title"`
 }
 
@@ -252,13 +252,13 @@ type LoginRequest struct {
 }
 
 type ProjectCreateRequest struct {
-    CustomerReference string `json:"customer_reference"`
+    CustomerReference *string `json:"customer_reference"`
     Title string `json:"title"`
 }
 
 type ProjectUpdateRequest struct {
-    CustomerReference string `json:"customer_reference"`
-    Title string `json:"title"`
+    CustomerReference *string `json:"customer_reference"`
+    Title *string `json:"title"`
 }
 
 func (c AuthClient) CreateProject(in ProjectCreateRequest) (ProjectSingleResponse, *http.Response, error) {
@@ -273,12 +273,20 @@ func (c AuthClient) CreateProject(in ProjectCreateRequest) (ProjectSingleRespons
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c AuthClient) GetProjects(qParams QueryParams) (ProjectListResponse, *http.Response, error) {
+type GetProjectsQueryParams struct {
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+    Detail *bool `url:"detail,omitempty"`
+}
+
+func (c AuthClient) GetProjects(qParams GetProjectsQueryParams) (ProjectListResponse, *http.Response, error) {
     body := ProjectListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -293,12 +301,17 @@ func (c AuthClient) GetProjects(qParams QueryParams) (ProjectListResponse, *http
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c AuthClient) GetProject(id string, qParams QueryParams) (ProjectSingleResponse, *http.Response, error) {
+type GetProjectQueryParams struct {
+    Detail *bool `url:"detail,omitempty"`
+}
+
+func (c AuthClient) GetProject(id string, qParams GetProjectQueryParams) (ProjectSingleResponse, *http.Response, error) {
     body := ProjectSingleResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -313,7 +326,8 @@ func (c AuthClient) GetProject(id string, qParams QueryParams) (ProjectSingleRes
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -329,7 +343,8 @@ func (c AuthClient) DeleteProject(id string) (EmptyResponse, *http.Response, err
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -346,7 +361,8 @@ func (c AuthClient) UpdateProject(in ProjectUpdateRequest, id string) (ProjectSi
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -363,12 +379,19 @@ func (c AuthClient) Login(in LoginRequest) (LoginResponse, *http.Response, error
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c AuthClient) GetUsers(qParams QueryParams) (UserListResponse, *http.Response, error) {
+type GetUsersQueryParams struct {
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+}
+
+func (c AuthClient) GetUsers(qParams GetUsersQueryParams) (UserListResponse, *http.Response, error) {
     body := UserListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -383,7 +406,8 @@ func (c AuthClient) GetUsers(qParams QueryParams) (UserListResponse, *http.Respo
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -399,7 +423,8 @@ func (c AuthClient) GetUser(id string) (UserSingleResponse, *http.Response, erro
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -416,7 +441,8 @@ func (c AuthClient) RequestPasswordReset(in RequestPasswordResetRequest) (EmptyR
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -433,7 +459,8 @@ func (c AuthClient) ExecutePasswordReset(in ExecutePasswordResetRequest) (EmptyR
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -450,7 +477,8 @@ func (c AuthClient) CreateToken(in TokenCreateRequest) (TokenSingleResponse, *ht
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -466,7 +494,8 @@ func (c AuthClient) GetTokens() (TokenListResponse, *http.Response, error) {
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -482,7 +511,8 @@ func (c AuthClient) GetToken(id string) (TokenSingleResponse, *http.Response, er
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -498,7 +528,8 @@ func (c AuthClient) DeleteToken(id string) (EmptyResponse, *http.Response, error
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -514,12 +545,19 @@ func (c AuthClient) ValidateToken(token string) (TokenValidationResponse, *http.
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
 
-func (c AuthClient) GetProjectMembers(id string, qParams QueryParams) (ProjectMemberListResponse, *http.Response, error) {
+type GetProjectMembersQueryParams struct {
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+}
+
+func (c AuthClient) GetProjectMembers(id string, qParams GetProjectMembersQueryParams) (ProjectMemberListResponse, *http.Response, error) {
     body := ProjectMemberListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -534,7 +572,8 @@ func (c AuthClient) GetProjectMembers(id string, qParams QueryParams) (ProjectMe
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -550,7 +589,8 @@ func (c AuthClient) ValidateSelf() (TokenValidationResponse, *http.Response, err
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -566,7 +606,8 @@ func (c AuthClient) RemoveProjectMember(id string, user_id string) (EmptyRespons
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
@@ -582,16 +623,9 @@ func (c AuthClient) GetUserProjectMemberships(id string) (ProjectMemberListRespo
         return body, res, err
     }
     if !body.Success {
-        return body, res, errors.New("response body success is false!")
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
     }
     return body, res, err
 }
-
-type QueryParams struct {
-    Search *string `json:"search"`
-    Page *int `json:"page"`
-    Detail *bool `json:"detail"`
-    PageSize *int `json:"page_size"`
-}
-
 
