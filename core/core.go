@@ -110,6 +110,7 @@ type Server struct {
     CreatedAt string `json:"created_at"`
     TemplateId string `json:"template_id"`
     Id string `json:"id"`
+    State string `json:"state"`
     Labels *interface{} `json:"labels"`
 }
 
@@ -960,7 +961,7 @@ type DomainHandleCreateRequest struct {
 
 type ServerCreateRequest struct {
     ZoneId string `json:"zone_id"`
-    VariantId *string `json:"variant_id"`
+    VariantId string `json:"variant_id"`
     SshKeys []string `json:"ssh_keys"`
     ProjectId string `json:"project_id"`
     Name string `json:"name"`
