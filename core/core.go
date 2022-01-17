@@ -106,8 +106,11 @@ func (c CoreClient) applyCurrentProject (v reflect.Value) {
 
             for i := 0; i < x.NumField(); i++ {
                 field := x.Field(i)
-                if field.Kind() == reflect.Struct {
-                    c.applyCurrentProject(field.Elem())
+                if field.Kind() == reflect.Ptr && field.Type().Elem().Kind() == reflect.Struct || field.Kind() == reflect.Struct {
+                    if field.IsNil() && field.CanSet() {
+                        field.Set(reflect.New(field.Type().Elem()))
+                    }
+                    c.applyCurrentProject(field)
                 }
             }
         }
