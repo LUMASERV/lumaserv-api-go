@@ -10,6 +10,7 @@ import (
     "errors"
     "strconv"
     "github.com/google/go-querystring/query"
+    "reflect"
 )
 
 type CoreClient struct {
@@ -88,6 +89,29 @@ func (c CoreClient) toStr(in interface{}) string {
     }
 
     panic("Unhandled type in toStr")
+}
+
+func (c CoreClient) applyCurrentProject (v reflect.Value) {
+    if len(c.currentProject) > 0 {
+        if v.Kind() == reflect.Ptr {
+            x := v.Elem()
+            f := x.FieldByName("ProjectId")
+            if f.IsValid() && f.CanSet() {
+                if f.Kind() == reflect.String && len(f.String()) == 0 {
+                    f.SetString(c.currentProject)
+                } else if f.Kind() == reflect.Ptr && f.Type().Elem().Kind() == reflect.String {
+                    f.Set(reflect.ValueOf(&c.currentProject))
+                }
+            }
+
+            for i := 0; i < x.NumField(); i++ {
+                field := x.Field(i)
+                if field.Kind() == reflect.Struct {
+                    c.applyCurrentProject(field.Elem())
+                }
+            }
+        }
+    }
 }
 type SSHKey struct {
     PublicKey string `json:"public_key"`
@@ -1215,6 +1239,7 @@ type DNSRecordsUpdateRequest []struct {
     }
 
 func (c CoreClient) CreateSSHKey(in SSHKeyCreateRequest) (SSHKeySingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := SSHKeySingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/ssh-keys", bytes.NewBuffer(inJson))
@@ -1247,6 +1272,7 @@ type GetSSHKeysQueryParams struct {
 }
 
 func (c CoreClient) GetSSHKeys(qParams GetSSHKeysQueryParams) (SSHKeyListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := SSHKeyListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -1285,6 +1311,7 @@ func (c CoreClient) StartServer(id string) (EmptyResponse, *http.Response, error
 }
 
 func (c CoreClient) CreateAvailabilityZone(in AvailabilityZoneCreateRequest) (AvailabilityZoneSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := AvailabilityZoneSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/availability-zones", bytes.NewBuffer(inJson))
@@ -1314,6 +1341,7 @@ type GetAvailabilityZonesQueryParams struct {
 }
 
 func (c CoreClient) GetAvailabilityZones(qParams GetAvailabilityZonesQueryParams) (AvailabilityZoneListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := AvailabilityZoneListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -1356,6 +1384,7 @@ type ShutdownServerQueryParams struct {
 }
 
 func (c CoreClient) ShutdownServer(id string, qParams ShutdownServerQueryParams) (EmptyResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := EmptyResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -1526,6 +1555,7 @@ type GetDNSZonesQueryParams struct {
 }
 
 func (c CoreClient) GetDNSZones(qParams GetDNSZonesQueryParams) (DNSZoneListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := DNSZoneListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -1598,6 +1628,7 @@ func (c CoreClient) CheckDomainVerification(name string) (DomainCheckVerificatio
 }
 
 func (c CoreClient) CreateServerHost(in ServerHostCreateRequest) (ServerHostSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := ServerHostSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/server-hosts", bytes.NewBuffer(inJson))
@@ -1622,6 +1653,7 @@ type GetServerHostsQueryParams struct {
 }
 
 func (c CoreClient) GetServerHosts(qParams GetServerHostsQueryParams) (ServerHostListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := ServerHostListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -1643,6 +1675,7 @@ func (c CoreClient) GetServerHosts(qParams GetServerHostsQueryParams) (ServerHos
 }
 
 func (c CoreClient) CreateServer(in ServerCreateRequest) (ServerSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := ServerSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/servers", bytes.NewBuffer(inJson))
@@ -1675,6 +1708,7 @@ type GetServersQueryParams struct {
 }
 
 func (c CoreClient) GetServers(qParams GetServersQueryParams) (ServerListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := ServerListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -1764,6 +1798,7 @@ func (c CoreClient) DeleteDomain(name string) (EmptyResponse, *http.Response, er
 }
 
 func (c CoreClient) UpdateDomain(in DomainUpdateRequest, name string) (DomainSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := DomainSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("PUT", "/domains/"+c.toStr(name), bytes.NewBuffer(inJson))
@@ -1816,6 +1851,7 @@ func (c CoreClient) DeleteDomainHandle(code string) (EmptyResponse, *http.Respon
 }
 
 func (c CoreClient) UpdateDomainHandle(in DomainHandleUpdateRequest, code string) (DomainHandleSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := DomainHandleSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("PUT", "/domain-handles/"+c.toStr(code), bytes.NewBuffer(inJson))
@@ -1834,6 +1870,7 @@ func (c CoreClient) UpdateDomainHandle(in DomainHandleUpdateRequest, code string
 }
 
 func (c CoreClient) GetAvailabilityZone(in AvailabilityZoneUpdateRequest, id string) (AvailabilityZoneSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := AvailabilityZoneSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("GET", "/availability-zones/"+c.toStr(id), bytes.NewBuffer(inJson))
@@ -1869,6 +1906,7 @@ func (c CoreClient) UpdateAvailabilityZone(id string) (AvailabilityZoneSingleRes
 }
 
 func (c CoreClient) CreateSubnet(in SubnetCreateRequest) (SubnetSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := SubnetSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/subnets", bytes.NewBuffer(inJson))
@@ -1900,6 +1938,7 @@ type GetSubnetsQueryParams struct {
 }
 
 func (c CoreClient) GetSubnets(qParams GetSubnetsQueryParams) (SubnetListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := SubnetListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -1935,6 +1974,7 @@ type GetServerVolumesQueryParams struct {
 }
 
 func (c CoreClient) GetServerVolumes(qParams GetServerVolumesQueryParams) (ServerVolumeListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := ServerVolumeListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -1973,6 +2013,7 @@ func (c CoreClient) GetPleskLicenseType(id string) (PleskLicenseTypeSingleRespon
 }
 
 func (c CoreClient) CreateServerStorageClass(in ServerStorageClassCreateRequest) (ServerStorageClassSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := ServerStorageClassSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/server-storage-classes", bytes.NewBuffer(inJson))
@@ -1997,6 +2038,7 @@ type GetServerVolumeClassesQueryParams struct {
 }
 
 func (c CoreClient) GetServerVolumeClasses(qParams GetServerVolumeClassesQueryParams) (ServerStorageClassListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := ServerStorageClassListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -2031,6 +2073,7 @@ type SearchQueryParams struct {
 }
 
 func (c CoreClient) Search(qParams SearchQueryParams) (SearchResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := SearchResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -2052,6 +2095,7 @@ func (c CoreClient) Search(qParams SearchQueryParams) (SearchResponse, *http.Res
 }
 
 func (c CoreClient) CreateS3Bucket(in S3BucketCreateRequest) (S3BucketSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := S3BucketSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/storage/s3/buckets", bytes.NewBuffer(inJson))
@@ -2083,6 +2127,7 @@ type GetS3BucketsQueryParams struct {
 }
 
 func (c CoreClient) GetS3Buckets(qParams GetS3BucketsQueryParams) (S3BucketListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := S3BucketListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -2110,6 +2155,7 @@ type GetPleskLicenseTypesQueryParams struct {
 }
 
 func (c CoreClient) GetPleskLicenseTypes(qParams GetPleskLicenseTypesQueryParams) (PleskLicenseTypeListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := PleskLicenseTypeListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -2137,6 +2183,7 @@ type GetServerActionsQueryParams struct {
 }
 
 func (c CoreClient) GetServerActions(id string, qParams GetServerActionsQueryParams) (ServerActionListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := ServerActionListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -2175,6 +2222,7 @@ func (c CoreClient) GetServerStatus(id string) (ServerStatusResponse, *http.Resp
 }
 
 func (c CoreClient) CreateSSLOrganisation(in SSLOrganisationCreateRequest) (SSLOrganisationSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := SSLOrganisationSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/ssl/organisations", bytes.NewBuffer(inJson))
@@ -2206,6 +2254,7 @@ type GetSSLOrganisationsQueryParams struct {
 }
 
 func (c CoreClient) GetSSLOrganisations(qParams GetSSLOrganisationsQueryParams) (SSLOrganisationListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := SSLOrganisationListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -2250,6 +2299,7 @@ type GetSSLTypesQueryParams struct {
 }
 
 func (c CoreClient) GetSSLTypes(qParams GetSSLTypesQueryParams) (SSLTypeListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := SSLTypeListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -2288,6 +2338,7 @@ func (c CoreClient) DeleteDNSRecord(name string, id string) (EmptyResponse, *htt
 }
 
 func (c CoreClient) UpdateDNSRecord(in DNSRecordUpdateRequest, name string, id string) (DNSRecordSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := DNSRecordSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("PUT", "/dns/zones/"+c.toStr(name)+"/records/"+c.toStr(id), bytes.NewBuffer(inJson))
@@ -2323,6 +2374,7 @@ func (c CoreClient) GetPleskLicense(id string) (PleskLicenseSingleResponse, *htt
 }
 
 func (c CoreClient) UpdatePleskLicense(in PleskLicenseUpdateRequest, id string) (PleskLicenseSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := PleskLicenseSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("PUT", "/licenses/plesk/"+c.toStr(id), bytes.NewBuffer(inJson))
@@ -2341,6 +2393,7 @@ func (c CoreClient) UpdatePleskLicense(in PleskLicenseUpdateRequest, id string) 
 }
 
 func (c CoreClient) CreateServerTemplate(in ServerTemplateCreateRequest) (ServerTemplateSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := ServerTemplateSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/server-templates", bytes.NewBuffer(inJson))
@@ -2370,6 +2423,7 @@ type GetServerTemplatesQueryParams struct {
 }
 
 func (c CoreClient) GetServerTemplates(qParams GetServerTemplatesQueryParams) (ServerTemplateListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := ServerTemplateListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -2442,6 +2496,7 @@ func (c CoreClient) StopServer(id string) (EmptyResponse, *http.Response, error)
 }
 
 func (c CoreClient) CreateDNSZoneRecord(in DNSRecordCreateRequest, name string) (DNSRecordSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := DNSRecordSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/dns/zones/"+c.toStr(name)+"/records", bytes.NewBuffer(inJson))
@@ -2465,6 +2520,7 @@ type GetDNSZoneRecordsQueryParams struct {
 }
 
 func (c CoreClient) GetDNSZoneRecords(name string, qParams GetDNSZoneRecordsQueryParams) (DNSRecordListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := DNSRecordListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -2486,6 +2542,7 @@ func (c CoreClient) GetDNSZoneRecords(name string, qParams GetDNSZoneRecordsQuer
 }
 
 func (c CoreClient) UpdateDNSZoneRecords(in DNSRecordsUpdateRequest, name string) (DNSRecordListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := DNSRecordListResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("PUT", "/dns/zones/"+c.toStr(name)+"/records", bytes.NewBuffer(inJson))
@@ -2521,6 +2578,7 @@ func (c CoreClient) GetServerVolume(id string) (ServerVolumeSingleResponse, *htt
 }
 
 func (c CoreClient) CreateServerNetwork(in ServerNetworkCreateRequest, id string) (ServerNetworkSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := ServerNetworkSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/servers/"+c.toStr(id)+"/networks", bytes.NewBuffer(inJson))
@@ -2545,6 +2603,7 @@ type GetServerNetworksQueryParams struct {
 }
 
 func (c CoreClient) GetServerNetworks(id string, qParams GetServerNetworksQueryParams) (ServerNetworkListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := ServerNetworkListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -2566,6 +2625,7 @@ func (c CoreClient) GetServerNetworks(id string, qParams GetServerNetworksQueryP
 }
 
 func (c CoreClient) CreateServerVariant(in ServerVariantCreateRequest) (ServerVariantSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := ServerVariantSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/server-variants", bytes.NewBuffer(inJson))
@@ -2595,6 +2655,7 @@ type GetServerVariantsQueryParams struct {
 }
 
 func (c CoreClient) GetServerVariants(qParams GetServerVariantsQueryParams) (ServerVariantListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := ServerVariantListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -2718,6 +2779,7 @@ func (c CoreClient) DeleteS3AccessKeyGrant(access_key_id string, id string) (Emp
 }
 
 func (c CoreClient) CreateServerMedia(in ServerMediaCreateRequest) (ServerMediaSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := ServerMediaSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/server-medias", bytes.NewBuffer(inJson))
@@ -2750,6 +2812,7 @@ type GetServerMediasQueryParams struct {
 }
 
 func (c CoreClient) GetServerMedias(qParams GetServerMediasQueryParams) (ServerMediaListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := ServerMediaListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -2805,6 +2868,7 @@ func (c CoreClient) DeleteSubnet(id string) (EmptyResponse, *http.Response, erro
 }
 
 func (c CoreClient) AttachServerVolume(in ServerVolumeAttachRequest, id string) (ServerVolumeSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := ServerVolumeSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/server-volumes/"+c.toStr(id)+"/attach", bytes.NewBuffer(inJson))
@@ -2823,6 +2887,7 @@ func (c CoreClient) AttachServerVolume(in ServerVolumeAttachRequest, id string) 
 }
 
 func (c CoreClient) CreatePleskLicense(in PleskLicenseCreateRequest) (PleskLicenseSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := PleskLicenseSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/licenses/plesk", bytes.NewBuffer(inJson))
@@ -2855,6 +2920,7 @@ type GetPleskLicensesQueryParams struct {
 }
 
 func (c CoreClient) GetPleskLicenses(qParams GetPleskLicensesQueryParams) (PleskLicenseListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := PleskLicenseListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -2910,6 +2976,7 @@ func (c CoreClient) DeleteS3AccessKey(id string) (EmptyResponse, *http.Response,
 }
 
 func (c CoreClient) CreateS3AccessKey(in S3AccessKeyCreateRequest) (S3AccessKeySingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := S3AccessKeySingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/storage/s3/access-keys", bytes.NewBuffer(inJson))
@@ -2941,6 +3008,7 @@ type GetS3AccessKeysQueryParams struct {
 }
 
 func (c CoreClient) GetS3AccessKeys(qParams GetS3AccessKeysQueryParams) (S3AccessKeyListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := S3AccessKeyListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -2979,6 +3047,7 @@ func (c CoreClient) GetDNSZone(name string) (DNSZoneSingleResponse, *http.Respon
 }
 
 func (c CoreClient) UpdateDNSZone(in DNSZoneUpdateRequest, name string) (DNSZoneSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := DNSZoneSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("PUT", "/dns/zones/"+c.toStr(name), bytes.NewBuffer(inJson))
@@ -2997,6 +3066,7 @@ func (c CoreClient) UpdateDNSZone(in DNSZoneUpdateRequest, name string) (DNSZone
 }
 
 func (c CoreClient) CreateDomainHandle(in DomainHandleCreateRequest) (DomainHandleSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := DomainHandleSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/domain-handles", bytes.NewBuffer(inJson))
@@ -3028,6 +3098,7 @@ type GetDomainHandlesQueryParams struct {
 }
 
 func (c CoreClient) GetDomainHandles(qParams GetDomainHandlesQueryParams) (DomainHandleListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := DomainHandleListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -3049,6 +3120,7 @@ func (c CoreClient) GetDomainHandles(qParams GetDomainHandlesQueryParams) (Domai
 }
 
 func (c CoreClient) CreateSSLCertificate(in SSLCertificateCreateRequest) (SSLCertificateSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := SSLCertificateSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/ssl/certificates", bytes.NewBuffer(inJson))
@@ -3084,6 +3156,7 @@ type GetSSLCertificatesQueryParams struct {
 }
 
 func (c CoreClient) GetSSLCertificates(qParams GetSSLCertificatesQueryParams) (SSLCertificateListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := SSLCertificateListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -3105,6 +3178,7 @@ func (c CoreClient) GetSSLCertificates(qParams GetSSLCertificatesQueryParams) (S
 }
 
 func (c CoreClient) ScheduleDomainDelete(in DomainScheduleDeleteRequest, name string) (DomainSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := DomainSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/domains/"+c.toStr(name)+"/schedule-delete", bytes.NewBuffer(inJson))
@@ -3127,6 +3201,7 @@ type GetDomainPricingListQueryParams struct {
 }
 
 func (c CoreClient) GetDomainPricingList(qParams GetDomainPricingListQueryParams) (DomainPriceListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := DomainPriceListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -3165,6 +3240,7 @@ func (c CoreClient) GetSSLCertificate(id string) (SSLCertificateSingleResponse, 
 }
 
 func (c CoreClient) CreateSubnetAddress(in SubnetAddressCreateRequest, id string) (AddressSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := AddressSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/subnets/"+c.toStr(id)+"/addresses", bytes.NewBuffer(inJson))
@@ -3183,6 +3259,7 @@ func (c CoreClient) CreateSubnetAddress(in SubnetAddressCreateRequest, id string
 }
 
 func (c CoreClient) CreateNetwork(in NetworkCreateRequest) (NetworkSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := NetworkSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/networks", bytes.NewBuffer(inJson))
@@ -3215,6 +3292,7 @@ type GetNetworksQueryParams struct {
 }
 
 func (c CoreClient) GetNetworks(qParams GetNetworksQueryParams) (NetworkListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := NetworkListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -3270,6 +3348,7 @@ func (c CoreClient) RemoveDomainAuthinfo(name string) (EmptyResponse, *http.Resp
 }
 
 func (c CoreClient) CreateServerStorage(in ServerStorageCreateRequest) (ServerStorageSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := ServerStorageSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/server-storages", bytes.NewBuffer(inJson))
@@ -3322,6 +3401,7 @@ func (c CoreClient) RestoreDomain(name string) (EmptyResponse, *http.Response, e
 }
 
 func (c CoreClient) CreateSSLContact(in SSLContactCreateRequest) (SSLContactSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := SSLContactSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/ssl/contacts", bytes.NewBuffer(inJson))
@@ -3353,6 +3433,7 @@ type GetSSLContactsQueryParams struct {
 }
 
 func (c CoreClient) GetSSLContacts(qParams GetSSLContactsQueryParams) (SSLContactListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := SSLContactListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -3408,6 +3489,7 @@ func (c CoreClient) DeleteServerMedia(id string) (EmptyResponse, *http.Response,
 }
 
 func (c CoreClient) CreateS3AccessKeyGrant(in S3AccessGrantCreateRequest, access_key_id string) (S3AccessGrantSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := S3AccessGrantSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/storage/s3/access-keys/"+c.toStr(access_key_id)+"/grants", bytes.NewBuffer(inJson))
@@ -3438,6 +3520,7 @@ type GetS3AccessKeyGrantsQueryParams struct {
 }
 
 func (c CoreClient) GetS3AccessKeyGrants(access_key_id string, qParams GetS3AccessKeyGrantsQueryParams) (S3AccessGrantListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := S3AccessGrantListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -3527,6 +3610,7 @@ func (c CoreClient) DeleteS3Bucket(id string) (EmptyResponse, *http.Response, er
 }
 
 func (c CoreClient) CreateDomain(in DomainCreateRequest) (DomainSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := DomainSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/domains", bytes.NewBuffer(inJson))
@@ -3563,6 +3647,7 @@ type GetDomainsQueryParams struct {
 }
 
 func (c CoreClient) GetDomains(qParams GetDomainsQueryParams) (DomainListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := DomainListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
