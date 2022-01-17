@@ -1263,7 +1263,7 @@ func (c CoreClient) CreateSSHKey(in SSHKeyCreateRequest) (SSHKeySingleResponse, 
 type GetSSHKeysQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
     Title *string `url:"title,omitempty"`
-    Labels *string `url:"labels,omitempty"`
+    Labels *map[string]string `url:"labels,omitempty"`
 }
 
 type GetSSHKeysQueryParams struct {
@@ -1546,7 +1546,7 @@ func (c CoreClient) DeleteSSLContact(id string) (EmptyResponse, *http.Response, 
 
 type GetDNSZonesQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
-    Labels *string `url:"labels,omitempty"`
+    Labels *map[string]string `url:"labels,omitempty"`
 }
 
 type GetDNSZonesQueryParams struct {
@@ -1698,7 +1698,7 @@ func (c CoreClient) CreateServer(in ServerCreateRequest) (ServerSingleResponse, 
 
 type GetServersQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
-    Labels *string `url:"labels,omitempty"`
+    Labels *map[string]string `url:"labels,omitempty"`
     Name *string `url:"name,omitempty"`
 }
 
@@ -1929,7 +1929,7 @@ func (c CoreClient) CreateSubnet(in SubnetCreateRequest) (SubnetSingleResponse, 
 
 type GetSubnetsQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
-    Labels *string `url:"labels,omitempty"`
+    Labels *map[string]string `url:"labels,omitempty"`
 }
 
 type GetSubnetsQueryParams struct {
@@ -1964,7 +1964,7 @@ func (c CoreClient) GetSubnets(qParams GetSubnetsQueryParams) (SubnetListRespons
 
 type GetServerVolumesQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
-    Labels *string `url:"labels,omitempty"`
+    Labels *map[string]string `url:"labels,omitempty"`
     ServerId *string `url:"server_id,omitempty"`
 }
 
@@ -2118,7 +2118,7 @@ func (c CoreClient) CreateS3Bucket(in S3BucketCreateRequest) (S3BucketSingleResp
 
 type GetS3BucketsQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
-    Labels *string `url:"labels,omitempty"`
+    Labels *map[string]string `url:"labels,omitempty"`
 }
 
 type GetS3BucketsQueryParams struct {
@@ -2245,7 +2245,7 @@ func (c CoreClient) CreateSSLOrganisation(in SSLOrganisationCreateRequest) (SSLO
 
 type GetSSLOrganisationsQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
-    Labels *string `url:"labels,omitempty"`
+    Labels *map[string]string `url:"labels,omitempty"`
 }
 
 type GetSSLOrganisationsQueryParams struct {
@@ -2803,7 +2803,7 @@ func (c CoreClient) CreateServerMedia(in ServerMediaCreateRequest) (ServerMediaS
 type GetServerMediasQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
     Title *string `url:"title,omitempty"`
-    Labels *string `url:"labels,omitempty"`
+    Labels *map[string]string `url:"labels,omitempty"`
 }
 
 type GetServerMediasQueryParams struct {
@@ -2910,7 +2910,7 @@ func (c CoreClient) CreatePleskLicense(in PleskLicenseCreateRequest) (PleskLicen
 
 type GetPleskLicensesQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
-    Labels *string `url:"labels,omitempty"`
+    Labels *map[string]string `url:"labels,omitempty"`
     TypeId *string `url:"type_id,omitempty"`
 }
 
@@ -2999,7 +2999,7 @@ func (c CoreClient) CreateS3AccessKey(in S3AccessKeyCreateRequest) (S3AccessKeyS
 
 type GetS3AccessKeysQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
-    Labels *string `url:"labels,omitempty"`
+    Labels *map[string]string `url:"labels,omitempty"`
 }
 
 type GetS3AccessKeysQueryParams struct {
@@ -3089,7 +3089,7 @@ func (c CoreClient) CreateDomainHandle(in DomainHandleCreateRequest) (DomainHand
 
 type GetDomainHandlesQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
-    Labels *string `url:"labels,omitempty"`
+    Labels *map[string]string `url:"labels,omitempty"`
 }
 
 type GetDomainHandlesQueryParams struct {
@@ -3145,7 +3145,7 @@ type GetSSLCertificatesQueryParamsFilter struct {
     OrganisationId *string `url:"organisation_id,omitempty"`
     ProjectId *string `url:"project_id,omitempty"`
     TechContactId *string `url:"tech_contact_id,omitempty"`
-    Labels *string `url:"labels,omitempty"`
+    Labels *map[string]string `url:"labels,omitempty"`
     TypeId *string `url:"type_id,omitempty"`
     AdminContactId *string `url:"admin_contact_id,omitempty"`
 }
@@ -3283,7 +3283,7 @@ func (c CoreClient) CreateNetwork(in NetworkCreateRequest) (NetworkSingleRespons
 type GetNetworksQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
     Title *string `url:"title,omitempty"`
-    Labels *string `url:"labels,omitempty"`
+    Labels *map[string]string `url:"labels,omitempty"`
 }
 
 type GetNetworksQueryParams struct {
@@ -3424,7 +3424,7 @@ func (c CoreClient) CreateSSLContact(in SSLContactCreateRequest) (SSLContactSing
 
 type GetSSLContactsQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
-    Labels *string `url:"labels,omitempty"`
+    Labels *map[string]string `url:"labels,omitempty"`
 }
 
 type GetSSLContactsQueryParams struct {
@@ -3511,7 +3511,7 @@ func (c CoreClient) CreateS3AccessKeyGrant(in S3AccessGrantCreateRequest, access
 }
 
 type GetS3AccessKeyGrantsQueryParamsFilter struct {
-    Labels *string `url:"labels,omitempty"`
+    Labels *map[string]string `url:"labels,omitempty"`
 }
 
 type GetS3AccessKeyGrantsQueryParams struct {
@@ -3635,7 +3635,7 @@ type GetDomainsQueryParamsFilter struct {
     AdminHandleCode *string `url:"admin_handle_code,omitempty"`
     ZoneHandleCode *string `url:"zone_handle_code,omitempty"`
     ProjectId *string `url:"project_id,omitempty"`
-    Labels *string `url:"labels,omitempty"`
+    Labels *map[string]string `url:"labels,omitempty"`
     OwnerHandleCode *string `url:"owner_handle_code,omitempty"`
     TechHandleCode *string `url:"tech_handle_code,omitempty"`
     Tld *string `url:"tld,omitempty"`
