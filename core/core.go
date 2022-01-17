@@ -122,7 +122,7 @@ type SSHKey struct {
     CreatedAt string `json:"created_at"`
     Id string `json:"id"`
     Title string `json:"title"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
 }
 
 type DomainVerificationStatus struct {
@@ -138,7 +138,7 @@ type Server struct {
     TemplateId string `json:"template_id"`
     Id string `json:"id"`
     State string `json:"state"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
 }
 
 type Address struct {
@@ -194,7 +194,7 @@ type DomainHandle struct {
     LastName string `json:"last_name"`
     BirthPlace *string `json:"birth_place"`
     IdCardIssueDate *string `json:"id_card_issue_date"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
     CountryCode string `json:"country_code"`
     CompanyRegistrationNumber *string `json:"company_registration_number"`
     Phone *string `json:"phone"`
@@ -208,14 +208,14 @@ type S3AccessKey struct {
     ProjectId string `json:"project_id"`
     Id string `json:"id"`
     Title string `json:"title"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
 }
 
 type S3Bucket struct {
     ProjectId string `json:"project_id"`
     Id string `json:"id"`
     Title string `json:"title"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
 }
 
 type S3AccessGrant struct {
@@ -223,7 +223,7 @@ type S3AccessGrant struct {
     Path *string `json:"path"`
     Role string `json:"role"`
     Id string `json:"id"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
 }
 
 type DomainAuthinfo struct {
@@ -246,7 +246,7 @@ type Network struct {
     Tag *int `json:"tag"`
     Title string `json:"title"`
     Type *NetworkType `json:"type"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
 }
 
 type ServerStatus struct {
@@ -280,7 +280,7 @@ type SSLContact struct {
     Organisation string `json:"organisation"`
     CreatedAt string `json:"created_at"`
     Title *string `json:"title"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
     CountryCode string `json:"country_code"`
     ProjectId string `json:"project_id"`
     Phone string `json:"phone"`
@@ -305,7 +305,7 @@ type PleskLicense struct {
     CreatedAt string `json:"created_at"`
     Id string `json:"id"`
     Key string `json:"key"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
 }
 
 type SSLCertificate struct {
@@ -318,7 +318,7 @@ type SSLCertificate struct {
     AdminContactId string `json:"admin_contact_id"`
     Id string `json:"id"`
     TechContactId string `json:"tech_contact_id"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
 }
 
 type ServerVolume struct {
@@ -330,7 +330,7 @@ type ServerVolume struct {
     Id string `json:"id"`
     Title string `json:"title"`
     ServerId *string `json:"server_id"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
 }
 
 type DNSRecord struct {
@@ -355,13 +355,13 @@ type DNSZone struct {
     Type string `json:"type"`
     Ns2 string `json:"ns2"`
     Ns1 string `json:"ns1"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
 }
 
 type AvailabilityZone struct {
     Id string `json:"id"`
     Title string `json:"title"`
-    Config *interface{} `json:"config"`
+    Config interface{} `json:"config"`
 }
 
 type ServerNetwork struct {
@@ -373,7 +373,7 @@ type ServerNetwork struct {
     Id string `json:"id"`
     AddressV4Id *string `json:"address_v4_id"`
     HostId *string `json:"host_id"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
 }
 
 type ServerStorage struct {
@@ -394,7 +394,7 @@ type ServerMedia struct {
     ExternalId *string `json:"external_id"`
     Id string `json:"id"`
     Title string `json:"title"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
 }
 
 type ResponsePagination struct {
@@ -409,7 +409,7 @@ type SSLOrganisation struct {
     City string `json:"city"`
     RegistrationNumber *string `json:"registration_number"`
     CreatedAt string `json:"created_at"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
     Division *string `json:"division"`
     CountryCode string `json:"country_code"`
     ProjectId string `json:"project_id"`
@@ -430,7 +430,7 @@ type Domain struct {
     TechHandleCode string `json:"tech_handle_code"`
     CreatedAt string `json:"created_at"`
     ZoneHandleCode string `json:"zone_handle_code"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
 }
 
 type ServerVariant struct {
@@ -785,7 +785,7 @@ type DomainCheckVerificationResponse struct {
 
 type InvalidRequestResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Data *interface{} `json:"data"`
+    Data interface{} `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
 }
@@ -976,7 +976,7 @@ type DomainHandleCreateRequest struct {
     LastName string `json:"last_name"`
     BirthPlace *string `json:"birth_place"`
     IdCardIssueDate *string `json:"id_card_issue_date"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
     CountryCode string `json:"country_code"`
     CompanyRegistrationNumber *string `json:"company_registration_number"`
     Phone *string `json:"phone"`
@@ -993,14 +993,14 @@ type ServerCreateRequest struct {
     ProjectId string `json:"project_id"`
     Name string `json:"name"`
     TemplateId string `json:"template_id"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
 }
 
 type DNSZoneUpdateRequest struct {
     Hostmaster *string `json:"hostmaster"`
     Ns2 *string `json:"ns2"`
     Ns1 *string `json:"ns1"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
 }
 
 type DNSRecordCreateRequest struct {
@@ -1023,7 +1023,7 @@ type SSLContactCreateRequest struct {
     LastName string `json:"last_name"`
     Organisation string `json:"organisation"`
     Title *string `json:"title"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
     CountryCode string `json:"country_code"`
     ProjectId string `json:"project_id"`
     Phone string `json:"phone"`
@@ -1062,29 +1062,29 @@ type DomainCreateRequest struct {
     Nameserver []DomainRequestNameserver `json:"nameserver"`
     Authinfo *string `json:"authinfo"`
     ZoneHandleCode string `json:"zone_handle_code"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
 }
 
 type SSLCertificateCreateRequest struct {
     OrganisationId *string `json:"organisation_id"`
-    TechContact *interface{} `json:"tech_contact"`
+    TechContact interface{} `json:"tech_contact"`
     Csr string `json:"csr"`
     ProjectId string `json:"project_id"`
     TypeId string `json:"type_id"`
-    AdminContact *interface{} `json:"admin_contact"`
-    Organisation *interface{} `json:"organisation"`
+    AdminContact interface{} `json:"admin_contact"`
+    Organisation interface{} `json:"organisation"`
     ApproverEmail string `json:"approver_email"`
     AdminContactId *string `json:"admin_contact_id"`
     TechContactId *string `json:"tech_contact_id"`
     ValidationMethod string `json:"validation_method"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
 }
 
 type SSHKeyCreateRequest struct {
     PublicKey string `json:"public_key"`
     ProjectId string `json:"project_id"`
     Title string `json:"title"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
 }
 
 type ServerStorageCreateRequest struct {
@@ -1103,14 +1103,14 @@ type ServerNetworkCreateRequest struct {
 
 type AvailabilityZoneUpdateRequest struct {
     Title *string `json:"title"`
-    Config *interface{} `json:"config"`
+    Config interface{} `json:"config"`
 }
 
 type S3AccessKeyCreateRequest struct {
     SecretKey string `json:"secret_key"`
     ProjectId string `json:"project_id"`
     Title string `json:"title"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
 }
 
 type SubnetAddressCreateRequest struct {
@@ -1122,7 +1122,7 @@ type SSLOrganisationCreateRequest struct {
     Address string `json:"address"`
     City string `json:"city"`
     RegistrationNumber *string `json:"registration_number"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
     Division *string `json:"division"`
     CountryCode string `json:"country_code"`
     ProjectId string `json:"project_id"`
@@ -1146,14 +1146,14 @@ type DomainUpdateRequest struct {
     TechHandleCode *string `json:"tech_handle_code"`
     Nameserver *[]DomainRequestNameserver `json:"nameserver"`
     ZoneHandleCode *string `json:"zone_handle_code"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
 }
 
 type S3AccessGrantCreateRequest struct {
     BucketId *string `json:"bucket_id"`
     Path *string `json:"path"`
     Role string `json:"role"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
 }
 
 type DNSRecordUpdateRequest struct {
@@ -1172,7 +1172,7 @@ type DomainHandleUpdateRequest struct {
     IdCard *string `json:"id_card"`
     BirthPlace *string `json:"birth_place"`
     IdCardIssueDate *string `json:"id_card_issue_date"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
     BirthCountryCode *string `json:"birth_country_code"`
     CountryCode *string `json:"country_code"`
     CompanyRegistrationNumber *string `json:"company_registration_number"`
@@ -1198,7 +1198,7 @@ type PleskLicenseCreateRequest struct {
     Address *string `json:"address"`
     ProjectId string `json:"project_id"`
     TypeId string `json:"type_id"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
 }
 
 type ServerStorageClassCreateRequest struct {
@@ -1209,13 +1209,13 @@ type ServerStorageClassCreateRequest struct {
 
 type PleskLicenseUpdateRequest struct {
     Address *string `json:"address"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
 }
 
 type S3BucketCreateRequest struct {
     ProjectId string `json:"project_id"`
     Title string `json:"title"`
-    Labels *interface{} `json:"labels"`
+    Labels map[string]string `json:"labels"`
 }
 
 type DomainScheduleDeleteRequest struct {
@@ -1263,7 +1263,7 @@ func (c CoreClient) CreateSSHKey(in SSHKeyCreateRequest) (SSHKeySingleResponse, 
 type GetSSHKeysQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
     Title *string `url:"title,omitempty"`
-    Labels *map[string]string `url:"labels,omitempty"`
+    Labels map[string]string `url:"labels,omitempty"`
 }
 
 type GetSSHKeysQueryParams struct {
@@ -1546,7 +1546,7 @@ func (c CoreClient) DeleteSSLContact(id string) (EmptyResponse, *http.Response, 
 
 type GetDNSZonesQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
-    Labels *map[string]string `url:"labels,omitempty"`
+    Labels map[string]string `url:"labels,omitempty"`
 }
 
 type GetDNSZonesQueryParams struct {
@@ -1698,7 +1698,7 @@ func (c CoreClient) CreateServer(in ServerCreateRequest) (ServerSingleResponse, 
 
 type GetServersQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
-    Labels *map[string]string `url:"labels,omitempty"`
+    Labels map[string]string `url:"labels,omitempty"`
     Name *string `url:"name,omitempty"`
 }
 
@@ -1929,7 +1929,7 @@ func (c CoreClient) CreateSubnet(in SubnetCreateRequest) (SubnetSingleResponse, 
 
 type GetSubnetsQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
-    Labels *map[string]string `url:"labels,omitempty"`
+    Labels map[string]string `url:"labels,omitempty"`
 }
 
 type GetSubnetsQueryParams struct {
@@ -1964,7 +1964,7 @@ func (c CoreClient) GetSubnets(qParams GetSubnetsQueryParams) (SubnetListRespons
 
 type GetServerVolumesQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
-    Labels *map[string]string `url:"labels,omitempty"`
+    Labels map[string]string `url:"labels,omitempty"`
     ServerId *string `url:"server_id,omitempty"`
 }
 
@@ -2063,7 +2063,7 @@ func (c CoreClient) GetServerVolumeClasses(qParams GetServerVolumeClassesQueryPa
 }
 
 type SearchQueryParamsLabels struct {
-    Name *map[string]string `url:"name,omitempty"`
+    Name map[string]string `url:"name,omitempty"`
 }
 
 type SearchQueryParams struct {
@@ -2118,7 +2118,7 @@ func (c CoreClient) CreateS3Bucket(in S3BucketCreateRequest) (S3BucketSingleResp
 
 type GetS3BucketsQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
-    Labels *map[string]string `url:"labels,omitempty"`
+    Labels map[string]string `url:"labels,omitempty"`
 }
 
 type GetS3BucketsQueryParams struct {
@@ -2245,7 +2245,7 @@ func (c CoreClient) CreateSSLOrganisation(in SSLOrganisationCreateRequest) (SSLO
 
 type GetSSLOrganisationsQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
-    Labels *map[string]string `url:"labels,omitempty"`
+    Labels map[string]string `url:"labels,omitempty"`
 }
 
 type GetSSLOrganisationsQueryParams struct {
@@ -2803,7 +2803,7 @@ func (c CoreClient) CreateServerMedia(in ServerMediaCreateRequest) (ServerMediaS
 type GetServerMediasQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
     Title *string `url:"title,omitempty"`
-    Labels *map[string]string `url:"labels,omitempty"`
+    Labels map[string]string `url:"labels,omitempty"`
 }
 
 type GetServerMediasQueryParams struct {
@@ -2910,7 +2910,7 @@ func (c CoreClient) CreatePleskLicense(in PleskLicenseCreateRequest) (PleskLicen
 
 type GetPleskLicensesQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
-    Labels *map[string]string `url:"labels,omitempty"`
+    Labels map[string]string `url:"labels,omitempty"`
     TypeId *string `url:"type_id,omitempty"`
 }
 
@@ -2999,7 +2999,7 @@ func (c CoreClient) CreateS3AccessKey(in S3AccessKeyCreateRequest) (S3AccessKeyS
 
 type GetS3AccessKeysQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
-    Labels *map[string]string `url:"labels,omitempty"`
+    Labels map[string]string `url:"labels,omitempty"`
 }
 
 type GetS3AccessKeysQueryParams struct {
@@ -3089,7 +3089,7 @@ func (c CoreClient) CreateDomainHandle(in DomainHandleCreateRequest) (DomainHand
 
 type GetDomainHandlesQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
-    Labels *map[string]string `url:"labels,omitempty"`
+    Labels map[string]string `url:"labels,omitempty"`
 }
 
 type GetDomainHandlesQueryParams struct {
@@ -3145,7 +3145,7 @@ type GetSSLCertificatesQueryParamsFilter struct {
     OrganisationId *string `url:"organisation_id,omitempty"`
     ProjectId *string `url:"project_id,omitempty"`
     TechContactId *string `url:"tech_contact_id,omitempty"`
-    Labels *map[string]string `url:"labels,omitempty"`
+    Labels map[string]string `url:"labels,omitempty"`
     TypeId *string `url:"type_id,omitempty"`
     AdminContactId *string `url:"admin_contact_id,omitempty"`
 }
@@ -3283,7 +3283,7 @@ func (c CoreClient) CreateNetwork(in NetworkCreateRequest) (NetworkSingleRespons
 type GetNetworksQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
     Title *string `url:"title,omitempty"`
-    Labels *map[string]string `url:"labels,omitempty"`
+    Labels map[string]string `url:"labels,omitempty"`
 }
 
 type GetNetworksQueryParams struct {
@@ -3424,7 +3424,7 @@ func (c CoreClient) CreateSSLContact(in SSLContactCreateRequest) (SSLContactSing
 
 type GetSSLContactsQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
-    Labels *map[string]string `url:"labels,omitempty"`
+    Labels map[string]string `url:"labels,omitempty"`
 }
 
 type GetSSLContactsQueryParams struct {
@@ -3511,7 +3511,7 @@ func (c CoreClient) CreateS3AccessKeyGrant(in S3AccessGrantCreateRequest, access
 }
 
 type GetS3AccessKeyGrantsQueryParamsFilter struct {
-    Labels *map[string]string `url:"labels,omitempty"`
+    Labels map[string]string `url:"labels,omitempty"`
 }
 
 type GetS3AccessKeyGrantsQueryParams struct {
@@ -3635,7 +3635,7 @@ type GetDomainsQueryParamsFilter struct {
     AdminHandleCode *string `url:"admin_handle_code,omitempty"`
     ZoneHandleCode *string `url:"zone_handle_code,omitempty"`
     ProjectId *string `url:"project_id,omitempty"`
-    Labels *map[string]string `url:"labels,omitempty"`
+    Labels map[string]string `url:"labels,omitempty"`
     OwnerHandleCode *string `url:"owner_handle_code,omitempty"`
     TechHandleCode *string `url:"tech_handle_code,omitempty"`
     Tld *string `url:"tld,omitempty"`

@@ -82,7 +82,7 @@ func (c AuthClient) toStr(in interface{}) string {
 }
 type Project struct {
     Id string `json:"id"`
-    Detail *struct {
+    Detail struct {
         DomainCount int `json:"domain_count"`
         PleskLicenseCount int `json:"plesk_license_count"`
         ServerCount int `json:"server_count"`
@@ -183,7 +183,7 @@ type UserSingleResponse struct {
 
 type InvalidRequestResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Data *interface{} `json:"data"`
+    Data interface{} `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
 }
