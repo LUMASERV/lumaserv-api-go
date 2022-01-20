@@ -44,7 +44,7 @@ func (c *BillingClient) SetAccessToken(token string) {
 func (c *BillingClient) Request(method string, path string, postBody io.Reader) (*http.Response, []byte, error) {
     if c.client == nil {
         c.client = &http.Client{
-            Timeout: time.Second * 2,
+            Timeout: time.Second * 5,
         }
     }
 

@@ -44,7 +44,7 @@ func (c *AuthClient) SetAccessToken(token string) {
 func (c *AuthClient) Request(method string, path string, postBody io.Reader) (*http.Response, []byte, error) {
     if c.client == nil {
         c.client = &http.Client{
-            Timeout: time.Second * 2,
+            Timeout: time.Second * 5,
         }
     }
 
@@ -80,6 +80,35 @@ func (c AuthClient) toStr(in interface{}) string {
 
     panic("Unhandled type in toStr")
 }
+type User struct {
+    Gender *Gender `json:"gender"`
+    LastName string `json:"last_name"`
+    Id string `json:"id"`
+    State *UserState `json:"state"`
+    CustomerId *int `json:"customer_id"`
+    Type *UserType `json:"type"`
+    FirstName string `json:"first_name"`
+    Email string `json:"email"`
+}
+
+type UserState string
+
+type Token struct {
+    UserId string `json:"user_id"`
+    Scope TokenScope `json:"scope"`
+    ValidUntil *string `json:"validuntil"`
+    CreatedAt string `json:"created_at"`
+    Type string `json:"type"`
+    Token *string `json:"token"`
+}
+
+type ResponseMessage struct {
+    Message string `json:"message"`
+    Key string `json:"key"`
+}
+
+type Gender string
+
 type Project struct {
     Id string `json:"id"`
     Detail struct {
@@ -90,17 +119,6 @@ type Project struct {
         S3BucketCount int `json:"s3_bucket_count"`
     } `json:"detail"`
     Title string `json:"title"`
-}
-
-type User struct {
-    Gender *string `json:"gender"`
-    LastName string `json:"last_name"`
-    Id string `json:"id"`
-    State *string `json:"state"`
-    CustomerId *int `json:"customer_id"`
-    Type *string `json:"type"`
-    FirstName string `json:"first_name"`
-    Email string `json:"email"`
 }
 
 type TokenValidationInfo struct {
@@ -119,24 +137,10 @@ type TokenScope struct {
     ProjectId *string `json:"project_id"`
 }
 
-type Token struct {
-    UserId string `json:"user_id"`
-    Scope TokenScope `json:"scope"`
-    ValidUntil *string `json:"validuntil"`
-    CreatedAt string `json:"created_at"`
-    Type string `json:"type"`
-    Token *string `json:"token"`
-}
-
 type ResponseMessages struct {
     Warnings []ResponseMessage `json:"warnings"`
     Errors []ResponseMessage `json:"errors"`
     Infos []ResponseMessage `json:"infos"`
-}
-
-type ResponseMessage struct {
-    Message string `json:"message"`
-    Key string `json:"key"`
 }
 
 type ProjectMember struct {
@@ -144,6 +148,8 @@ type ProjectMember struct {
     UserId *string `json:"user_id"`
     ProjectId *string `json:"project_id"`
 }
+
+type UserType string
 
 type ResponseMetadata struct {
     TransactionId string `json:"transaction_id"`
@@ -261,6 +267,16 @@ type ProjectUpdateRequest struct {
     Title *string `json:"title"`
 }
 
+type UserCreateRequest struct {
+    Password string `json:"password"`
+    Gender Gender `json:"gender"`
+    LastName string `json:"last_name"`
+    Company *string `json:"company"`
+    Type *UserType `json:"type"`
+    FirstName string `json:"first_name"`
+    Email string `json:"email"`
+}
+
 func (c AuthClient) CreateProject(in ProjectCreateRequest) (ProjectSingleResponse, *http.Response, error) {
     body := ProjectSingleResponse{}
     inJson, err := json.Marshal(in)
@@ -371,6 +387,23 @@ func (c AuthClient) Login(in LoginRequest) (LoginResponse, *http.Response, error
     body := LoginResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/login", bytes.NewBuffer(inJson))
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c AuthClient) CreateUser() (UserSingleResponse, *http.Response, error) {
+    body := UserSingleResponse{}
+    res, j, err := c.Request("POST", "/users", nil)
     if err != nil {
         return body, res, err
     }
