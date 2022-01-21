@@ -1145,6 +1145,11 @@ type ServerMediaCreateRequest struct {
     Title string `json:"title"`
 }
 
+type ServerUpdateRequest struct {
+    Name *string `json:"name"`
+    Labels map[string]*string `json:"labels"`
+}
+
 type DomainUpdateRequest struct {
     AdminHandleCode *string `json:"admin_handle_code"`
     OwnerHandleCode *string `json:"owner_handle_code"`
@@ -1433,6 +1438,25 @@ func (c CoreClient) GetServer(id string) (ServerSingleResponse, *http.Response, 
 func (c CoreClient) DeleteServer(id string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
     res, j, err := c.Request("DELETE", "/servers/"+c.toStr(id), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c CoreClient) UpdateServer(in ServerUpdateRequest, id string) (ServerSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
+    body := ServerSingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("PUT", "/servers/"+c.toStr(id), bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }

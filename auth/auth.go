@@ -111,13 +111,6 @@ type Gender string
 
 type Project struct {
     Id string `json:"id"`
-    Detail struct {
-        DomainCount int `json:"domain_count"`
-        PleskLicenseCount int `json:"plesk_license_count"`
-        ServerCount int `json:"server_count"`
-        SslCertificateCount int `json:"ssl_certificate_count"`
-        S3BucketCount int `json:"s3_bucket_count"`
-    } `json:"detail"`
     Title string `json:"title"`
 }
 
@@ -258,12 +251,10 @@ type LoginRequest struct {
 }
 
 type ProjectCreateRequest struct {
-    CustomerReference *string `json:"customer_reference"`
     Title string `json:"title"`
 }
 
 type ProjectUpdateRequest struct {
-    CustomerReference *string `json:"customer_reference"`
     Title *string `json:"title"`
 }
 
