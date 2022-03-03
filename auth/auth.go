@@ -130,6 +130,11 @@ type TokenScope struct {
     ProjectId *string `json:"project_id"`
 }
 
+type Country struct {
+    Code string `json:"code"`
+    Title string `json:"title"`
+}
+
 type ResponseMessages struct {
     Warnings []ResponseMessage `json:"warnings"`
     Errors []ResponseMessage `json:"errors"`
@@ -150,14 +155,6 @@ type ResponseMetadata struct {
     BuildTimestamp string `json:"build_timestamp"`
 }
 
-type ProjectMemberListResponse struct {
-    Metadata ResponseMetadata `json:"metadata"`
-    Pagination *ResponsePagination `json:"pagination"`
-    Data []ProjectMember `json:"data"`
-    Success bool `json:"success"`
-    Messages ResponseMessages `json:"messages"`
-}
-
 type TokenListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
     Pagination *ResponsePagination `json:"pagination"`
@@ -169,13 +166,6 @@ type TokenListResponse struct {
 type LoginResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
     Data Token `json:"data"`
-    Success bool `json:"success"`
-    Messages ResponseMessages `json:"messages"`
-}
-
-type UserSingleResponse struct {
-    Metadata ResponseMetadata `json:"metadata"`
-    Data User `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
 }
@@ -205,6 +195,43 @@ type ProjectListResponse struct {
 type TokenSingleResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
     Data Token `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
+}
+
+type AuditLogResponse struct {
+    Metadata ResponseMetadata `json:"metadata"`
+    Data []interface{} `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
+}
+
+type CountrySingleResponse struct {
+    Metadata ResponseMetadata `json:"metadata"`
+    Data Country `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
+}
+
+type ProjectMemberListResponse struct {
+    Metadata ResponseMetadata `json:"metadata"`
+    Pagination *ResponsePagination `json:"pagination"`
+    Data []ProjectMember `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
+}
+
+type CountryListResponse struct {
+    Metadata ResponseMetadata `json:"metadata"`
+    Pagination *ResponsePagination `json:"pagination"`
+    Data []Country `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
+}
+
+type UserSingleResponse struct {
+    Metadata ResponseMetadata `json:"metadata"`
+    Data User `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
 }
@@ -258,6 +285,18 @@ type ProjectUpdateRequest struct {
     Title *string `json:"title"`
 }
 
+type UserUpdateRequest struct {
+    Password *string `json:"password"`
+    Gender *Gender `json:"gender"`
+    LastName *string `json:"last_name"`
+    Company *string `json:"company"`
+    State *UserState `json:"state"`
+    Type *UserType `json:"type"`
+    CustomerId *int `json:"customer_id"`
+    FirstName *string `json:"first_name"`
+    Email *string `json:"email"`
+}
+
 type UserCreateRequest struct {
     Password string `json:"password"`
     Gender Gender `json:"gender"`
@@ -266,6 +305,12 @@ type UserCreateRequest struct {
     Type *UserType `json:"type"`
     FirstName string `json:"first_name"`
     Email string `json:"email"`
+}
+
+type AuditLogRequest struct {
+    Query interface{} `json:"query"`
+    Limit *int `json:"limit"`
+    Sort interface{} `json:"sort"`
 }
 
 func (c AuthClient) CreateProject(in ProjectCreateRequest) (ProjectSingleResponse, *http.Response, error) {
@@ -392,9 +437,10 @@ func (c AuthClient) Login(in LoginRequest) (LoginResponse, *http.Response, error
     return body, res, err
 }
 
-func (c AuthClient) CreateUser() (UserSingleResponse, *http.Response, error) {
+func (c AuthClient) CreateUser(in UserCreateRequest) (UserSingleResponse, *http.Response, error) {
     body := UserSingleResponse{}
-    res, j, err := c.Request("POST", "/users", nil)
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("POST", "/users", bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
@@ -409,7 +455,12 @@ func (c AuthClient) CreateUser() (UserSingleResponse, *http.Response, error) {
     return body, res, err
 }
 
+type GetUsersQueryParamsFilter struct {
+    CustomerId *string `url:"customer_id,omitempty"`
+}
+
 type GetUsersQueryParams struct {
+    Filter *GetUsersQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
@@ -439,6 +490,24 @@ func (c AuthClient) GetUsers(qParams GetUsersQueryParams) (UserListResponse, *ht
 func (c AuthClient) GetUser(id string) (UserSingleResponse, *http.Response, error) {
     body := UserSingleResponse{}
     res, j, err := c.Request("GET", "/users/"+c.toStr(id), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c AuthClient) UpdateUser(in UserUpdateRequest, id string) (UserSingleResponse, *http.Response, error) {
+    body := UserSingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("PUT", "/users/"+c.toStr(id), bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
@@ -489,6 +558,24 @@ func (c AuthClient) ExecutePasswordReset(in ExecutePasswordResetRequest) (EmptyR
     return body, res, err
 }
 
+func (c AuthClient) SearchAuditLog(in AuditLogRequest) (AuditLogResponse, *http.Response, error) {
+    body := AuditLogResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("POST", "/audit-log", bytes.NewBuffer(inJson))
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
 func (c AuthClient) CreateToken(in TokenCreateRequest) (TokenSingleResponse, *http.Response, error) {
     body := TokenSingleResponse{}
     inJson, err := json.Marshal(in)
@@ -507,9 +594,41 @@ func (c AuthClient) CreateToken(in TokenCreateRequest) (TokenSingleResponse, *ht
     return body, res, err
 }
 
-func (c AuthClient) GetTokens() (TokenListResponse, *http.Response, error) {
+type GetTokensQueryParamsFilter struct {
+    UserId *string `url:"user_id,omitempty"`
+}
+
+type GetTokensQueryParams struct {
+    Filter *GetTokensQueryParamsFilter `url:"filter,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+}
+
+func (c AuthClient) GetTokens(qParams GetTokensQueryParams) (TokenListResponse, *http.Response, error) {
     body := TokenListResponse{}
-    res, j, err := c.Request("GET", "/tokens", nil)
+    q, err := query.Values(qParams)
+    if err != nil {
+        return body, nil, err
+    }
+    res, j, err := c.Request("GET", "/tokens"+"?"+q.Encode(), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c AuthClient) GetCountry(code string) (CountrySingleResponse, *http.Response, error) {
+    body := CountrySingleResponse{}
+    res, j, err := c.Request("GET", "/countries/"+c.toStr(code), nil)
     if err != nil {
         return body, res, err
     }
@@ -639,6 +758,33 @@ func (c AuthClient) RemoveProjectMember(id string, user_id string) (EmptyRespons
 func (c AuthClient) GetUserProjectMemberships(id string) (ProjectMemberListResponse, *http.Response, error) {
     body := ProjectMemberListResponse{}
     res, j, err := c.Request("GET", "/users/"+c.toStr(id)+"/project_memberships", nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+type GetCountriesQueryParams struct {
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+}
+
+func (c AuthClient) GetCountries(qParams GetCountriesQueryParams) (CountryListResponse, *http.Response, error) {
+    body := CountryListResponse{}
+    q, err := query.Values(qParams)
+    if err != nil {
+        return body, nil, err
+    }
+    res, j, err := c.Request("GET", "/countries"+"?"+q.Encode(), nil)
     if err != nil {
         return body, res, err
     }
