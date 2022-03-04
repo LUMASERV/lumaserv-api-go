@@ -85,7 +85,7 @@ type User struct {
     LastName string `json:"last_name"`
     Id string `json:"id"`
     State *UserState `json:"state"`
-    CustomerId *int `json:"customer_id"`
+    CustomerId *string `json:"customer_id"`
     Type *UserType `json:"type"`
     FirstName string `json:"first_name"`
     Email string `json:"email"`
@@ -292,7 +292,7 @@ type UserUpdateRequest struct {
     Company *string `json:"company"`
     State *UserState `json:"state"`
     Type *UserType `json:"type"`
-    CustomerId *int `json:"customer_id"`
+    CustomerId *string `json:"customer_id"`
     FirstName *string `json:"first_name"`
     Email *string `json:"email"`
 }
