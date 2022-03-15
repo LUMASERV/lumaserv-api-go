@@ -89,7 +89,7 @@ type InvoiceDetailed struct {
     Positions *[]InvoicePosition `json:"positions"`
     Id *string `json:"id"`
     State *InvoiceState `json:"state"`
-    CustomerId *int `json:"customer_id"`
+    CustomerId *string `json:"customer_id"`
 }
 
 type OfferCreateRequestPosition struct {
@@ -110,7 +110,7 @@ type Invoice struct {
     DueAt *string `json:"due_at"`
     Id *string `json:"id"`
     State *InvoiceState `json:"state"`
-    CustomerId *int `json:"customer_id"`
+    CustomerId *string `json:"customer_id"`
 }
 
 type Customer struct {
@@ -150,7 +150,7 @@ type PaymentReminder struct {
     InvoiceId string `json:"invoice_id"`
     Id string `json:"id"`
     State *PaymentReminderState `json:"state"`
-    CustomerId *int `json:"customer_id"`
+    CustomerId *string `json:"customer_id"`
 }
 
 type FileDownload struct {
@@ -208,7 +208,7 @@ type OnlinePayment struct {
     ExternalId *string `json:"external_id"`
     Id string `json:"id"`
     State *string `json:"state"`
-    CustomerId *int `json:"customer_id"`
+    CustomerId *string `json:"customer_id"`
 }
 
 type ServiceContractCreateRequestPosition struct {
@@ -234,7 +234,7 @@ type ServiceContract struct {
     Description *string `json:"description"`
     Runtime *string `json:"runtime"`
     Id string `json:"id"`
-    CustomerId int `json:"customer_id"`
+    CustomerId string `json:"customer_id"`
     Title *string `json:"title"`
     AccountingPeriod *string `json:"accounting_period"`
 }
@@ -306,7 +306,7 @@ type DebitMandate struct {
     SignedAt *string `json:"signed_at"`
     Depositor *string `json:"depositor"`
     Id string `json:"id"`
-    CustomerId int `json:"customer_id"`
+    CustomerId string `json:"customer_id"`
     PostalCode *string `json:"postal_code"`
 }
 
@@ -553,13 +553,13 @@ type OfferUpdateRequest struct {
     Amount *float32 `json:"amount"`
     NetAmount *float32 `json:"net_amount"`
     State *OfferState `json:"state"`
-    CustomerId *int `json:"customer_id"`
+    CustomerId *string `json:"customer_id"`
 }
 
 type InvoiceCreateRequest struct {
     DueAt string `json:"due_at"`
     Positions *[]InvoiceCreateRequestPosition `json:"positions"`
-    CustomerId int `json:"customer_id"`
+    CustomerId string `json:"customer_id"`
 }
 
 type OfferPositionUpdateRequest struct {
@@ -612,7 +612,7 @@ type InvoiceUpdateRequest struct {
     CancelledAt *string `json:"cancelled_at"`
     DueAt *string `json:"due_at"`
     State *InvoiceState `json:"state"`
-    CustomerId *int `json:"customer_id"`
+    CustomerId *string `json:"customer_id"`
 }
 
 type OfferCreateRequest struct {
@@ -621,7 +621,7 @@ type OfferCreateRequest struct {
     Positions *[]OfferCreateRequestPosition `json:"positions"`
     NetAmount *float32 `json:"net_amount"`
     State *OfferState `json:"state"`
-    CustomerId int `json:"customer_id"`
+    CustomerId string `json:"customer_id"`
 }
 
 type PaymentReminderUpdateRequest struct {
@@ -657,7 +657,7 @@ type PaymentReminderCreateRequest struct {
     DueDate *string `json:"due_date"`
     InvoiceId string `json:"invoice_id"`
     State *string `json:"state"`
-    CustomerId int `json:"customer_id"`
+    CustomerId string `json:"customer_id"`
 }
 
 type ServiceContractPositionCreateRequest struct {
@@ -697,7 +697,7 @@ type ServiceContractCreateRequest struct {
     Description string `json:"description"`
     Runtime ServiceContractInterval `json:"runtime"`
     Positions *[]ServiceContractCreateRequestPosition `json:"positions"`
-    CustomerId int `json:"customer_id"`
+    CustomerId string `json:"customer_id"`
     Title string `json:"title"`
     AccountingPeriod ServiceContractInterval `json:"accounting_period"`
 }
@@ -714,7 +714,7 @@ type DebitMandateCreateRequest struct {
     BankName string `json:"bank_name"`
     SignedAt *string `json:"signed_at"`
     Depositor string `json:"depositor"`
-    CustomerId int `json:"customer_id"`
+    CustomerId string `json:"customer_id"`
     PostalCode string `json:"postal_code"`
 }
 
