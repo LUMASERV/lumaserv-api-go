@@ -694,7 +694,12 @@ func (c AuthClient) ValidateToken(token string) (TokenValidationResponse, *http.
     return body, res, err
 }
 
+type GetProjectMembersQueryParamsFilter struct {
+    Role *string `url:"role,omitempty"`
+}
+
 type GetProjectMembersQueryParams struct {
+    Filter *GetProjectMembersQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`

@@ -642,6 +642,7 @@ type ServiceContractPositionUpdateRequest struct {
 type BillingPositionUpdateRequest struct {
     InvoicePositionId *string `json:"invoice_position_id"`
     Amount *float32 `json:"amount"`
+    Unit *string `json:"unit"`
     Price *float32 `json:"price"`
     Description *string `json:"description"`
     Title *string `json:"title"`
@@ -671,6 +672,7 @@ type ServiceContractPositionCreateRequest struct {
 type BillingPositionCreateRequest struct {
     InvoicePositionId *string `json:"invoice_position_id"`
     Amount float32 `json:"amount"`
+    Unit string `json:"unit"`
     Price float32 `json:"price"`
     Description string `json:"description"`
     CustomerId string `json:"customer_id"`
