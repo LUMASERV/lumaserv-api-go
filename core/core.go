@@ -301,6 +301,10 @@ type ResponseMessage struct {
     Key string `json:"key"`
 }
 
+type ServerFirewallMemberType string
+
+type ServerFirewallRuleType string
+
 type ResponsePagination struct {
     Total int `json:"total"`
     Page int `json:"page"`
@@ -315,6 +319,17 @@ type ScheduledServerAction struct {
     ExecuteAt string `json:"execute_at"`
     ServerId string `json:"server_id"`
     Type ServerActionType `json:"type"`
+}
+
+type ServerFirewallMember struct {
+    LabelValue *string `json:"label_value"`
+    Applied bool `json:"applied"`
+    Children *[]ServerFirewallMember `json:"children"`
+    CreatedAt string `json:"created_at"`
+    Id string `json:"id"`
+    Type ServerFirewallMemberType `json:"type"`
+    ServerId *string `json:"server_id"`
+    LabelName *string `json:"label_name"`
 }
 
 type Domain struct {
@@ -334,6 +349,19 @@ type Subnet struct {
     Prefix int `json:"prefix"`
     CreatedAt string `json:"created_at"`
     Id string `json:"id"`
+}
+
+type ServerFirewallRule struct {
+    SourceAddresses *[]string `json:"source_addresses"`
+    Protocol *ServerFirewallRuleProtocol `json:"protocol"`
+    DestinationPorts *[]string `json:"destination_ports"`
+    DestinationAddresses *[]string `json:"destination_addresses"`
+    Applied bool `json:"applied"`
+    Description *string `json:"description"`
+    CreatedAt string `json:"created_at"`
+    Id string `json:"id"`
+    SourcePorts *[]string `json:"source_ports"`
+    Type ServerFirewallRuleType `json:"type"`
 }
 
 type ServerStorageClass struct {
@@ -437,6 +465,13 @@ type PleskLicense struct {
     Labels map[string]*string `json:"labels"`
 }
 
+type ServerFirewall struct {
+    ProjectId string `json:"project_id"`
+    CreatedAt string `json:"created_at"`
+    Id string `json:"id"`
+    Title string `json:"title"`
+}
+
 type SSLCertificate struct {
     OrganisationId string `json:"organisation_id"`
     ValidUntil *string `json:"valid_until"`
@@ -485,6 +520,8 @@ type ServerMedia struct {
     Title string `json:"title"`
     Labels map[string]*string `json:"labels"`
 }
+
+type ServerFirewallRuleProtocol string
 
 type SSLOrganisation struct {
     AdditionalAddress *string `json:"additional_address"`
@@ -549,6 +586,14 @@ type DomainHandleSingleResponse struct {
     Data DomainHandle `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
+}
+
+type ServerFirewallRuleListResponse struct {
+    Metadata *ResponseMetadata `json:"metadata"`
+    Pagination *ResponsePagination `json:"pagination"`
+    Data *[]ServerFirewallRule `json:"data"`
+    Success *bool `json:"success"`
+    Messages *ResponseMessages `json:"messages"`
 }
 
 type DomainListResponse struct {
@@ -673,6 +718,13 @@ type SSLOrganisationSingleResponse struct {
 type ServerVNCResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
     Data ServerVNC `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
+}
+
+type ServerFirewallRuleSingleResponse struct {
+    Metadata ResponseMetadata `json:"metadata"`
+    Data ServerFirewallRule `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
 }
@@ -929,6 +981,14 @@ type ServerBackupSingleResponse struct {
     Messages ResponseMessages `json:"messages"`
 }
 
+type ServerFirewallListResponse struct {
+    Metadata ResponseMetadata `json:"metadata"`
+    Pagination *ResponsePagination `json:"pagination"`
+    Data []ServerFirewall `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
+}
+
 type DNSRecordSingleResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
     Data DNSRecord `json:"data"`
@@ -998,10 +1058,25 @@ type SSLContactListResponse struct {
     Messages ResponseMessages `json:"messages"`
 }
 
+type ServerFirewallMemberListResponse struct {
+    Metadata ResponseMetadata `json:"metadata"`
+    Pagination *ResponsePagination `json:"pagination"`
+    Data []ServerFirewallMember `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
+}
+
 type SSLCertificateListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
     Pagination *ResponsePagination `json:"pagination"`
     Data []SSLCertificate `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
+}
+
+type ServerFirewallSingleResponse struct {
+    Metadata ResponseMetadata `json:"metadata"`
+    Data ServerFirewall `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
 }
@@ -1051,6 +1126,13 @@ type DomainAuthinfoResponse struct {
     Messages ResponseMessages `json:"messages"`
 }
 
+type ServerFirewallMemberSingleResponse struct {
+    Metadata ResponseMetadata `json:"metadata"`
+    Data ServerFirewallMember `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
+}
+
 type ScheduledServerActionSingleResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
     Data ScheduledServerAction `json:"data"`
@@ -1061,6 +1143,11 @@ type ScheduledServerActionSingleResponse struct {
 type ServerBackupCreateRequest struct {
     ServerId string `json:"server_id"`
     Title *string `json:"title"`
+}
+
+type ServerFirewallCreateRequest struct {
+    ProjectId string `json:"project_id"`
+    Title string `json:"title"`
 }
 
 type DomainHandleCreateRequest struct {
@@ -1189,11 +1276,28 @@ type SSLCertificateCreateRequest struct {
     Labels map[string]*string `json:"labels"`
 }
 
+type ServerFIrewallMemberCreateRequest struct {
+    LabelValue *string `json:"label_value"`
+    Type ServerFirewallMemberType `json:"type"`
+    ServerId *string `json:"server_id"`
+    LabelName *string `json:"label_name"`
+}
+
 type ScheduledServerActionCreateRequest struct {
     BackupId *string `json:"backup_id"`
     Interval *ScheduledServerActionInterval `json:"interval"`
     ExecuteAt string `json:"execute_at"`
     Type ServerActionType `json:"type"`
+}
+
+type ServerFirewallRuleCreateRequest struct {
+    SourceAddresses *[]string `json:"source_addresses"`
+    Protocol *ServerFirewallRuleProtocol `json:"protocol"`
+    DestinationPorts *[]string `json:"destination_ports"`
+    DestinationAddresses *[]string `json:"destination_addresses"`
+    Description *string `json:"description"`
+    SourcePorts *[]string `json:"source_ports"`
+    Type ServerFirewallRuleType `json:"type"`
 }
 
 type SSHKeyCreateRequest struct {
@@ -1551,6 +1655,40 @@ func (c CoreClient) ShutdownServer(id string, qParams ShutdownServerQueryParams)
     return body, res, err
 }
 
+func (c CoreClient) GetServerFirewall(id string) (ServerFirewallSingleResponse, *http.Response, error) {
+    body := ServerFirewallSingleResponse{}
+    res, j, err := c.Request("GET", "/server-firewalls/"+c.toStr(id), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c CoreClient) DeleteServerFirewall(id string) (EmptyResponse, *http.Response, error) {
+    body := EmptyResponse{}
+    res, j, err := c.Request("DELETE", "/server-firewalls/"+c.toStr(id), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
 func (c CoreClient) GetServer(id string) (ServerSingleResponse, *http.Response, error) {
     body := ServerSingleResponse{}
     res, j, err := c.Request("GET", "/servers/"+c.toStr(id), nil)
@@ -1789,6 +1927,92 @@ func (c CoreClient) GetDNSZones(qParams GetDNSZonesQueryParams) (DNSZoneListResp
 func (c CoreClient) RecreateServer(id string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
     res, j, err := c.Request("POST", "/servers/"+c.toStr(id)+"/recreate", nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c CoreClient) CreateServerFirewall(in ServerFirewallCreateRequest) (ServerFirewallSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
+    body := ServerFirewallSingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("POST", "/server-firewalls", bytes.NewBuffer(inJson))
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+type GetServerFirewallsQueryParamsFilter struct {
+    ProjectId *string `url:"project_id,omitempty"`
+}
+
+type GetServerFirewallsQueryParams struct {
+    Filter *GetServerFirewallsQueryParamsFilter `url:"filter,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+}
+
+func (c CoreClient) GetServerFirewalls(qParams GetServerFirewallsQueryParams) (ServerFirewallListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
+    body := ServerFirewallListResponse{}
+    q, err := query.Values(qParams)
+    if err != nil {
+        return body, nil, err
+    }
+    res, j, err := c.Request("GET", "/server-firewalls"+"?"+q.Encode(), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c CoreClient) GetServerFirewallRule(id string, rule_id string) (ServerFirewallRuleSingleResponse, *http.Response, error) {
+    body := ServerFirewallRuleSingleResponse{}
+    res, j, err := c.Request("GET", "/server-firewalls/"+c.toStr(id)+"/rules/"+c.toStr(rule_id), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c CoreClient) DeleteServerFirewallRule(id string, rule_id string) (EmptyResponse, *http.Response, error) {
+    body := EmptyResponse{}
+    res, j, err := c.Request("DELETE", "/server-firewalls/"+c.toStr(id)+"/rules/"+c.toStr(rule_id), nil)
     if err != nil {
         return body, res, err
     }
@@ -2136,6 +2360,7 @@ func (c CoreClient) CreateServerBackup(in ServerBackupCreateRequest) (ServerBack
 
 type GetServerBackupsQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
+    ServerId *string `url:"server_id,omitempty"`
 }
 
 type GetServerBackupsQueryParams struct {
@@ -2340,6 +2565,40 @@ func (c CoreClient) GetServerStorageClasses(qParams GetServerStorageClassesQuery
     return body, res, err
 }
 
+func (c CoreClient) GetServerFirewallMember(id string, member_id string) (ServerFirewallMemberSingleResponse, *http.Response, error) {
+    body := ServerFirewallMemberSingleResponse{}
+    res, j, err := c.Request("GET", "/server-firewalls/"+c.toStr(id)+"/members/"+c.toStr(member_id), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c CoreClient) DeleteServerFirewallMember(id string, member_id string) (EmptyResponse, *http.Response, error) {
+    body := EmptyResponse{}
+    res, j, err := c.Request("DELETE", "/server-firewalls/"+c.toStr(id)+"/members/"+c.toStr(member_id), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
 type SearchQueryParamsLabels struct {
     Name map[string]*string `url:"name,omitempty"`
 }
@@ -2522,6 +2781,53 @@ func (c CoreClient) GetServerActions(id string, qParams GetServerActionsQueryPar
 func (c CoreClient) GetServerStatus(id string) (ServerStatusResponse, *http.Response, error) {
     body := ServerStatusResponse{}
     res, j, err := c.Request("GET", "/servers/"+c.toStr(id)+"/status", nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c CoreClient) CreateServerFirewallMember(in ServerFIrewallMemberCreateRequest, id string) (ServerFirewallMemberSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
+    body := ServerFirewallMemberSingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("POST", "/server-firewalls/"+c.toStr(id)+"/members", bytes.NewBuffer(inJson))
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+type GetServerFirewallMembersQueryParams struct {
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+}
+
+func (c CoreClient) GetServerFirewallMembers(id string, qParams GetServerFirewallMembersQueryParams) (ServerFirewallMemberListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
+    body := ServerFirewallMemberListResponse{}
+    q, err := query.Values(qParams)
+    if err != nil {
+        return body, nil, err
+    }
+    res, j, err := c.Request("GET", "/server-firewalls/"+c.toStr(id)+"/members"+"?"+q.Encode(), nil)
     if err != nil {
         return body, res, err
     }
@@ -2776,6 +3082,53 @@ func (c CoreClient) GetServerHost(id string) (ServerHostSingleResponse, *http.Re
     return body, res, err
 }
 
+func (c CoreClient) CreateServerFirewallRule(in ServerFirewallRuleCreateRequest, id string) (ServerFirewallRuleSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
+    body := ServerFirewallRuleSingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("POST", "/server-firewalls/"+c.toStr(id)+"/rules", bytes.NewBuffer(inJson))
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+type GetServerFirewallRulesQueryParams struct {
+    PageSize *int `url:"page_size,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+}
+
+func (c CoreClient) GetServerFirewallRules(id string, qParams GetServerFirewallRulesQueryParams) (ServerFirewallRuleListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
+    body := ServerFirewallRuleListResponse{}
+    q, err := query.Values(qParams)
+    if err != nil {
+        return body, nil, err
+    }
+    res, j, err := c.Request("GET", "/server-firewalls/"+c.toStr(id)+"/rules"+"?"+q.Encode(), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
 func (c CoreClient) CreateScheduledServerAction(in ScheduledServerActionCreateRequest, id string) (ScheduledServerActionSingleResponse, *http.Response, error) {
     c.applyCurrentProject(reflect.ValueOf(&in))
     body := ScheduledServerActionSingleResponse{}
@@ -2925,6 +3278,23 @@ func (c CoreClient) UpdateDNSZoneRecords(in DNSRecordsUpdateRequest, name string
 func (c CoreClient) GetServerVolume(id string) (ServerVolumeSingleResponse, *http.Response, error) {
     body := ServerVolumeSingleResponse{}
     res, j, err := c.Request("GET", "/server-volumes/"+c.toStr(id), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c CoreClient) DeleteServerVolume(id string) (EmptyResponse, *http.Response, error) {
+    body := EmptyResponse{}
+    res, j, err := c.Request("DELETE", "/server-volumes/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
