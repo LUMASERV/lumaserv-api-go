@@ -286,7 +286,7 @@ type BillingPosition struct {
     Price *float32 `json:"price"`
     Description *string `json:"description"`
     Id string `json:"id"`
-    CustomerId int `json:"customer_id"`
+    CustomerId string `json:"customer_id"`
     Title *string `json:"title"`
     AvailableAt *string `json:"available_at"`
     VatRate *float32 `json:"vat_rate"`
