@@ -26,7 +26,7 @@ func NewClient (apiKey string) CoreClient {
 
 func NewClientWithUrl (apiKey string, baseUrl string) CoreClient {
     if len(baseUrl) == 0 {
-        baseUrl = "https://api.lumaserv.cloud"
+        baseUrl = "https://api.lumaserv.com"
     }
 
     return CoreClient {
@@ -139,7 +139,7 @@ type Server struct {
     CreatedAt string `json:"created_at"`
     TemplateId string `json:"template_id"`
     Id string `json:"id"`
-    State string `json:"state"`
+    State ServerState `json:"state"`
     Labels map[string]*string `json:"labels"`
 }
 
@@ -278,6 +278,13 @@ type DNSRecord struct {
     Ttl *int `json:"ttl"`
 }
 
+type ServerPriceRangeAssignment struct {
+    UserId string `json:"user_id"`
+    ProjectId *string `json:"project_id"`
+    Id string `json:"id"`
+    RangeId string `json:"range_id"`
+}
+
 type DNSZone struct {
     Hostmaster string `json:"hostmaster"`
     ProjectId string `json:"project_id"`
@@ -333,14 +340,19 @@ type ServerFirewallMember struct {
 }
 
 type Domain struct {
-    ProjectId string `json:"project_id"`
+    RegisteredAt *string `json:"registered_at"`
     AdminHandleCode string `json:"admin_handle_code"`
-    Name string `json:"name"`
-    OwnerHandleCode string `json:"owner_handle_code"`
     TechHandleCode string `json:"tech_handle_code"`
     CreatedAt string `json:"created_at"`
-    ZoneHandleCode string `json:"zone_handle_code"`
     Labels map[string]*string `json:"labels"`
+    ProjectId string `json:"project_id"`
+    SuspendedUntil *string `json:"suspended_until"`
+    Name string `json:"name"`
+    OwnerHandleCode string `json:"owner_handle_code"`
+    ExpireAt *string `json:"expire_at"`
+    ZoneHandleCode string `json:"zone_handle_code"`
+    Status DomainStatus `json:"status"`
+    SuspendedAt *string `json:"suspended_at"`
 }
 
 type Subnet struct {
@@ -354,14 +366,13 @@ type Subnet struct {
 type ServerFirewallRule struct {
     SourceAddresses *[]string `json:"source_addresses"`
     Protocol *ServerFirewallRuleProtocol `json:"protocol"`
-    DestinationPorts *[]string `json:"destination_ports"`
     DestinationAddresses *[]string `json:"destination_addresses"`
     Applied bool `json:"applied"`
     Description *string `json:"description"`
     CreatedAt string `json:"created_at"`
     Id string `json:"id"`
-    SourcePorts *[]string `json:"source_ports"`
     Type ServerFirewallRuleType `json:"type"`
+    Ports *[]string `json:"ports"`
 }
 
 type ServerStorageClass struct {
@@ -491,6 +502,8 @@ type ServerVNC struct {
     Host string `json:"host"`
 }
 
+type ServerState string
+
 type ServerNetwork struct {
     Default bool `json:"default"`
     NetworkId string `json:"network_id"`
@@ -507,6 +520,12 @@ type ServerStorage struct {
     ZoneId string `json:"zone_id"`
     ExternalId string `json:"external_id"`
     Id string `json:"id"`
+}
+
+type ServerVariantPrice struct {
+    VariantId string `json:"variant_id"`
+    Price float32 `json:"price"`
+    OfflinePrice float32 `json:"offline_price"`
 }
 
 type ScheduledServerActionInterval string
@@ -548,6 +567,11 @@ type ServerCreateRequestNetwork struct {
     NetworkId string `json:"network_id"`
 }
 
+type ServerPriceRange struct {
+    Id string `json:"id"`
+    Title string `json:"title"`
+}
+
 type ServerVariant struct {
     Disk int `json:"disk"`
     Cores int `json:"cores"`
@@ -558,6 +582,7 @@ type ServerVariant struct {
 }
 
 type ServerAction struct {
+    Progress float32 `json:"progress"`
     StartedAt string `json:"started_at"`
     Id string `json:"id"`
     State ServerActionState `json:"state"`
@@ -565,6 +590,8 @@ type ServerAction struct {
     Cancellable bool `json:"cancellable"`
     EndedAt *string `json:"ended_at"`
 }
+
+type DomainStatus string
 
 type S3AccessGrantListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
@@ -600,6 +627,13 @@ type DomainListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
     Pagination *ResponsePagination `json:"pagination"`
     Data []Domain `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
+}
+
+type ServerPriceRangeSingleResponse struct {
+    Metadata  `json:"metadata"`
+    Data ServerPriceRange `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
 }
@@ -837,6 +871,14 @@ type SubnetSingleResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
     Pagination *ResponsePagination `json:"pagination"`
     Data Subnet `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
+}
+
+type ServerPriceRangeAssignmentListResponse struct {
+    Metadata ResponseMetadata `json:"metadata"`
+    Pagination *ResponsePagination `json:"pagination"`
+    Data []ServerPriceRangeAssignment `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
 }
@@ -1104,10 +1146,33 @@ type AvailabilityZoneListResponse struct {
     Messages ResponseMessages `json:"messages"`
 }
 
+type ServerVariantPriceListResponse struct {
+    Metadata ResponseMetadata `json:"metadata"`
+    Pagination *ResponsePagination `json:"pagination"`
+    Data []ServerVariantPrice `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
+}
+
 type ServerVolumeListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
     Pagination *ResponsePagination `json:"pagination"`
     Data []ServerVolume `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
+}
+
+type ServerVariantPriceSingleResponse struct {
+    Metadata ResponseMetadata `json:"metadata"`
+    Data ServerVariantPrice `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
+}
+
+type ServerPriceRangeListResponse struct {
+    Metadata ResponseMetadata `json:"metadata"`
+    Pagination *ResponsePagination `json:"pagination"`
+    Data []ServerPriceRange `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
 }
@@ -1129,6 +1194,13 @@ type DomainAuthinfoResponse struct {
 type ServerFirewallMemberSingleResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
     Data ServerFirewallMember `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
+}
+
+type ServerPriceRangeAssignmentSingleResponse struct {
+    Metadata ResponseMetadata `json:"metadata"`
+    Data ServerPriceRangeAssignment `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
 }
@@ -1181,13 +1253,18 @@ type DomainHandleCreateRequest struct {
     PrivacyProtection *bool `json:"privacy_protection"`
 }
 
+type ServerVolumeUpdateRequest struct {
+    Labels map[string]*string `json:"labels"`
+}
+
 type ServerCreateRequest struct {
     ZoneId string `json:"zone_id"`
+    BackupId *string `json:"backup_id"`
     VariantId string `json:"variant_id"`
     SshKeys []string `json:"ssh_keys"`
     ProjectId string `json:"project_id"`
     Name string `json:"name"`
-    TemplateId string `json:"template_id"`
+    TemplateId *string `json:"template_id"`
     Networks *[]ServerCreateRequestNetwork `json:"networks"`
     Labels map[string]*string `json:"labels"`
 }
@@ -1238,6 +1315,12 @@ type NetworkCreateRequest struct {
     Type *NetworkType `json:"type"`
 }
 
+type ServerVariantPriceCreateRequest struct {
+    VariantId string `json:"variant_id"`
+    Price float32 `json:"price"`
+    OfflinePrice float32 `json:"offline_price"`
+}
+
 type ServerVariantCreateRequest struct {
     ZoneIds []string `json:"zone_ids"`
     Disk int `json:"disk"`
@@ -1276,16 +1359,15 @@ type SSLCertificateCreateRequest struct {
     Labels map[string]*string `json:"labels"`
 }
 
-type ServerFIrewallMemberCreateRequest struct {
-    LabelValue *string `json:"label_value"`
-    Type ServerFirewallMemberType `json:"type"`
-    ServerId *string `json:"server_id"`
-    LabelName *string `json:"label_name"`
+type ServerVariantPriceUpdateRequest struct {
+    Price *float32 `json:"price"`
+    OfflinePrice *float32 `json:"offline_price"`
 }
 
 type ScheduledServerActionCreateRequest struct {
     BackupId *string `json:"backup_id"`
     Interval *ScheduledServerActionInterval `json:"interval"`
+    Force *bool `json:"force"`
     ExecuteAt string `json:"execute_at"`
     Type ServerActionType `json:"type"`
 }
@@ -1293,11 +1375,10 @@ type ScheduledServerActionCreateRequest struct {
 type ServerFirewallRuleCreateRequest struct {
     SourceAddresses *[]string `json:"source_addresses"`
     Protocol *ServerFirewallRuleProtocol `json:"protocol"`
-    DestinationPorts *[]string `json:"destination_ports"`
     DestinationAddresses *[]string `json:"destination_addresses"`
     Description *string `json:"description"`
-    SourcePorts *[]string `json:"source_ports"`
     Type ServerFirewallRuleType `json:"type"`
+    Ports *[]string `json:"ports"`
 }
 
 type SSHKeyCreateRequest struct {
@@ -1305,6 +1386,13 @@ type SSHKeyCreateRequest struct {
     ProjectId string `json:"project_id"`
     Title string `json:"title"`
     Labels map[string]*string `json:"labels"`
+}
+
+type ServerFirewallMemberCreateRequest struct {
+    LabelValue *string `json:"label_value"`
+    Type ServerFirewallMemberType `json:"type"`
+    ServerId *string `json:"server_id"`
+    LabelName *string `json:"label_name"`
 }
 
 type ServerStorageCreateRequest struct {
@@ -1317,6 +1405,12 @@ type AvailabilityZoneCreateRequest struct {
     City string `json:"city"`
     Title string `json:"title"`
     Config interface{} `json:"config"`
+}
+
+type ServerPriceRangeAssignmentCreateRequest struct {
+    UserId *string `json:"user_id"`
+    ProjectId *string `json:"project_id"`
+    RangeId string `json:"range_id"`
 }
 
 type ServerNetworkCreateRequest struct {
@@ -1339,6 +1433,14 @@ type S3AccessKeyCreateRequest struct {
 
 type SubnetAddressCreateRequest struct {
     Address string `json:"address"`
+}
+
+type ServerPriceRangeCreateRequest struct {
+    Title string `json:"title"`
+}
+
+type ServerPriceRangeAssignmentUpdateRequest struct {
+    RangeId string `json:"range_id"`
 }
 
 type SSLOrganisationCreateRequest struct {
@@ -1529,6 +1631,42 @@ func (c CoreClient) GetSSHKeys(qParams GetSSHKeysQueryParams) (SSHKeyListRespons
         return body, nil, err
     }
     res, j, err := c.Request("GET", "/ssh-keys"+"?"+q.Encode(), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c CoreClient) CreateServerPriceRange(in ServerPriceRangeCreateRequest) (ServerPriceRangeSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
+    body := ServerPriceRangeSingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("POST", "/server-price-ranges", bytes.NewBuffer(inJson))
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c CoreClient) GetServerPriceRanges() (ServerPriceRangeListResponse, *http.Response, error) {
+    body := ServerPriceRangeListResponse{}
+    res, j, err := c.Request("GET", "/server-price-ranges", nil)
     if err != nil {
         return body, res, err
     }
@@ -1745,6 +1883,23 @@ func (c CoreClient) UpdateServer(in ServerUpdateRequest, id string) (ServerSingl
 func (c CoreClient) GetServerStorageClass(id string) (ServerStorageClassSingleResponse, *http.Response, error) {
     body := ServerStorageClassSingleResponse{}
     res, j, err := c.Request("GET", "/server-storage-classes/"+c.toStr(id), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c CoreClient) RestartServer(id string) (ServerActionSingleResponse, *http.Response, error) {
+    body := ServerActionSingleResponse{}
+    res, j, err := c.Request("POST", "/servers/"+c.toStr(id)+"/restart", nil)
     if err != nil {
         return body, res, err
     }
@@ -2795,7 +2950,7 @@ func (c CoreClient) GetServerStatus(id string) (ServerStatusResponse, *http.Resp
     return body, res, err
 }
 
-func (c CoreClient) CreateServerFirewallMember(in ServerFIrewallMemberCreateRequest, id string) (ServerFirewallMemberSingleResponse, *http.Response, error) {
+func (c CoreClient) CreateServerFirewallMember(in ServerFirewallMemberCreateRequest, id string) (ServerFirewallMemberSingleResponse, *http.Response, error) {
     c.applyCurrentProject(reflect.ValueOf(&in))
     body := ServerFirewallMemberSingleResponse{}
     inJson, err := json.Marshal(in)
@@ -2828,6 +2983,23 @@ func (c CoreClient) GetServerFirewallMembers(id string, qParams GetServerFirewal
         return body, nil, err
     }
     res, j, err := c.Request("GET", "/server-firewalls/"+c.toStr(id)+"/members"+"?"+q.Encode(), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c CoreClient) GetServerPriceRange(id string) (ServerPriceRangeSingleResponse, *http.Response, error) {
+    body := ServerPriceRangeSingleResponse{}
+    res, j, err := c.Request("GET", "/server-price-ranges/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
@@ -2927,6 +3099,59 @@ func (c CoreClient) GetSSLTypes(qParams GetSSLTypesQueryParams) (SSLTypeListResp
         return body, nil, err
     }
     res, j, err := c.Request("GET", "/ssl/types"+"?"+q.Encode(), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c CoreClient) GetServerVariantPrice(id string, variant_id string) (ServerVariantPriceSingleResponse, *http.Response, error) {
+    body := ServerVariantPriceSingleResponse{}
+    res, j, err := c.Request("GET", "/server-price-ranges/"+c.toStr(id)+"/variant-prices/"+c.toStr(variant_id), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c CoreClient) DeleteServerVariantPrice(id string, variant_id string) (EmptyResponse, *http.Response, error) {
+    body := EmptyResponse{}
+    res, j, err := c.Request("DELETE", "/server-price-ranges/"+c.toStr(id)+"/variant-prices/"+c.toStr(variant_id), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c CoreClient) UpdateServerVariantPrice(in ServerVariantPriceUpdateRequest, id string, variant_id string) (ServerVariantPriceSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
+    body := ServerVariantPriceSingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("PUT", "/server-price-ranges/"+c.toStr(id)+"/variant-prices/"+c.toStr(variant_id), bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
@@ -3309,6 +3534,25 @@ func (c CoreClient) DeleteServerVolume(id string) (EmptyResponse, *http.Response
     return body, res, err
 }
 
+func (c CoreClient) UpdateServerVolume(in ServerVolumeUpdateRequest, id string) (ServerVolumeSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
+    body := ServerVolumeSingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("PUT", "/server-volumes/"+c.toStr(id), bytes.NewBuffer(inJson))
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
 func (c CoreClient) CreateServerNetwork(in ServerNetworkCreateRequest, id string) (ServerNetworkSingleResponse, *http.Response, error) {
     c.applyCurrentProject(reflect.ValueOf(&in))
     body := ServerNetworkSingleResponse{}
@@ -3445,6 +3689,42 @@ func (c CoreClient) GetSSHKey(id string) (SSHKeySingleResponse, *http.Response, 
 func (c CoreClient) DeleteSSHKey(id string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
     res, j, err := c.Request("DELETE", "/ssh-keys/"+c.toStr(id), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c CoreClient) CreateServerPriceRangeAssignment(in ServerPriceRangeAssignmentCreateRequest) (ServerPriceRangeAssignmentSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
+    body := ServerPriceRangeAssignmentSingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("POST", "/server-price-range-assignments", bytes.NewBuffer(inJson))
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c CoreClient) GetServerPriceRangeAssignments() (ServerPriceRangeAssignmentListResponse, *http.Response, error) {
+    body := ServerPriceRangeAssignmentListResponse{}
+    res, j, err := c.Request("GET", "/server-price-range-assignments", nil)
     if err != nil {
         return body, res, err
     }
@@ -4376,6 +4656,59 @@ func (c CoreClient) GetS3AccessKeyGrants(access_key_id string, qParams GetS3Acce
     return body, res, err
 }
 
+func (c CoreClient) GetServerPriceRangeAssignment(id string) (ServerPriceRangeAssignmentSingleResponse, *http.Response, error) {
+    body := ServerPriceRangeAssignmentSingleResponse{}
+    res, j, err := c.Request("GET", "/server-price-range-assignments/"+c.toStr(id), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c CoreClient) DeleteServerPriceRangeAssignment(id string) (EmptyResponse, *http.Response, error) {
+    body := EmptyResponse{}
+    res, j, err := c.Request("DELETE", "/server-price-range-assignments/"+c.toStr(id), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c CoreClient) UpdateServerPriceRangeAssignment(in ServerPriceRangeAssignmentUpdateRequest, id string) (ServerPriceRangeAssignmentSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
+    body := ServerPriceRangeAssignmentSingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("PUT", "/server-price-range-assignments/"+c.toStr(id), bytes.NewBuffer(inJson))
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
 func (c CoreClient) GetServerVNC(id string) (ServerVNCResponse, *http.Response, error) {
     body := ServerVNCResponse{}
     res, j, err := c.Request("GET", "/servers/"+c.toStr(id)+"/vnc", nil)
@@ -4542,6 +4875,42 @@ func (c CoreClient) GetDomains(qParams GetDomainsQueryParams) (DomainListRespons
 func (c CoreClient) DetachServerVolume(id string) (ServerVolumeSingleResponse, *http.Response, error) {
     body := ServerVolumeSingleResponse{}
     res, j, err := c.Request("POST", "/server-volumes/"+c.toStr(id)+"/detach", nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c CoreClient) CreateServerVariantPrice(in ServerVariantPriceCreateRequest, id string) (ServerVariantPriceSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
+    body := ServerVariantPriceSingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("POST", "/server-price-ranges/"+c.toStr(id)+"/variant-prices", bytes.NewBuffer(inJson))
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c CoreClient) GetServerVariantPrices(id string) (ServerVariantPriceListResponse, *http.Response, error) {
+    body := ServerVariantPriceListResponse{}
+    res, j, err := c.Request("GET", "/server-price-ranges/"+c.toStr(id)+"/variant-prices", nil)
     if err != nil {
         return body, res, err
     }

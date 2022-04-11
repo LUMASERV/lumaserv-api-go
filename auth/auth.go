@@ -24,7 +24,7 @@ func NewClient (apiKey string) AuthClient {
 
 func NewClientWithUrl (apiKey string, baseUrl string) AuthClient {
     if len(baseUrl) == 0 {
-        baseUrl = "https://auth.lumaserv.cloud"
+        baseUrl = "https://auth.lumaserv.com"
     }
 
     return AuthClient {
@@ -120,6 +120,19 @@ type TokenValidationInfo struct {
     Token Token `json:"token"`
 }
 
+type AuditLogEntry struct {
+    Date string `json:"date"`
+    TokenId string `json:"token_id"`
+    UserId string `json:"user_id"`
+    ProjectId *string `json:"project_id"`
+    ObjectType *string `json:"object_type"`
+    Context interface{} `json:"context"`
+    Action string `json:"action"`
+    Id string `json:"id"`
+    IpAddress *string `json:"ip_address"`
+    ObjectId *string `json:"object_id"`
+}
+
 type ResponsePagination struct {
     Total int `json:"total"`
     Page int `json:"page"`
@@ -199,13 +212,6 @@ type TokenSingleResponse struct {
     Messages ResponseMessages `json:"messages"`
 }
 
-type AuditLogResponse struct {
-    Metadata ResponseMetadata `json:"metadata"`
-    Data []interface{} `json:"data"`
-    Success bool `json:"success"`
-    Messages ResponseMessages `json:"messages"`
-}
-
 type CountrySingleResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
     Data Country `json:"data"`
@@ -221,6 +227,13 @@ type ProjectMemberListResponse struct {
     Messages ResponseMessages `json:"messages"`
 }
 
+type TransactionLogResponse struct {
+    Metadata ResponseMetadata `json:"metadata"`
+    Data []interface{} `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
+}
+
 type CountryListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
     Pagination *ResponsePagination `json:"pagination"`
@@ -232,6 +245,13 @@ type CountryListResponse struct {
 type UserSingleResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
     Data User `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
+}
+
+type AuditLogEntryListResponse struct {
+    Metadata ResponseMetadata `json:"metadata"`
+    Data []AuditLogEntry `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
 }
@@ -264,6 +284,12 @@ type RequestPasswordResetRequest struct {
 type ExecutePasswordResetRequest struct {
     Password string `json:"password"`
     Token string `json:"token"`
+}
+
+type TransactionLogRequest struct {
+    Query interface{} `json:"query"`
+    Limit *int `json:"limit"`
+    Sort interface{} `json:"sort"`
 }
 
 type TokenCreateRequest struct {
@@ -308,9 +334,13 @@ type UserCreateRequest struct {
 }
 
 type AuditLogRequest struct {
-    Query interface{} `json:"query"`
-    Limit *int `json:"limit"`
-    Sort interface{} `json:"sort"`
+    TokenId string `json:"token_id"`
+    ProjectId *string `json:"project_id"`
+    ObjectType *string `json:"object_type"`
+    Context interface{} `json:"context"`
+    Action string `json:"action"`
+    IpAddress *string `json:"ip_address"`
+    ObjectId *string `json:"object_id"`
 }
 
 func (c AuthClient) CreateProject(in ProjectCreateRequest) (ProjectSingleResponse, *http.Response, error) {
@@ -558,10 +588,38 @@ func (c AuthClient) ExecutePasswordReset(in ExecutePasswordResetRequest) (EmptyR
     return body, res, err
 }
 
-func (c AuthClient) SearchAuditLog(in AuditLogRequest) (AuditLogResponse, *http.Response, error) {
-    body := AuditLogResponse{}
+func (c AuthClient) InsertAuditLogEntry(in AuditLogRequest) (EmptyResponse, *http.Response, error) {
+    body := EmptyResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/audit-log", bytes.NewBuffer(inJson))
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+type SearchAuditLogQueryParams struct {
+    ObjectType *string `url:"object_type,omitempty"`
+    ObjectId *string `url:"object_id,omitempty"`
+    ProjectId *string `url:"project_id,omitempty"`
+    UserId *string `url:"user_id,omitempty"`
+}
+
+func (c AuthClient) SearchAuditLog(qParams SearchAuditLogQueryParams) (AuditLogEntryListResponse, *http.Response, error) {
+    body := AuditLogEntryListResponse{}
+    q, err := query.Values(qParams)
+    if err != nil {
+        return body, nil, err
+    }
+    res, j, err := c.Request("GET", "/audit-log"+"?"+q.Encode(), nil)
     if err != nil {
         return body, res, err
     }
@@ -712,6 +770,24 @@ func (c AuthClient) GetProjectMembers(id string, qParams GetProjectMembersQueryP
         return body, nil, err
     }
     res, j, err := c.Request("GET", "/projects/"+c.toStr(id)+"/members"+"?"+q.Encode(), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c AuthClient) SearchTransactionLog(in TransactionLogRequest) (TransactionLogResponse, *http.Response, error) {
+    body := TransactionLogResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("POST", "/transaction-log", bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }

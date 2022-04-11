@@ -211,14 +211,6 @@ type OnlinePayment struct {
     CustomerId *string `json:"customer_id"`
 }
 
-type ServiceContractCreateRequestPosition struct {
-    Amount float32 `json:"amount"`
-    Price float32 `json:"price"`
-    Description string `json:"description"`
-    Title string `json:"title"`
-    VatRate *float32 `json:"vat_rate"`
-}
-
 type ServiceContractPosition struct {
     Amount *float32 `json:"amount"`
     Price *float32 `json:"price"`
@@ -227,6 +219,19 @@ type ServiceContractPosition struct {
     Id string `json:"id"`
     Title *string `json:"title"`
     VatRate *float32 `json:"vat_rate"`
+}
+
+type Position struct {
+    Amount *float32 `json:"amount"`
+    Unit *string `json:"unit"`
+    UpdatedAt *string `json:"updated_at"`
+    Price *float32 `json:"price"`
+    Name *string `json:"name"`
+    Description *string `json:"description"`
+    CreatedAt *string `json:"created_at"`
+    Position float32 `json:"position"`
+    VatRate *float32 `json:"vat_rate"`
+    GroupKey *string `json:"group_key"`
 }
 
 type ServiceContract struct {
@@ -308,19 +313,6 @@ type DebitMandate struct {
     Id string `json:"id"`
     CustomerId string `json:"customer_id"`
     PostalCode *string `json:"postal_code"`
-}
-
-type InvoicePosition struct {
-    Amount *float32 `json:"amount"`
-    Unit *string `json:"unit"`
-    UpdatedAt *string `json:"updated_at"`
-    Price *float32 `json:"price"`
-    Name *string `json:"name"`
-    Description *string `json:"description"`
-    CreatedAt *string `json:"created_at"`
-    Position float32 `json:"position"`
-    VatRate *float32 `json:"vat_rate"`
-    GroupKey *string `json:"group_key"`
 }
 
 type InvoiceState string
@@ -434,7 +426,7 @@ type BillingPositionSingleResponse struct {
 type InvoicePositionListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
     Pagination *ResponsePagination `json:"pagination"`
-    Data []InvoicePosition `json:"data"`
+    Data []Position `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
 }
@@ -464,7 +456,7 @@ type BankTransactionListResponse struct {
 
 type InvoicePositionSingleResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Data InvoicePosition `json:"data"`
+    Data Position `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
 }
@@ -562,6 +554,16 @@ type InvoiceCreateRequest struct {
     CustomerId string `json:"customer_id"`
 }
 
+type PositionCreateRequest struct {
+    Amount string `json:"amount"`
+    Unit string `json:"unit"`
+    Price float32 `json:"price"`
+    Name string `json:"name"`
+    Description string `json:"description"`
+    VatRate *float32 `json:"vat_rate"`
+    GroupKey string `json:"group_key"`
+}
+
 type OfferPositionUpdateRequest struct {
     PurchasingPrice *float32 `json:"purchasing_price"`
     Note *string `json:"note"`
@@ -597,7 +599,7 @@ type CustomerCreateRequest struct {
     Email string `json:"email"`
 }
 
-type InvoicePositionUpdateRequest struct {
+type PositionUpdateRequest struct {
     Amount *float32 `json:"amount"`
     Unit *string `json:"unit"`
     Price *float32 `json:"price"`
@@ -631,14 +633,6 @@ type PaymentReminderUpdateRequest struct {
     State *PaymentReminderState `json:"state"`
 }
 
-type ServiceContractPositionUpdateRequest struct {
-    Amount *float32 `json:"amount"`
-    Price *float32 `json:"price"`
-    Description *string `json:"description"`
-    Title *string `json:"title"`
-    VatRate *float32 `json:"vat_rate"`
-}
-
 type BillingPositionUpdateRequest struct {
     InvoicePositionId *string `json:"invoice_position_id"`
     Amount *float32 `json:"amount"`
@@ -660,15 +654,6 @@ type PaymentReminderCreateRequest struct {
     CustomerId string `json:"customer_id"`
 }
 
-type ServiceContractPositionCreateRequest struct {
-    Amount float32 `json:"amount"`
-    Price float32 `json:"price"`
-    ServiceContractId string `json:"service_contract_id"`
-    Description string `json:"description"`
-    Title string `json:"title"`
-    VatRate float32 `json:"vat_rate"`
-}
-
 type BillingPositionCreateRequest struct {
     InvoicePositionId *string `json:"invoice_position_id"`
     Amount float32 `json:"amount"`
@@ -680,16 +665,6 @@ type BillingPositionCreateRequest struct {
     AvailableAt *string `json:"available_at"`
     VatRate *float32 `json:"vat_rate"`
     GroupKey *string `json:"group_key"`
-}
-
-type InvoicePositionCreateRequest struct {
-    Amount string `json:"amount"`
-    Unit string `json:"unit"`
-    Price float32 `json:"price"`
-    Name string `json:"name"`
-    Description string `json:"description"`
-    VatRate *float32 `json:"vat_rate"`
-    GroupKey string `json:"group_key"`
 }
 
 type ServiceContractCreateRequest struct {
@@ -722,6 +697,7 @@ type ServiceContractUpdateRequest struct {
     CancellationPeriod *int `json:"cancellation_period"`
     Description *string `json:"description"`
     Runtime *ServiceContractInterval `json:"runtime"`
+    CustomerId *string `json:"customer_id"`
     Title *string `json:"title"`
     AccountingPeriod *ServiceContractInterval `json:"accounting_period"`
 }
@@ -776,7 +752,7 @@ func (c BillingClient) GetInvoiceFile(id string) (FileSingleResponse, *http.Resp
     return body, res, err
 }
 
-func (c BillingClient) CreateInvoicePosition(in InvoicePositionCreateRequest, id string) (InvoicePositionSingleResponse, *http.Response, error) {
+func (c BillingClient) CreateInvoicePosition(in PositionCreateRequest, id string) (InvoicePositionSingleResponse, *http.Response, error) {
     body := InvoicePositionSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/invoices/"+c.toStr(id)+"/positions", bytes.NewBuffer(inJson))
@@ -859,51 +835,6 @@ func (c BillingClient) UpdateBillingPosition(in BillingPositionUpdateRequest, id
     body := BillingPositionSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("PUT", "/billing-positions/"+c.toStr(id), bytes.NewBuffer(inJson))
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-func (c BillingClient) CreateServiceContractPosition(in ServiceContractPositionCreateRequest) (ServiceContractPositionSingleResponse, *http.Response, error) {
-    body := ServiceContractPositionSingleResponse{}
-    inJson, err := json.Marshal(in)
-    res, j, err := c.Request("POST", "/service-contract-positions", bytes.NewBuffer(inJson))
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-type GetServiceContractPositionsQueryParams struct {
-    PageSize *int `url:"page_size,omitempty"`
-    Search *string `url:"search,omitempty"`
-    Page *int `url:"page,omitempty"`
-}
-
-func (c BillingClient) GetServiceContractPositions(qParams GetServiceContractPositionsQueryParams) (ServiceContractPositionListResponse, *http.Response, error) {
-    body := ServiceContractPositionListResponse{}
-    q, err := query.Values(qParams)
-    if err != nil {
-        return body, nil, err
-    }
-    res, j, err := c.Request("GET", "/service-contract-positions"+"?"+q.Encode(), nil)
     if err != nil {
         return body, res, err
     }
@@ -1097,6 +1028,58 @@ func (c BillingClient) GetOnlinePayments(qParams GetOnlinePaymentsQueryParams) (
     return body, res, err
 }
 
+func (c BillingClient) GetServiceContractPosition(contract_id string, id string) (ServiceContractPositionSingleResponse, *http.Response, error) {
+    body := ServiceContractPositionSingleResponse{}
+    res, j, err := c.Request("GET", "/service-contracts/"+c.toStr(contract_id)+"/positions/"+c.toStr(id), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c BillingClient) DeleteServiceContractPosition(contract_id string, id string) (EmptyResponse, *http.Response, error) {
+    body := EmptyResponse{}
+    res, j, err := c.Request("DELETE", "/service-contracts/"+c.toStr(contract_id)+"/positions/"+c.toStr(id), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c BillingClient) UpdateServiceContractPosition(in PositionUpdateRequest, contract_id string, id string) (ServiceContractPositionSingleResponse, *http.Response, error) {
+    body := ServiceContractPositionSingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("PUT", "/service-contracts/"+c.toStr(contract_id)+"/positions/"+c.toStr(id), bytes.NewBuffer(inJson))
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
 func (c BillingClient) CreateInvoice(in InvoiceCreateRequest) (InvoiceSingleResponse, *http.Response, error) {
     body := InvoiceSingleResponse{}
     inJson, err := json.Marshal(in)
@@ -1128,6 +1111,41 @@ func (c BillingClient) GetInvoices(qParams GetInvoicesQueryParams) (InvoiceListR
         return body, nil, err
     }
     res, j, err := c.Request("GET", "/invoices"+"?"+q.Encode(), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c BillingClient) CreateServiceContractPosition(in PositionCreateRequest, contract_id string) (ServiceContractPositionSingleResponse, *http.Response, error) {
+    body := ServiceContractPositionSingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("POST", "/service-contracts/"+c.toStr(contract_id)+"/positions", bytes.NewBuffer(inJson))
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c BillingClient) GetServiceContractPositions(contract_id string) (ServiceContractPositionListResponse, *http.Response, error) {
+    body := ServiceContractPositionListResponse{}
+    res, j, err := c.Request("GET", "/service-contracts/"+c.toStr(contract_id)+"/positions", nil)
     if err != nil {
         return body, res, err
     }
@@ -1180,58 +1198,6 @@ func (c BillingClient) UpdateOfferPosition(in OfferPositionUpdateRequest, id str
     body := OfferPositionSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("PUT", "/offer-positions/"+c.toStr(id), bytes.NewBuffer(inJson))
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-func (c BillingClient) GetServiceContractPosition(id string) (ServiceContractPositionSingleResponse, *http.Response, error) {
-    body := ServiceContractPositionSingleResponse{}
-    res, j, err := c.Request("GET", "/service-contract-positions/"+c.toStr(id), nil)
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-func (c BillingClient) DeleteServiceContractPosition(id string) (EmptyResponse, *http.Response, error) {
-    body := EmptyResponse{}
-    res, j, err := c.Request("DELETE", "/service-contract-positions/"+c.toStr(id), nil)
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-func (c BillingClient) UpdateServiceContractPosition(in ServiceContractPositionUpdateRequest, id string) (ServiceContractPositionSingleResponse, *http.Response, error) {
-    body := ServiceContractPositionSingleResponse{}
-    inJson, err := json.Marshal(in)
-    res, j, err := c.Request("PUT", "/service-contract-positions/"+c.toStr(id), bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
@@ -1456,7 +1422,7 @@ func (c BillingClient) DeleteInvoicePosition(invoice_id string, id string) (Empt
     return body, res, err
 }
 
-func (c BillingClient) UpdateInvoicePosition(in InvoicePositionUpdateRequest, invoice_id string, id string) (InvoicePositionSingleResponse, *http.Response, error) {
+func (c BillingClient) UpdateInvoicePosition(in PositionUpdateRequest, invoice_id string, id string) (InvoicePositionSingleResponse, *http.Response, error) {
     body := InvoicePositionSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("PUT", "/invoices/"+c.toStr(invoice_id)+"/positions/"+c.toStr(id), bytes.NewBuffer(inJson))
