@@ -632,7 +632,7 @@ type DomainListResponse struct {
 }
 
 type ServerPriceRangeSingleResponse struct {
-    Metadata  `json:"metadata"`
+    Metadata ResponseMetadata `json:"metadata"`
     Data ServerPriceRange `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`

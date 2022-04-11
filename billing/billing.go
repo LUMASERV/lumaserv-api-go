@@ -86,7 +86,7 @@ type InvoiceDetailed struct {
     PaidAt *string `json:"paid_at"`
     CreatedAt *string `json:"created_at"`
     DueAt *string `json:"due_at"`
-    Positions *[]InvoicePosition `json:"positions"`
+    Positions *[]Position `json:"positions"`
     Id *string `json:"id"`
     State *InvoiceState `json:"state"`
     CustomerId *string `json:"customer_id"`
@@ -125,6 +125,16 @@ type Customer struct {
     NextBillingDate *string `json:"next_billing_date"`
 }
 
+type CreateRequestPosition struct {
+    Amount float32 `json:"amount"`
+    Unit string `json:"unit"`
+    Price float32 `json:"price"`
+    Name string `json:"name"`
+    Description *string `json:"description"`
+    GroupKey *string `json:"group_key"`
+    VatRate *float32 `json:"vat_rate"`
+}
+
 type ServiceContractInterval string
 
 type BankTransaction struct {
@@ -151,11 +161,6 @@ type PaymentReminder struct {
     Id string `json:"id"`
     State *PaymentReminderState `json:"state"`
     CustomerId *string `json:"customer_id"`
-}
-
-type FileDownload struct {
-    FileId string `json:"file_id"`
-    Url string `json:"url"`
 }
 
 type InvoiceCreateRequestPosition struct {
@@ -253,8 +258,6 @@ type ResponseMessage struct {
 
 type PaymentReminderStage string
 
-type CustomerTransactionType string
-
 type OfferPosition struct {
     PurchasingPrice *float32 `json:"purchasing_price"`
     Note *string `json:"note"`
@@ -316,14 +319,6 @@ type DebitMandate struct {
 }
 
 type InvoiceState string
-
-type File struct {
-    Name *string `json:"name"`
-    Id string `json:"id"`
-    State *string `json:"state"`
-    Type *string `json:"type"`
-    ObjectId *string `json:"object_id"`
-}
 
 type OfferState string
 
@@ -583,7 +578,6 @@ type CustomerCreateRequest struct {
     BillingInterval BillingInterval `json:"billing_interval"`
     CustomVatRate float32 `json:"custom_vat_rate"`
     CountryCode string `json:"country_code"`
-    InvoiceShippingType *InvoiceShippingType `json:"invoice_shipping_type"`
     Balance *float32 `json:"balance"`
     UserId string `json:"user_id"`
     Street string `json:"street"`
@@ -671,7 +665,7 @@ type ServiceContractCreateRequest struct {
     CancellationPeriod int `json:"cancellation_period"`
     Description string `json:"description"`
     Runtime ServiceContractInterval `json:"runtime"`
-    Positions *[]ServiceContractCreateRequestPosition `json:"positions"`
+    Positions *[]CreateRequestPosition `json:"positions"`
     CustomerId string `json:"customer_id"`
     Title string `json:"title"`
     AccountingPeriod ServiceContractInterval `json:"accounting_period"`
