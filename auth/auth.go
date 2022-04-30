@@ -277,6 +277,18 @@ type TokenValidationResponse struct {
     Messages ResponseMessages `json:"messages"`
 }
 
+type ProjectMemberSingleResponse struct {
+    Metadata ResponseMetadata `json:"metadata"`
+    Data ProjectMember `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
+}
+
+type ProjectMemberCreateRequest struct {
+    Role *string `json:"role"`
+    UserId string `json:"user_id"`
+}
+
 type RequestPasswordResetRequest struct {
     Username string `json:"username"`
 }
@@ -738,6 +750,24 @@ func (c AuthClient) DeleteToken(id string) (EmptyResponse, *http.Response, error
 func (c AuthClient) ValidateToken(token string) (TokenValidationResponse, *http.Response, error) {
     body := TokenValidationResponse{}
     res, j, err := c.Request("GET", "/validate/"+c.toStr(token), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c AuthClient) AddProjectMember(in ProjectMemberCreateRequest, id string) (ProjectMemberSingleResponse, *http.Response, error) {
+    body := ProjectMemberSingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("POST", "/projects/"+c.toStr(id)+"/members", bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }

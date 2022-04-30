@@ -364,9 +364,8 @@ type Subnet struct {
 }
 
 type ServerFirewallRule struct {
-    SourceAddresses *[]string `json:"source_addresses"`
+    Addresses *[]string `json:"addresses"`
     Protocol *ServerFirewallRuleProtocol `json:"protocol"`
-    DestinationAddresses *[]string `json:"destination_addresses"`
     Applied bool `json:"applied"`
     Description *string `json:"description"`
     CreatedAt string `json:"created_at"`
@@ -1373,9 +1372,8 @@ type ScheduledServerActionCreateRequest struct {
 }
 
 type ServerFirewallRuleCreateRequest struct {
-    SourceAddresses *[]string `json:"source_addresses"`
+    Addresses *[]string `json:"addresses"`
     Protocol *ServerFirewallRuleProtocol `json:"protocol"`
-    DestinationAddresses *[]string `json:"destination_addresses"`
     Description *string `json:"description"`
     Type ServerFirewallRuleType `json:"type"`
     Ports *[]string `json:"ports"`
