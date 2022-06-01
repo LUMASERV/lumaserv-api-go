@@ -768,7 +768,9 @@ func (c BillingClient) CreateInvoicePosition(in PositionCreateRequest, id string
 }
 
 type GetInvoicePositionsQueryParams struct {
+    Order *string `url:"order,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }
@@ -865,7 +867,9 @@ func (c BillingClient) CreateBillingPosition(in BillingPositionCreateRequest) (B
 }
 
 type GetBillingPositionsQueryParams struct {
+    Order *string `url:"order,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }
@@ -910,7 +914,9 @@ func (c BillingClient) CreateCustomer(in CustomerCreateRequest) (CustomerSingleR
 }
 
 type GetCustomersQueryParams struct {
+    Order *string `url:"order,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }
@@ -937,7 +943,9 @@ func (c BillingClient) GetCustomers(qParams GetCustomersQueryParams) (CustomerLi
 }
 
 type GetDebitsQueryParams struct {
+    Order *string `url:"order,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }
@@ -999,7 +1007,9 @@ func (c BillingClient) UpdateCustomer(in CustomerUpdateRequest, id int) (Custome
 }
 
 type GetOnlinePaymentsQueryParams struct {
+    Order *string `url:"order,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }
@@ -1096,7 +1106,9 @@ func (c BillingClient) CreateInvoice(in InvoiceCreateRequest) (InvoiceSingleResp
 }
 
 type GetInvoicesQueryParams struct {
+    Order *string `url:"order,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }
@@ -1140,9 +1152,21 @@ func (c BillingClient) CreateServiceContractPosition(in PositionCreateRequest, c
     return body, res, err
 }
 
-func (c BillingClient) GetServiceContractPositions(contract_id string) (ServiceContractPositionListResponse, *http.Response, error) {
+type GetServiceContractPositionsQueryParams struct {
+    Order *string `url:"order,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+}
+
+func (c BillingClient) GetServiceContractPositions(contract_id string, qParams GetServiceContractPositionsQueryParams) (ServiceContractPositionListResponse, *http.Response, error) {
     body := ServiceContractPositionListResponse{}
-    res, j, err := c.Request("GET", "/service-contracts/"+c.toStr(contract_id)+"/positions", nil)
+    q, err := query.Values(qParams)
+    if err != nil {
+        return body, nil, err
+    }
+    res, j, err := c.Request("GET", "/service-contracts/"+c.toStr(contract_id)+"/positions"+"?"+q.Encode(), nil)
     if err != nil {
         return body, res, err
     }
@@ -1263,7 +1287,9 @@ func (c BillingClient) CreateDebitMandate(in DebitMandateCreateRequest) (DebitMa
 }
 
 type GetDebitMandatesQueryParams struct {
+    Order *string `url:"order,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }
@@ -1290,7 +1316,9 @@ func (c BillingClient) GetDebitMandates(qParams GetDebitMandatesQueryParams) (De
 }
 
 type GetBankTransactionsQueryParams struct {
+    Order *string `url:"order,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }
@@ -1456,7 +1484,9 @@ func (c BillingClient) CreateServiceContract(in ServiceContractCreateRequest) (S
 }
 
 type GetServiceContractsQueryParams struct {
+    Order *string `url:"order,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }
@@ -1587,7 +1617,9 @@ func (c BillingClient) CreateOffer(in OfferCreateRequest) (OfferSingleResponse, 
 }
 
 type GetOffersQueryParams struct {
+    Order *string `url:"order,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }
@@ -1684,7 +1716,9 @@ func (c BillingClient) CreateOfferPosition(in OfferPositionCreateRequest) (Offer
 }
 
 type GetOfferPositionsQueryParams struct {
+    Order *string `url:"order,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }
@@ -1729,7 +1763,9 @@ func (c BillingClient) CreatePaymentReminder(in PaymentReminderCreateRequest) (P
 }
 
 type GetPaymentRemindersQueryParams struct {
+    Order *string `url:"order,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }

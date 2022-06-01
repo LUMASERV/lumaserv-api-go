@@ -110,9 +110,12 @@ type ResponseMessage struct {
 type Gender string
 
 type Project struct {
+    CreatedAt *string `json:"created_at"`
     Id string `json:"id"`
     Title string `json:"title"`
 }
+
+type ObjectType string
 
 type TokenValidationInfo struct {
     ProjectMemberships []ProjectMember `json:"project_memberships"`
@@ -125,7 +128,7 @@ type AuditLogEntry struct {
     TokenId string `json:"token_id"`
     UserId string `json:"user_id"`
     ProjectId *string `json:"project_id"`
-    ObjectType *string `json:"object_type"`
+    ObjectType *ObjectType `json:"object_type"`
     Context interface{} `json:"context"`
     Action string `json:"action"`
     Id string `json:"id"`
@@ -348,7 +351,7 @@ type UserCreateRequest struct {
 type AuditLogRequest struct {
     TokenId string `json:"token_id"`
     ProjectId *string `json:"project_id"`
-    ObjectType *string `json:"object_type"`
+    ObjectType *ObjectType `json:"object_type"`
     Context interface{} `json:"context"`
     Action string `json:"action"`
     IpAddress *string `json:"ip_address"`
@@ -373,8 +376,16 @@ func (c AuthClient) CreateProject(in ProjectCreateRequest) (ProjectSingleRespons
     return body, res, err
 }
 
+type GetProjectsQueryParamsFilter struct {
+    Title *string `url:"title,omitempty"`
+    Id *string `url:"id,omitempty"`
+}
+
 type GetProjectsQueryParams struct {
+    Order *string `url:"order,omitempty"`
+    Filter *GetProjectsQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
     Detail *bool `url:"detail,omitempty"`
@@ -498,12 +509,18 @@ func (c AuthClient) CreateUser(in UserCreateRequest) (UserSingleResponse, *http.
 }
 
 type GetUsersQueryParamsFilter struct {
+    Type *string `url:"type,omitempty"`
+    Email *string `url:"email,omitempty"`
     CustomerId *string `url:"customer_id,omitempty"`
+    State *string `url:"state,omitempty"`
+    Id *string `url:"id,omitempty"`
 }
 
 type GetUsersQueryParams struct {
+    Order *string `url:"order,omitempty"`
     Filter *GetUsersQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }
@@ -665,12 +682,17 @@ func (c AuthClient) CreateToken(in TokenCreateRequest) (TokenSingleResponse, *ht
 }
 
 type GetTokensQueryParamsFilter struct {
+    Type *string `url:"type,omitempty"`
+    Title *string `url:"title,omitempty"`
+    Id *string `url:"id,omitempty"`
     UserId *string `url:"user_id,omitempty"`
 }
 
 type GetTokensQueryParams struct {
+    Order *string `url:"order,omitempty"`
     Filter *GetTokensQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }
@@ -787,8 +809,10 @@ type GetProjectMembersQueryParamsFilter struct {
 }
 
 type GetProjectMembersQueryParams struct {
+    Order *string `url:"order,omitempty"`
     Filter *GetProjectMembersQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }
@@ -866,9 +890,21 @@ func (c AuthClient) RemoveProjectMember(id string, user_id string) (EmptyRespons
     return body, res, err
 }
 
-func (c AuthClient) GetUserProjectMemberships(id string) (ProjectMemberListResponse, *http.Response, error) {
+type GetUserProjectMembershipsQueryParams struct {
+    Order *string `url:"order,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+}
+
+func (c AuthClient) GetUserProjectMemberships(id string, qParams GetUserProjectMembershipsQueryParams) (ProjectMemberListResponse, *http.Response, error) {
     body := ProjectMemberListResponse{}
-    res, j, err := c.Request("GET", "/users/"+c.toStr(id)+"/project_memberships", nil)
+    q, err := query.Values(qParams)
+    if err != nil {
+        return body, nil, err
+    }
+    res, j, err := c.Request("GET", "/users/"+c.toStr(id)+"/project_memberships"+"?"+q.Encode(), nil)
     if err != nil {
         return body, res, err
     }
@@ -884,7 +920,9 @@ func (c AuthClient) GetUserProjectMemberships(id string) (ProjectMemberListRespo
 }
 
 type GetCountriesQueryParams struct {
+    Order *string `url:"order,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }

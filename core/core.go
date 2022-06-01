@@ -145,6 +145,7 @@ type Server struct {
 
 type Address struct {
     Address string `json:"address"`
+    Assignments *[]AddressAssignments `json:"assignments"`
     ProjectId *string `json:"project_id"`
     SubnetId string `json:"subnet_id"`
     CreatedAt string `json:"created_at"`
@@ -218,6 +219,7 @@ type ServerBackup struct {
     ProjectId string `json:"project_id"`
     ActionId string `json:"action_id"`
     Scheduled bool `json:"scheduled"`
+    Keep *bool `json:"keep"`
     CreatedAt string `json:"created_at"`
     Id string `json:"id"`
     State ServerBackupState `json:"state"`
@@ -320,6 +322,7 @@ type ResponsePagination struct {
 
 type ScheduledServerAction struct {
     BackupId *string `json:"backup_id"`
+    BackupRetention *int `json:"backup_retention"`
     CreatedAt string `json:"created_at"`
     Interval ScheduledServerActionInterval `json:"interval"`
     Id string `json:"id"`
@@ -384,6 +387,11 @@ type ResponseMetadata struct {
     TransactionId string `json:"transaction_id"`
     BuildCommit string `json:"build_commit"`
     BuildTimestamp string `json:"build_timestamp"`
+}
+
+type AddressAssignments struct {
+    AssignedType ObjectType `json:"assigned_type"`
+    AssignedId string `json:"assigned_id"`
 }
 
 type ServerGraphEntry struct {
@@ -506,11 +514,10 @@ type ServerState string
 type ServerNetwork struct {
     Default bool `json:"default"`
     NetworkId string `json:"network_id"`
-    AddressV6Id *string `json:"address_v6_id"`
+    Addresses *[]Address `json:"addresses"`
     CreatedAt string `json:"created_at"`
     ExternalId *string `json:"external_id"`
     Id string `json:"id"`
-    AddressV4Id *string `json:"address_v4_id"`
     HostId *string `json:"host_id"`
     Labels map[string]*string `json:"labels"`
 }
@@ -615,11 +622,11 @@ type DomainHandleSingleResponse struct {
 }
 
 type ServerFirewallRuleListResponse struct {
-    Metadata *ResponseMetadata `json:"metadata"`
+    Metadata ResponseMetadata `json:"metadata"`
     Pagination *ResponsePagination `json:"pagination"`
-    Data *[]ServerFirewallRule `json:"data"`
-    Success *bool `json:"success"`
-    Messages *ResponseMessages `json:"messages"`
+    Data []ServerFirewallRule `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
 }
 
 type DomainListResponse struct {
@@ -1259,6 +1266,7 @@ type ServerVolumeUpdateRequest struct {
 type ServerCreateRequest struct {
     ZoneId string `json:"zone_id"`
     BackupId *string `json:"backup_id"`
+    NoPublicNetwork *bool `json:"no_public_network"`
     VariantId string `json:"variant_id"`
     SshKeys []string `json:"ssh_keys"`
     ProjectId string `json:"project_id"`
@@ -1308,6 +1316,7 @@ type SSLContactCreateRequest struct {
 
 type NetworkCreateRequest struct {
     ZoneId string `json:"zone_id"`
+    Subnet *string `json:"subnet"`
     ProjectId *string `json:"project_id"`
     Tag *int `json:"tag"`
     Title string `json:"title"`
@@ -1365,6 +1374,7 @@ type ServerVariantPriceUpdateRequest struct {
 
 type ScheduledServerActionCreateRequest struct {
     BackupId *string `json:"backup_id"`
+    BackupRetention *int `json:"backup_retention"`
     Interval *ScheduledServerActionInterval `json:"interval"`
     Force *bool `json:"force"`
     ExecuteAt string `json:"execute_at"`
@@ -1391,6 +1401,10 @@ type ServerFirewallMemberCreateRequest struct {
     Type ServerFirewallMemberType `json:"type"`
     ServerId *string `json:"server_id"`
     LabelName *string `json:"label_name"`
+}
+
+type ServerBackupUpdateRequest struct {
+    Keep *bool `json:"keep"`
 }
 
 type ServerStorageCreateRequest struct {
@@ -1427,10 +1441,6 @@ type S3AccessKeyCreateRequest struct {
     ProjectId string `json:"project_id"`
     Title string `json:"title"`
     Labels map[string]*string `json:"labels"`
-}
-
-type SubnetAddressCreateRequest struct {
-    Address string `json:"address"`
 }
 
 type ServerPriceRangeCreateRequest struct {
@@ -1565,11 +1575,12 @@ type DomainScheduleDeleteRequest struct {
 }
 
 type SubnetCreateRequest struct {
+    Shared *bool `json:"shared"`
     NetworkId string `json:"network_id"`
     Address string `json:"address"`
-    Public *bool `json:"public"`
     ProjectId *string `json:"project_id"`
     Prefix int `json:"prefix"`
+    Range *string `json:"range"`
 }
 
 type ServerVolumeAttachRequest struct {
@@ -1614,8 +1625,10 @@ type GetSSHKeysQueryParamsFilter struct {
 }
 
 type GetSSHKeysQueryParams struct {
+    Order *string `url:"order,omitempty"`
     Filter *GetSSHKeysQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
     WithLabels *bool `url:"with_labels,omitempty"`
@@ -1662,9 +1675,28 @@ func (c CoreClient) CreateServerPriceRange(in ServerPriceRangeCreateRequest) (Se
     return body, res, err
 }
 
-func (c CoreClient) GetServerPriceRanges() (ServerPriceRangeListResponse, *http.Response, error) {
+type GetServerPriceRangesQueryParamsFilter struct {
+    Title *string `url:"title,omitempty"`
+    Id *string `url:"id,omitempty"`
+}
+
+type GetServerPriceRangesQueryParams struct {
+    Order *string `url:"order,omitempty"`
+    Filter *GetServerPriceRangesQueryParamsFilter `url:"filter,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+}
+
+func (c CoreClient) GetServerPriceRanges(qParams GetServerPriceRangesQueryParams) (ServerPriceRangeListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := ServerPriceRangeListResponse{}
-    res, j, err := c.Request("GET", "/server-price-ranges", nil)
+    q, err := query.Values(qParams)
+    if err != nil {
+        return body, nil, err
+    }
+    res, j, err := c.Request("GET", "/server-price-ranges"+"?"+q.Encode(), nil)
     if err != nil {
         return body, res, err
     }
@@ -1716,12 +1748,17 @@ func (c CoreClient) CreateAvailabilityZone(in AvailabilityZoneCreateRequest) (Av
 }
 
 type GetAvailabilityZonesQueryParamsFilter struct {
+    CountryCode *string `url:"country_code,omitempty"`
     Title *string `url:"title,omitempty"`
+    Id *string `url:"id,omitempty"`
+    City *string `url:"city,omitempty"`
 }
 
 type GetAvailabilityZonesQueryParams struct {
+    Order *string `url:"order,omitempty"`
     Filter *GetAvailabilityZonesQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }
@@ -2048,8 +2085,10 @@ type GetDNSZonesQueryParamsFilter struct {
 }
 
 type GetDNSZonesQueryParams struct {
+    Order *string `url:"order,omitempty"`
     Filter *GetDNSZonesQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
     WithLabels *bool `url:"with_labels,omitempty"`
@@ -2115,11 +2154,15 @@ func (c CoreClient) CreateServerFirewall(in ServerFirewallCreateRequest) (Server
 
 type GetServerFirewallsQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
+    Title *string `url:"title,omitempty"`
+    Id *string `url:"id,omitempty"`
 }
 
 type GetServerFirewallsQueryParams struct {
+    Order *string `url:"order,omitempty"`
     Filter *GetServerFirewallsQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }
@@ -2233,8 +2276,16 @@ func (c CoreClient) CreateServerHost(in ServerHostCreateRequest) (ServerHostSing
     return body, res, err
 }
 
+type GetServerHostsQueryParamsFilter struct {
+    Title *string `url:"title,omitempty"`
+    Id *string `url:"id,omitempty"`
+}
+
 type GetServerHostsQueryParams struct {
+    Order *string `url:"order,omitempty"`
+    Filter *GetServerHostsQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }
@@ -2281,14 +2332,21 @@ func (c CoreClient) CreateServer(in ServerCreateRequest) (ServerSingleResponse, 
 }
 
 type GetServersQueryParamsFilter struct {
+    TemplateId *string `url:"template_id,omitempty"`
+    State *string `url:"state,omitempty"`
     ProjectId *string `url:"project_id,omitempty"`
+    HostId *string `url:"host_id,omitempty"`
     Labels map[string]*string `url:"labels,omitempty"`
+    Id *string `url:"id,omitempty"`
+    VariantId *string `url:"variant_id,omitempty"`
     Name *string `url:"name,omitempty"`
 }
 
 type GetServersQueryParams struct {
+    Order *string `url:"order,omitempty"`
     Filter *GetServersQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
     WithLabels *bool `url:"with_labels,omitempty"`
@@ -2514,11 +2572,14 @@ func (c CoreClient) CreateServerBackup(in ServerBackupCreateRequest) (ServerBack
 type GetServerBackupsQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
     ServerId *string `url:"server_id,omitempty"`
+    Id *string `url:"id,omitempty"`
 }
 
 type GetServerBackupsQueryParams struct {
+    Order *string `url:"order,omitempty"`
     Filter *GetServerBackupsQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }
@@ -2567,11 +2628,15 @@ func (c CoreClient) CreateSubnet(in SubnetCreateRequest) (SubnetSingleResponse, 
 type GetSubnetsQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
     Labels map[string]*string `url:"labels,omitempty"`
+    Id *string `url:"id,omitempty"`
+    NetworkId *string `url:"network_id,omitempty"`
 }
 
 type GetSubnetsQueryParams struct {
+    Order *string `url:"order,omitempty"`
     Filter *GetSubnetsQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
     WithLabels *bool `url:"with_labels,omitempty"`
@@ -2619,14 +2684,19 @@ func (c CoreClient) CreateServerVolume(in ServerVolumeCreateRequest) (ServerVolu
 }
 
 type GetServerVolumesQueryParamsFilter struct {
+    ClassId *string `url:"class_id,omitempty"`
     ProjectId *string `url:"project_id,omitempty"`
+    Title *string `url:"title,omitempty"`
     Labels map[string]*string `url:"labels,omitempty"`
     ServerId *string `url:"server_id,omitempty"`
+    Id *string `url:"id,omitempty"`
 }
 
 type GetServerVolumesQueryParams struct {
+    Order *string `url:"order,omitempty"`
     Filter *GetServerVolumesQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
     WithLabels *bool `url:"with_labels,omitempty"`
@@ -2690,8 +2760,18 @@ func (c CoreClient) CreateServerStorageClass(in ServerStorageClassCreateRequest)
     return body, res, err
 }
 
+type GetServerStorageClassesQueryParamsFilter struct {
+    Ssd *string `url:"ssd,omitempty"`
+    Title *string `url:"title,omitempty"`
+    Replication *string `url:"replication,omitempty"`
+    Id *string `url:"id,omitempty"`
+}
+
 type GetServerStorageClassesQueryParams struct {
+    Order *string `url:"order,omitempty"`
+    Filter *GetServerStorageClassesQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }
@@ -2846,8 +2926,10 @@ type GetS3BucketsQueryParamsFilter struct {
 }
 
 type GetS3BucketsQueryParams struct {
+    Order *string `url:"order,omitempty"`
     Filter *GetS3BucketsQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
     WithLabels *bool `url:"with_labels,omitempty"`
@@ -2876,7 +2958,9 @@ func (c CoreClient) GetS3Buckets(qParams GetS3BucketsQueryParams) (S3BucketListR
 }
 
 type GetPleskLicenseTypesQueryParams struct {
+    Order *string `url:"order,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }
@@ -2904,7 +2988,9 @@ func (c CoreClient) GetPleskLicenseTypes(qParams GetPleskLicenseTypesQueryParams
 }
 
 type GetServerActionsQueryParams struct {
+    Order *string `url:"order,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }
@@ -2967,8 +3053,20 @@ func (c CoreClient) CreateServerFirewallMember(in ServerFirewallMemberCreateRequ
     return body, res, err
 }
 
+type GetServerFirewallMembersQueryParamsFilter struct {
+    Type *string `url:"type,omitempty"`
+    ServerId *string `url:"server_id,omitempty"`
+    LabelValue *string `url:"label_value,omitempty"`
+    Id *string `url:"id,omitempty"`
+    LabelName *string `url:"label_name,omitempty"`
+    Applied *string `url:"applied,omitempty"`
+}
+
 type GetServerFirewallMembersQueryParams struct {
+    Order *string `url:"order,omitempty"`
+    Filter *GetServerFirewallMembersQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }
@@ -3037,8 +3135,10 @@ type GetSSLOrganisationsQueryParamsFilter struct {
 }
 
 type GetSSLOrganisationsQueryParams struct {
+    Order *string `url:"order,omitempty"`
     Filter *GetSSLOrganisationsQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
     WithLabels *bool `url:"with_labels,omitempty"`
@@ -3084,7 +3184,9 @@ func (c CoreClient) GetSSLType(id string) (SSLTypeSingleResponse, *http.Response
 }
 
 type GetSSLTypesQueryParams struct {
+    Order *string `url:"order,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }
@@ -3257,11 +3359,15 @@ func (c CoreClient) CreateServerTemplate(in ServerTemplateCreateRequest) (Server
 
 type GetServerTemplatesQueryParamsFilter struct {
     Title *string `url:"title,omitempty"`
+    Id *string `url:"id,omitempty"`
 }
 
 type GetServerTemplatesQueryParams struct {
+    Order *string `url:"order,omitempty"`
     Filter *GetServerTemplatesQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
+    ZoneId *string `url:"zone_id,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }
@@ -3324,8 +3430,18 @@ func (c CoreClient) CreateServerFirewallRule(in ServerFirewallRuleCreateRequest,
     return body, res, err
 }
 
+type GetServerFirewallRulesQueryParamsFilter struct {
+    Type *string `url:"type,omitempty"`
+    Id *string `url:"id,omitempty"`
+    Protocol *string `url:"protocol,omitempty"`
+    Applied *string `url:"applied,omitempty"`
+}
+
 type GetServerFirewallRulesQueryParams struct {
+    Order *string `url:"order,omitempty"`
+    Filter *GetServerFirewallRulesQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }
@@ -3372,7 +3488,9 @@ func (c CoreClient) CreateScheduledServerAction(in ScheduledServerActionCreateRe
 }
 
 type GetScheduledServerActionsQueryParams struct {
+    Order *string `url:"order,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }
@@ -3453,7 +3571,9 @@ func (c CoreClient) CreateDNSZoneRecord(in DNSRecordCreateRequest, name string) 
 }
 
 type GetDNSZoneRecordsQueryParams struct {
+    Order *string `url:"order,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Page *int `url:"page,omitempty"`
 }
 
@@ -3570,8 +3690,21 @@ func (c CoreClient) CreateServerNetwork(in ServerNetworkCreateRequest, id string
     return body, res, err
 }
 
+type GetServerNetworksQueryParamsFilter struct {
+    AddressV6Id *string `url:"address_v6_id,omitempty"`
+    ServerId *string `url:"server_id,omitempty"`
+    AddressV4Id *string `url:"address_v4_id,omitempty"`
+    Id *string `url:"id,omitempty"`
+    NetworkId *string `url:"network_id,omitempty"`
+    Default *string `url:"default,omitempty"`
+    MacAddress *string `url:"mac_address,omitempty"`
+}
+
 type GetServerNetworksQueryParams struct {
+    Order *string `url:"order,omitempty"`
+    Filter *GetServerNetworksQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }
@@ -3618,13 +3751,22 @@ func (c CoreClient) CreateServerVariant(in ServerVariantCreateRequest) (ServerVa
 }
 
 type GetServerVariantsQueryParamsFilter struct {
+    Cores *string `url:"cores,omitempty"`
+    StorageClassId *string `url:"storage_class_id,omitempty"`
+    Memory *string `url:"memory,omitempty"`
     Title *string `url:"title,omitempty"`
+    Id *string `url:"id,omitempty"`
+    Disk *string `url:"disk,omitempty"`
 }
 
 type GetServerVariantsQueryParams struct {
+    Order *string `url:"order,omitempty"`
     Filter *GetServerVariantsQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
+    ZoneId *string `url:"zone_id,omitempty"`
     Search *string `url:"search,omitempty"`
+    ProjectId *string `url:"project_id,omitempty"`
     Page *int `url:"page,omitempty"`
 }
 
@@ -3720,9 +3862,30 @@ func (c CoreClient) CreateServerPriceRangeAssignment(in ServerPriceRangeAssignme
     return body, res, err
 }
 
-func (c CoreClient) GetServerPriceRangeAssignments() (ServerPriceRangeAssignmentListResponse, *http.Response, error) {
+type GetServerPriceRangeAssignmentsQueryParamsFilter struct {
+    RangeId *string `url:"range_id,omitempty"`
+    ProjectId *string `url:"project_id,omitempty"`
+    Id *string `url:"id,omitempty"`
+    UserId *string `url:"user_id,omitempty"`
+}
+
+type GetServerPriceRangeAssignmentsQueryParams struct {
+    Order *string `url:"order,omitempty"`
+    Filter *GetServerPriceRangeAssignmentsQueryParamsFilter `url:"filter,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+}
+
+func (c CoreClient) GetServerPriceRangeAssignments(qParams GetServerPriceRangeAssignmentsQueryParams) (ServerPriceRangeAssignmentListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := ServerPriceRangeAssignmentListResponse{}
-    res, j, err := c.Request("GET", "/server-price-range-assignments", nil)
+    q, err := query.Values(qParams)
+    if err != nil {
+        return body, nil, err
+    }
+    res, j, err := c.Request("GET", "/server-price-range-assignments"+"?"+q.Encode(), nil)
     if err != nil {
         return body, res, err
     }
@@ -3739,11 +3902,14 @@ func (c CoreClient) GetServerPriceRangeAssignments() (ServerPriceRangeAssignment
 
 type GetAddressesQueryParamsFilter struct {
     ProjectId *string `url:"project_id,omitempty"`
+    Id *string `url:"id,omitempty"`
 }
 
 type GetAddressesQueryParams struct {
+    Order *string `url:"order,omitempty"`
     Filter *GetAddressesQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
 }
@@ -3841,14 +4007,18 @@ func (c CoreClient) CreateServerMedia(in ServerMediaCreateRequest) (ServerMediaS
 }
 
 type GetServerMediasQueryParamsFilter struct {
+    ZoneId *string `url:"zone_id,omitempty"`
     ProjectId *string `url:"project_id,omitempty"`
     Title *string `url:"title,omitempty"`
     Labels map[string]*string `url:"labels,omitempty"`
+    Id *string `url:"id,omitempty"`
 }
 
 type GetServerMediasQueryParams struct {
+    Order *string `url:"order,omitempty"`
     Filter *GetServerMediasQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
     WithLabels *bool `url:"with_labels,omitempty"`
@@ -3955,8 +4125,10 @@ type GetPleskLicensesQueryParamsFilter struct {
 }
 
 type GetPleskLicensesQueryParams struct {
+    Order *string `url:"order,omitempty"`
     Filter *GetPleskLicensesQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
     WithLabels *bool `url:"with_labels,omitempty"`
@@ -4043,8 +4215,10 @@ type GetS3AccessKeysQueryParamsFilter struct {
 }
 
 type GetS3AccessKeysQueryParams struct {
+    Order *string `url:"order,omitempty"`
     Filter *GetS3AccessKeysQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
     WithLabels *bool `url:"with_labels,omitempty"`
@@ -4108,6 +4282,23 @@ func (c CoreClient) UpdateDNSZone(in DNSZoneUpdateRequest, name string) (DNSZone
     return body, res, err
 }
 
+func (c CoreClient) CancelServerAction(id string, action_id string) (ServerActionSingleResponse, *http.Response, error) {
+    body := ServerActionSingleResponse{}
+    res, j, err := c.Request("POST", "/servers/"+c.toStr(id)+"/actions/"+c.toStr(action_id)+"/cancel", nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
 func (c CoreClient) CreateDomainHandle(in DomainHandleCreateRequest) (DomainHandleSingleResponse, *http.Response, error) {
     c.applyCurrentProject(reflect.ValueOf(&in))
     body := DomainHandleSingleResponse{}
@@ -4133,8 +4324,10 @@ type GetDomainHandlesQueryParamsFilter struct {
 }
 
 type GetDomainHandlesQueryParams struct {
+    Order *string `url:"order,omitempty"`
     Filter *GetDomainHandlesQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
     WithLabels *bool `url:"with_labels,omitempty"`
@@ -4208,8 +4401,10 @@ type GetSSLCertificatesQueryParamsFilter struct {
 }
 
 type GetSSLCertificatesQueryParams struct {
+    Order *string `url:"order,omitempty"`
     Filter *GetSSLCertificatesQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
     WithLabels *bool `url:"with_labels,omitempty"`
@@ -4290,6 +4485,25 @@ func (c CoreClient) DeleteServerBackup(id string) (EmptyResponse, *http.Response
     return body, res, err
 }
 
+func (c CoreClient) UpdateServerBackup(in ServerBackupUpdateRequest, id string) (ServerBackupSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
+    body := ServerBackupSingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("PUT", "/server-backups/"+c.toStr(id), bytes.NewBuffer(inJson))
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
 type GetDomainPricingListQueryParams struct {
     ProjectId *string `url:"project_id,omitempty"`
 }
@@ -4333,25 +4547,6 @@ func (c CoreClient) GetSSLCertificate(id string) (SSLCertificateSingleResponse, 
     return body, res, err
 }
 
-func (c CoreClient) CreateSubnetAddress(in SubnetAddressCreateRequest, id string) (AddressSingleResponse, *http.Response, error) {
-    c.applyCurrentProject(reflect.ValueOf(&in))
-    body := AddressSingleResponse{}
-    inJson, err := json.Marshal(in)
-    res, j, err := c.Request("POST", "/subnets/"+c.toStr(id)+"/addresses", bytes.NewBuffer(inJson))
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
 func (c CoreClient) CreateNetwork(in NetworkCreateRequest) (NetworkSingleResponse, *http.Response, error) {
     c.applyCurrentProject(reflect.ValueOf(&in))
     body := NetworkSingleResponse{}
@@ -4372,14 +4567,19 @@ func (c CoreClient) CreateNetwork(in NetworkCreateRequest) (NetworkSingleRespons
 }
 
 type GetNetworksQueryParamsFilter struct {
+    Type *string `url:"type,omitempty"`
+    ZoneId *string `url:"zone_id,omitempty"`
     ProjectId *string `url:"project_id,omitempty"`
     Title *string `url:"title,omitempty"`
     Labels map[string]*string `url:"labels,omitempty"`
+    Id *string `url:"id,omitempty"`
 }
 
 type GetNetworksQueryParams struct {
+    Order *string `url:"order,omitempty"`
     Filter *GetNetworksQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
     WithLabels *bool `url:"with_labels,omitempty"`
@@ -4460,9 +4660,26 @@ func (c CoreClient) CreateServerStorage(in ServerStorageCreateRequest) (ServerSt
     return body, res, err
 }
 
-func (c CoreClient) GetServerStorages() (ServerStorageListResponse, *http.Response, error) {
+type GetServerStoragesQueryParamsFilter struct {
+    ExternalId *string `url:"external_id,omitempty"`
+    ZoneId *string `url:"zone_id,omitempty"`
+    Id *string `url:"id,omitempty"`
+}
+
+type GetServerStoragesQueryParams struct {
+    Order *string `url:"order,omitempty"`
+    Filter *GetServerStoragesQueryParamsFilter `url:"filter,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
+}
+
+func (c CoreClient) GetServerStorages(qParams GetServerStoragesQueryParams) (ServerStorageListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := ServerStorageListResponse{}
-    res, j, err := c.Request("GET", "/server-storages", nil)
+    q, err := query.Values(qParams)
+    if err != nil {
+        return body, nil, err
+    }
+    res, j, err := c.Request("GET", "/server-storages"+"?"+q.Encode(), nil)
     if err != nil {
         return body, res, err
     }
@@ -4538,8 +4755,10 @@ type GetSSLContactsQueryParamsFilter struct {
 }
 
 type GetSSLContactsQueryParams struct {
+    Order *string `url:"order,omitempty"`
     Filter *GetSSLContactsQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
     WithLabels *bool `url:"with_labels,omitempty"`
@@ -4625,8 +4844,10 @@ type GetS3AccessKeyGrantsQueryParamsFilter struct {
 }
 
 type GetS3AccessKeyGrantsQueryParams struct {
+    Order *string `url:"order,omitempty"`
     Filter *GetS3AccessKeyGrantsQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
     WithLabels *bool `url:"with_labels,omitempty"`
@@ -4841,8 +5062,10 @@ type GetDomainsQueryParamsFilter struct {
 }
 
 type GetDomainsQueryParams struct {
+    Order *string `url:"order,omitempty"`
     Filter *GetDomainsQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
     Page *int `url:"page,omitempty"`
     WithLabels *bool `url:"with_labels,omitempty"`
@@ -4906,9 +5129,22 @@ func (c CoreClient) CreateServerVariantPrice(in ServerVariantPriceCreateRequest,
     return body, res, err
 }
 
-func (c CoreClient) GetServerVariantPrices(id string) (ServerVariantPriceListResponse, *http.Response, error) {
+type GetServerVariantPricesQueryParams struct {
+    Order *string `url:"order,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+}
+
+func (c CoreClient) GetServerVariantPrices(id string, qParams GetServerVariantPricesQueryParams) (ServerVariantPriceListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := ServerVariantPriceListResponse{}
-    res, j, err := c.Request("GET", "/server-price-ranges/"+c.toStr(id)+"/variant-prices", nil)
+    q, err := query.Values(qParams)
+    if err != nil {
+        return body, nil, err
+    }
+    res, j, err := c.Request("GET", "/server-price-ranges/"+c.toStr(id)+"/variant-prices"+"?"+q.Encode(), nil)
     if err != nil {
         return body, res, err
     }
