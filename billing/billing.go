@@ -24,7 +24,7 @@ func NewClient (apiKey string) BillingClient {
 
 func NewClientWithUrl (apiKey string, baseUrl string) BillingClient {
     if len(baseUrl) == 0 {
-        baseUrl = "https://billing.lumaserv.com"
+        baseUrl = "https://api.lumaserv.com/billing"
     }
 
     return BillingClient {
@@ -291,6 +291,7 @@ type Offer struct {
 type BillingPosition struct {
     InvoicePositionId *string `json:"invoice_position_id"`
     Amount *float32 `json:"amount"`
+    SyncKey *string `json:"sync_key"`
     Price *float32 `json:"price"`
     Draft *bool `json:"draft"`
     Description *string `json:"description"`
@@ -654,6 +655,7 @@ type BillingPositionCreateRequest struct {
     InvoicePositionId *string `json:"invoice_position_id"`
     Amount float32 `json:"amount"`
     Unit string `json:"unit"`
+    SyncKey *string `json:"sync_key"`
     Price float32 `json:"price"`
     Draft *bool `json:"draft"`
     Description string `json:"description"`
@@ -866,8 +868,18 @@ func (c BillingClient) CreateBillingPosition(in BillingPositionCreateRequest) (B
     return body, res, err
 }
 
+type GetBillingPositionsQueryParamsFilter struct {
+    Draft *bool `url:"draft,omitempty"`
+    SyncKey *string `url:"sync_key,omitempty"`
+    CustomerId *string `url:"customer_id,omitempty"`
+    Title *string `url:"title,omitempty"`
+    InvoiceId *string `url:"invoice_id,omitempty"`
+    GroupKey *string `url:"group_key,omitempty"`
+}
+
 type GetBillingPositionsQueryParams struct {
     Order *string `url:"order,omitempty"`
+    Filter *GetBillingPositionsQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
     OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
