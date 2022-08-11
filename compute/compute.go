@@ -357,6 +357,7 @@ type ServerBackupState string
 type ServerHost struct {
     ZoneId string `json:"zone_id"`
     CreatedAt string `json:"created_at"`
+    Active bool `json:"active"`
     Id string `json:"id"`
     Title string `json:"title"`
 }
@@ -933,7 +934,12 @@ type ServerFirewallCreateRequest struct {
     Title string `json:"title"`
 }
 
+type ServerMediaMountRequest struct {
+    MediaId string `json:"media_id"`
+}
+
 type ServerVolumeUpdateRequest struct {
+    Title *string `json:"title"`
     Labels map[string]*string `json:"labels"`
 }
 
@@ -948,6 +954,11 @@ type ServerCreateRequest struct {
     TemplateId *string `json:"template_id"`
     Networks *[]ServerCreateRequestNetwork `json:"networks"`
     Labels map[string]*string `json:"labels"`
+}
+
+type ServerHostUpdateRequest struct {
+    Active *bool `json:"active"`
+    Title *string `json:"title"`
 }
 
 type ServerTemplateCreateRequest struct {
@@ -969,6 +980,10 @@ type ServerVariantPriceCreateRequest struct {
     VariantId string `json:"variant_id"`
     Price float32 `json:"price"`
     OfflinePrice float32 `json:"offline_price"`
+}
+
+type ServerVolumeResizeRequest struct {
+    Size int `json:"size"`
 }
 
 type ServerVariantCreateRequest struct {
@@ -999,6 +1014,7 @@ type ServerFirewallRuleCreateRequest struct {
     Addresses *[]string `json:"addresses"`
     Protocol *ServerFirewallRuleProtocol `json:"protocol"`
     Description *string `json:"description"`
+    Disabled *bool `json:"disabled"`
     Type ServerFirewallRuleType `json:"type"`
     Ports *[]string `json:"ports"`
 }
@@ -1019,6 +1035,7 @@ type ServerFirewallMemberCreateRequest struct {
 
 type ServerBackupUpdateRequest struct {
     Keep *bool `json:"keep"`
+    Title *string `json:"title"`
 }
 
 type ServerStorageCreateRequest struct {
@@ -1031,6 +1048,16 @@ type AvailabilityZoneCreateRequest struct {
     City string `json:"city"`
     Title string `json:"title"`
     Config interface{} `json:"config"`
+}
+
+type ServerFirewallRuleUpdateRequest struct {
+    Description *string `json:"description"`
+    Disabled *bool `json:"disabled"`
+}
+
+type NetworkUpdateRequest struct {
+    Title *string `json:"title"`
+    Labels interface{} `json:"labels"`
 }
 
 type ServerPriceRangeAssignmentCreateRequest struct {
@@ -1092,8 +1119,17 @@ type S3AccessGrantCreateRequest struct {
     Labels map[string]*string `json:"labels"`
 }
 
+type ScheduledServerActionUpdateRequest struct {
+    BackupId *string `json:"backup_id"`
+    BackupRetention *int `json:"backup_retention"`
+    Interval *ScheduledServerActionInterval `json:"interval"`
+    Force *bool `json:"force"`
+    Type *ServerActionType `json:"type"`
+}
+
 type ServerHostCreateRequest struct {
     ZoneId string `json:"zone_id"`
+    Active *bool `json:"active"`
     ExternalId string `json:"external_id"`
     Title string `json:"title"`
 }
@@ -1460,6 +1496,44 @@ func (c ComputeClient) UpdateServer(in ServerUpdateRequest, id string) (ServerSi
     return body, res, err
 }
 
+type GetServerActionsQueryParamsFilter struct {
+    Type *string `url:"type,omitempty"`
+    State *string `url:"state,omitempty"`
+    ServerId *string `url:"server_id,omitempty"`
+    Id *string `url:"id,omitempty"`
+}
+
+type GetServerActionsQueryParams struct {
+    Order *string `url:"order,omitempty"`
+    Filter *GetServerActionsQueryParamsFilter `url:"filter,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+}
+
+func (c ComputeClient) GetServerActions(qParams GetServerActionsQueryParams) (ServerActionListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
+    body := ServerActionListResponse{}
+    q, err := query.Values(qParams)
+    if err != nil {
+        return body, nil, err
+    }
+    res, j, err := c.Request("GET", "/server-actions"+"?"+q.Encode(), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
 func (c ComputeClient) GetServerStorageClass(id string) (ServerStorageClassSingleResponse, *http.Response, error) {
     body := ServerStorageClassSingleResponse{}
     res, j, err := c.Request("GET", "/server-storage-classes/"+c.toStr(id), nil)
@@ -1494,11 +1568,11 @@ func (c ComputeClient) RestartServer(id string) (ServerActionSingleResponse, *ht
     return body, res, err
 }
 
-func (c ComputeClient) RestoreServer(in ServerRestoreRequest, id string) (ScheduledServerActionSingleResponse, *http.Response, error) {
+func (c ComputeClient) MountServerMedia(in ServerMediaMountRequest, id string) (ServerSingleResponse, *http.Response, error) {
     c.applyCurrentProject(reflect.ValueOf(&in))
-    body := ScheduledServerActionSingleResponse{}
+    body := ServerSingleResponse{}
     inJson, err := json.Marshal(in)
-    res, j, err := c.Request("POST", "/servers/"+c.toStr(id)+"/restore", bytes.NewBuffer(inJson))
+    res, j, err := c.Request("POST", "/servers/"+c.toStr(id)+"/mount", bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
@@ -1513,9 +1587,28 @@ func (c ComputeClient) RestoreServer(in ServerRestoreRequest, id string) (Schedu
     return body, res, err
 }
 
-func (c ComputeClient) GetServerAction(id string, action_id string) (ServerActionSingleResponse, *http.Response, error) {
-    body := ServerActionSingleResponse{}
-    res, j, err := c.Request("GET", "/servers/"+c.toStr(id)+"/actions/"+c.toStr(action_id), nil)
+func (c ComputeClient) UnmountServerMedia(id string) (ServerSingleResponse, *http.Response, error) {
+    body := ServerSingleResponse{}
+    res, j, err := c.Request("DELETE", "/servers/"+c.toStr(id)+"/mount", nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c ComputeClient) RestoreServer(in ServerRestoreRequest, id string) (ScheduledServerActionSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
+    body := ScheduledServerActionSingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("POST", "/servers/"+c.toStr(id)+"/restore", bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
@@ -1663,6 +1756,25 @@ func (c ComputeClient) DeleteServerFirewallRule(id string, rule_id string) (Empt
     return body, res, err
 }
 
+func (c ComputeClient) UpdateServerFirewallRule(in ServerFirewallRuleUpdateRequest, id string, rule_id string) (ServerFirewallRuleSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
+    body := ServerFirewallRuleSingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("PUT", "/server-firewalls/"+c.toStr(id)+"/rules/"+c.toStr(rule_id), bytes.NewBuffer(inJson))
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
 func (c ComputeClient) CreateServerHost(in ServerHostCreateRequest) (ServerHostSingleResponse, *http.Response, error) {
     c.applyCurrentProject(reflect.ValueOf(&in))
     body := ServerHostSingleResponse{}
@@ -1744,6 +1856,7 @@ type GetServersQueryParamsFilter struct {
     HostId *string `url:"host_id,omitempty"`
     Labels map[string]*string `url:"labels,omitempty"`
     Id *string `url:"id,omitempty"`
+    NetworkId *string `url:"network_id,omitempty"`
     VariantId *string `url:"variant_id,omitempty"`
     Name *string `url:"name,omitempty"`
 }
@@ -2184,6 +2297,25 @@ func (c ComputeClient) DeleteScheduledServerAction(id string, action_id string) 
     return body, res, err
 }
 
+func (c ComputeClient) UpdateScheduledServerAction(in ScheduledServerActionUpdateRequest, id string, action_id string) (ScheduledServerActionSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
+    body := ScheduledServerActionSingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("PUT", "/servers/"+c.toStr(id)+"/scheduled-actions/"+c.toStr(action_id), bytes.NewBuffer(inJson))
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
 func (c ComputeClient) CreateS3Bucket(in S3BucketCreateRequest) (S3BucketSingleResponse, *http.Response, error) {
     c.applyCurrentProject(reflect.ValueOf(&in))
     body := S3BucketSingleResponse{}
@@ -2256,36 +2388,6 @@ func (c ComputeClient) GetPleskLicenseTypes(qParams GetPleskLicenseTypesQueryPar
         return body, nil, err
     }
     res, j, err := c.Request("GET", "/licenses/plesk-types"+"?"+q.Encode(), nil)
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-type GetServerActionsQueryParams struct {
-    Order *string `url:"order,omitempty"`
-    PageSize *int `url:"page_size,omitempty"`
-    OrderBy *string `url:"order_by,omitempty"`
-    Search *string `url:"search,omitempty"`
-    Page *int `url:"page,omitempty"`
-}
-
-func (c ComputeClient) GetServerActions(id string, qParams GetServerActionsQueryParams) (ServerActionListResponse, *http.Response, error) {
-    c.applyCurrentProject(reflect.ValueOf(&qParams))
-    body := ServerActionListResponse{}
-    q, err := query.Values(qParams)
-    if err != nil {
-        return body, nil, err
-    }
-    res, j, err := c.Request("GET", "/servers/"+c.toStr(id)+"/actions"+"?"+q.Encode(), nil)
     if err != nil {
         return body, res, err
     }
@@ -2379,6 +2481,23 @@ func (c ComputeClient) GetServerFirewallMembers(id string, qParams GetServerFire
 func (c ComputeClient) GetServerPriceRange(id string) (ServerPriceRangeSingleResponse, *http.Response, error) {
     body := ServerPriceRangeSingleResponse{}
     res, j, err := c.Request("GET", "/server-price-ranges/"+c.toStr(id), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c ComputeClient) GetServerAction(id string) (ServerActionSingleResponse, *http.Response, error) {
+    body := ServerActionSingleResponse{}
+    res, j, err := c.Request("GET", "/server-actions/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
@@ -2555,6 +2674,25 @@ func (c ComputeClient) GetServerHost(id string) (ServerHostSingleResponse, *http
     return body, res, err
 }
 
+func (c ComputeClient) UpdateServerHost(in ServerHostUpdateRequest, id string) (ServerHostSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
+    body := ServerHostSingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("PUT", "/server-hosts/"+c.toStr(id), bytes.NewBuffer(inJson))
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
 func (c ComputeClient) CreateServerFirewallRule(in ServerFirewallRuleCreateRequest, id string) (ServerFirewallRuleSingleResponse, *http.Response, error) {
     c.applyCurrentProject(reflect.ValueOf(&in))
     body := ServerFirewallRuleSingleResponse{}
@@ -2578,6 +2716,7 @@ type GetServerFirewallRulesQueryParamsFilter struct {
     Type *string `url:"type,omitempty"`
     Id *string `url:"id,omitempty"`
     Protocol *string `url:"protocol,omitempty"`
+    Disabled *bool `url:"disabled,omitempty"`
     Applied *string `url:"applied,omitempty"`
 }
 
@@ -3306,23 +3445,6 @@ func (c ComputeClient) GetS3AccessKeys(qParams GetS3AccessKeysQueryParams) (S3Ac
     return body, res, err
 }
 
-func (c ComputeClient) CancelServerAction(id string, action_id string) (ServerActionSingleResponse, *http.Response, error) {
-    body := ServerActionSingleResponse{}
-    res, j, err := c.Request("POST", "/servers/"+c.toStr(id)+"/actions/"+c.toStr(action_id)+"/cancel", nil)
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
 func (c ComputeClient) GetAddress(id string) (AddressSingleResponse, *http.Response, error) {
     body := AddressSingleResponse{}
     res, j, err := c.Request("GET", "/addresses/"+c.toStr(id), nil)
@@ -3684,9 +3806,45 @@ func (c ComputeClient) GetServerVNC(id string) (ServerVNCResponse, *http.Respons
     return body, res, err
 }
 
+func (c ComputeClient) CancelServerAction(id string) (ServerActionSingleResponse, *http.Response, error) {
+    body := ServerActionSingleResponse{}
+    res, j, err := c.Request("POST", "/server-actions/"+c.toStr(id)+"/cancel", nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
 func (c ComputeClient) GetNetwork(id string) (NetworkSingleResponse, *http.Response, error) {
     body := NetworkSingleResponse{}
     res, j, err := c.Request("GET", "/networks/"+c.toStr(id), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c ComputeClient) UpdateNetwork(in NetworkUpdateRequest, id string) (NetworkSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
+    body := NetworkSingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("PUT", "/networks/"+c.toStr(id), bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
@@ -3723,6 +3881,25 @@ func (c ComputeClient) GetLabels(qParams GetLabelsQueryParams) (LabelListRespons
         return body, nil, err
     }
     res, j, err := c.Request("GET", "/labels"+"?"+q.Encode(), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c ComputeClient) ResizeServerVolume(in ServerVolumeResizeRequest, id string) (ServerVolumeSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
+    body := ServerVolumeSingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("POST", "/server-volumes/"+c.toStr(id)+"/resize", bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }

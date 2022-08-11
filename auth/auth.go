@@ -10,12 +10,14 @@ import (
     "errors"
     "strconv"
     "github.com/google/go-querystring/query"
+    "reflect"
 )
 
 type AuthClient struct {
     baseUrl string
     apiKey  string
     client  *http.Client
+    currentProject string
 }
 
 func NewClient (apiKey string) AuthClient {
@@ -31,6 +33,14 @@ func NewClientWithUrl (apiKey string, baseUrl string) AuthClient {
         apiKey: apiKey,
         baseUrl: baseUrl,
     }
+}
+
+func (c *AuthClient) SetProject (project string) {
+    c.currentProject = project
+}
+
+func (c *AuthClient) GetProject () string {
+    return c.currentProject
 }
 
 func (c *AuthClient) SetHttpClient(client *http.Client) {
@@ -79,6 +89,32 @@ func (c AuthClient) toStr(in interface{}) string {
     }
 
     panic("Unhandled type in toStr")
+}
+
+func (c AuthClient) applyCurrentProject (v reflect.Value) {
+    if len(c.currentProject) > 0 {
+        if v.Kind() == reflect.Ptr {
+            x := v.Elem()
+            f := x.FieldByName("ProjectId")
+            if f.IsValid() && f.CanSet() {
+                if f.Kind() == reflect.String && len(f.String()) == 0 {
+                    f.SetString(c.currentProject)
+                } else if f.Kind() == reflect.Ptr && f.Type().Elem().Kind() == reflect.String {
+                    f.Set(reflect.ValueOf(&c.currentProject))
+                }
+            }
+
+            for i := 0; i < x.NumField(); i++ {
+                field := x.Field(i)
+                if field.Kind() == reflect.Ptr && field.Type().Elem().Kind() == reflect.Struct || field.Kind() == reflect.Struct {
+                    if field.IsNil() && field.CanSet() {
+                        field.Set(reflect.New(field.Type().Elem()))
+                    }
+                    c.applyCurrentProject(field)
+                }
+            }
+        }
+    }
 }
 type User struct {
     Gender *Gender `json:"gender"`
@@ -157,6 +193,15 @@ type ResponseMessages struct {
     Infos []ResponseMessage `json:"infos"`
 }
 
+type ProjectInvite struct {
+    ValidUntil string `json:"valid_until"`
+    ProjectId string `json:"project_id"`
+    CreatedAt string `json:"created_at"`
+    ProjectTitle string `json:"project_title"`
+    Id string `json:"id"`
+    Email string `json:"email"`
+}
+
 type ProjectMember struct {
     Role string `json:"role"`
     UserId *string `json:"user_id"`
@@ -211,6 +256,21 @@ type ProjectListResponse struct {
 type TokenSingleResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
     Data Token `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
+}
+
+type ProjectInviteListResponse struct {
+    Metadata ResponseMetadata `json:"metadata"`
+    Pagination *ResponsePagination `json:"pagination"`
+    Data []ProjectInvite `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
+}
+
+type ProjectInviteSingleResponse struct {
+    Metadata string `json:"metadata"`
+    Data ProjectInvite `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
 }
@@ -307,6 +367,11 @@ type TransactionLogRequest struct {
     Sort interface{} `json:"sort"`
 }
 
+type ProjectInviteCreateRequest struct {
+    ProjectId string `json:"project_id"`
+    Email string `json:"email"`
+}
+
 type TokenCreateRequest struct {
     UserId *string `json:"user_id"`
     Scope *TokenScope `json:"scope"`
@@ -359,6 +424,7 @@ type AuditLogRequest struct {
 }
 
 func (c AuthClient) CreateProject(in ProjectCreateRequest) (ProjectSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := ProjectSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/projects", bytes.NewBuffer(inJson))
@@ -392,6 +458,7 @@ type GetProjectsQueryParams struct {
 }
 
 func (c AuthClient) GetProjects(qParams GetProjectsQueryParams) (ProjectListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := ProjectListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -417,6 +484,7 @@ type GetProjectQueryParams struct {
 }
 
 func (c AuthClient) GetProject(id string, qParams GetProjectQueryParams) (ProjectSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := ProjectSingleResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -455,6 +523,7 @@ func (c AuthClient) DeleteProject(id string) (EmptyResponse, *http.Response, err
 }
 
 func (c AuthClient) UpdateProject(in ProjectUpdateRequest, id string) (ProjectSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := ProjectSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("PUT", "/projects/"+c.toStr(id), bytes.NewBuffer(inJson))
@@ -473,6 +542,7 @@ func (c AuthClient) UpdateProject(in ProjectUpdateRequest, id string) (ProjectSi
 }
 
 func (c AuthClient) Login(in LoginRequest) (LoginResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := LoginResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/login", bytes.NewBuffer(inJson))
@@ -491,6 +561,7 @@ func (c AuthClient) Login(in LoginRequest) (LoginResponse, *http.Response, error
 }
 
 func (c AuthClient) CreateUser(in UserCreateRequest) (UserSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := UserSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/users", bytes.NewBuffer(inJson))
@@ -526,6 +597,7 @@ type GetUsersQueryParams struct {
 }
 
 func (c AuthClient) GetUsers(qParams GetUsersQueryParams) (UserListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := UserListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -564,6 +636,7 @@ func (c AuthClient) GetUser(id string) (UserSingleResponse, *http.Response, erro
 }
 
 func (c AuthClient) UpdateUser(in UserUpdateRequest, id string) (UserSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := UserSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("PUT", "/users/"+c.toStr(id), bytes.NewBuffer(inJson))
@@ -582,6 +655,7 @@ func (c AuthClient) UpdateUser(in UserUpdateRequest, id string) (UserSingleRespo
 }
 
 func (c AuthClient) RequestPasswordReset(in RequestPasswordResetRequest) (EmptyResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := EmptyResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/password-reset", bytes.NewBuffer(inJson))
@@ -600,6 +674,7 @@ func (c AuthClient) RequestPasswordReset(in RequestPasswordResetRequest) (EmptyR
 }
 
 func (c AuthClient) ExecutePasswordReset(in ExecutePasswordResetRequest) (EmptyResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := EmptyResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("PUT", "/password-reset", bytes.NewBuffer(inJson))
@@ -617,7 +692,25 @@ func (c AuthClient) ExecutePasswordReset(in ExecutePasswordResetRequest) (EmptyR
     return body, res, err
 }
 
+func (c AuthClient) RejectProjectInvite(id string) (EmptyResponse, *http.Response, error) {
+    body := EmptyResponse{}
+    res, j, err := c.Request("POST", "/project-invites/"+c.toStr(id)+"/reject", nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
 func (c AuthClient) InsertAuditLogEntry(in AuditLogRequest) (EmptyResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := EmptyResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/audit-log", bytes.NewBuffer(inJson))
@@ -643,6 +736,7 @@ type SearchAuditLogQueryParams struct {
 }
 
 func (c AuthClient) SearchAuditLog(qParams SearchAuditLogQueryParams) (AuditLogEntryListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := AuditLogEntryListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -664,6 +758,7 @@ func (c AuthClient) SearchAuditLog(qParams SearchAuditLogQueryParams) (AuditLogE
 }
 
 func (c AuthClient) CreateToken(in TokenCreateRequest) (TokenSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := TokenSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/tokens", bytes.NewBuffer(inJson))
@@ -698,6 +793,7 @@ type GetTokensQueryParams struct {
 }
 
 func (c AuthClient) GetTokens(qParams GetTokensQueryParams) (TokenListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := TokenListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -769,6 +865,23 @@ func (c AuthClient) DeleteToken(id string) (EmptyResponse, *http.Response, error
     return body, res, err
 }
 
+func (c AuthClient) DeleteProjectInvite(id string) (EmptyResponse, *http.Response, error) {
+    body := EmptyResponse{}
+    res, j, err := c.Request("DELETE", "/project-invites/"+c.toStr(id), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
 func (c AuthClient) ValidateToken(token string) (TokenValidationResponse, *http.Response, error) {
     body := TokenValidationResponse{}
     res, j, err := c.Request("GET", "/validate/"+c.toStr(token), nil)
@@ -786,7 +899,64 @@ func (c AuthClient) ValidateToken(token string) (TokenValidationResponse, *http.
     return body, res, err
 }
 
+func (c AuthClient) CreateProjectInvite(in ProjectInviteCreateRequest) (ProjectInviteSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
+    body := ProjectInviteSingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("POST", "/project-invites", bytes.NewBuffer(inJson))
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+type GetProjectInvitesQueryParamsFilter struct {
+    Email *string `url:"email,omitempty"`
+    ProjectId *string `url:"project_id,omitempty"`
+    Id *string `url:"id,omitempty"`
+}
+
+type GetProjectInvitesQueryParams struct {
+    Order *string `url:"order,omitempty"`
+    Filter *GetProjectInvitesQueryParamsFilter `url:"filter,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+}
+
+func (c AuthClient) GetProjectInvites(qParams GetProjectInvitesQueryParams) (ProjectInviteListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
+    body := ProjectInviteListResponse{}
+    q, err := query.Values(qParams)
+    if err != nil {
+        return body, nil, err
+    }
+    res, j, err := c.Request("GET", "/project-invites"+"?"+q.Encode(), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
 func (c AuthClient) AddProjectMember(in ProjectMemberCreateRequest, id string) (ProjectMemberSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := ProjectMemberSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/projects/"+c.toStr(id)+"/members", bytes.NewBuffer(inJson))
@@ -818,6 +988,7 @@ type GetProjectMembersQueryParams struct {
 }
 
 func (c AuthClient) GetProjectMembers(id string, qParams GetProjectMembersQueryParams) (ProjectMemberListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := ProjectMemberListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -839,6 +1010,7 @@ func (c AuthClient) GetProjectMembers(id string, qParams GetProjectMembersQueryP
 }
 
 func (c AuthClient) SearchTransactionLog(in TransactionLogRequest) (TransactionLogResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
     body := TransactionLogResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/transaction-log", bytes.NewBuffer(inJson))
@@ -859,6 +1031,23 @@ func (c AuthClient) SearchTransactionLog(in TransactionLogRequest) (TransactionL
 func (c AuthClient) ValidateSelf() (TokenValidationResponse, *http.Response, error) {
     body := TokenValidationResponse{}
     res, j, err := c.Request("GET", "/validate/self", nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c AuthClient) AcceptProjectInvite(id string) (EmptyResponse, *http.Response, error) {
+    body := EmptyResponse{}
+    res, j, err := c.Request("POST", "/project-invites/"+c.toStr(id)+"/accept", nil)
     if err != nil {
         return body, res, err
     }
@@ -899,6 +1088,7 @@ type GetUserProjectMembershipsQueryParams struct {
 }
 
 func (c AuthClient) GetUserProjectMemberships(id string, qParams GetUserProjectMembershipsQueryParams) (ProjectMemberListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := ProjectMemberListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
@@ -928,6 +1118,7 @@ type GetCountriesQueryParams struct {
 }
 
 func (c AuthClient) GetCountries(qParams GetCountriesQueryParams) (CountryListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := CountryListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
