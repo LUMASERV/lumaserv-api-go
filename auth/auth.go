@@ -35,11 +35,11 @@ func NewClientWithUrl (apiKey string, baseUrl string) AuthClient {
     }
 }
 
-func (c *AuthClient) SetProject (project string) {
+func (c *AuthClient) SetCurrentProject (project string) {
     c.currentProject = project
 }
 
-func (c *AuthClient) GetProject () string {
+func (c *AuthClient) GetCurrentProject () string {
     return c.currentProject
 }
 

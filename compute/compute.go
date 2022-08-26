@@ -35,11 +35,11 @@ func NewClientWithUrl (apiKey string, baseUrl string) ComputeClient {
     }
 }
 
-func (c *ComputeClient) SetProject (project string) {
+func (c *ComputeClient) SetCurrentProject (project string) {
     c.currentProject = project
 }
 
-func (c *ComputeClient) GetProject () string {
+func (c *ComputeClient) GetCurrentProject () string {
     return c.currentProject
 }
 
@@ -155,9 +155,15 @@ type Label struct {
     ObjectId string `json:"object_id"`
 }
 
-type PleskLicenseType struct {
-    Id string `json:"id"`
-    Title string `json:"title"`
+type ServerGraphEntry struct {
+    DiskRead int `json:"disk_read"`
+    Memory float32 `json:"memory"`
+    NetworkIngress float32 `json:"network_ingress"`
+    NetworkEgress float32 `json:"network_egress"`
+    MemoryUsage float32 `json:"memory_usage"`
+    Time int `json:"time"`
+    CpuUsage float32 `json:"cpu_usage"`
+    DiskWrite int `json:"disk_write"`
 }
 
 type SearchResults struct {
@@ -166,7 +172,6 @@ type SearchResults struct {
     Servers *[]Server `json:"servers"`
     ServerMedias *[]ServerMedia `json:"server_medias"`
     S3Buckets *[]S3Bucket `json:"s3_buckets"`
-    PleskLicenses *[]PleskLicense `json:"plesk_licenses"`
     S3AccessKeys *[]S3AccessKey `json:"s3_access_keys"`
 }
 
@@ -180,145 +185,6 @@ type ServerBackup struct {
     Id string `json:"id"`
     State ServerBackupState `json:"state"`
     Title string `json:"title"`
-}
-
-type Network struct {
-    ZoneId string `json:"zone_id"`
-    ProjectId string `json:"project_id"`
-    CreatedAt string `json:"created_at"`
-    Id string `json:"id"`
-    Tag *int `json:"tag"`
-    Title string `json:"title"`
-    Type *NetworkType `json:"type"`
-    Labels map[string]*string `json:"labels"`
-}
-
-type ServerStatus struct {
-    Memory *int `json:"memory"`
-    Online bool `json:"online"`
-    MemoryUsage *float32 `json:"memory_usage"`
-    CpuUsage *float32 `json:"cpu_usage"`
-    Uptime *int `json:"uptime"`
-}
-
-type ResponseMessages struct {
-    Warnings []ResponseMessage `json:"warnings"`
-    Errors []ResponseMessage `json:"errors"`
-    Infos []ResponseMessage `json:"infos"`
-}
-
-type ServerActionState string
-
-type ServerVolume struct {
-    ZoneId string `json:"zone_id"`
-    Size int `json:"size"`
-    ProjectId string `json:"project_id"`
-    StorageId *string `json:"storage_id"`
-    ClassId string `json:"class_id"`
-    Root *bool `json:"root"`
-    CreatedAt string `json:"created_at"`
-    Id string `json:"id"`
-    Title string `json:"title"`
-    ServerId *string `json:"server_id"`
-    Labels map[string]*string `json:"labels"`
-}
-
-type ServerPriceRangeAssignment struct {
-    UserId string `json:"user_id"`
-    ProjectId *string `json:"project_id"`
-    Id string `json:"id"`
-    RangeId string `json:"range_id"`
-}
-
-type AvailabilityZone struct {
-    CountryCode string `json:"country_code"`
-    City string `json:"city"`
-    Id string `json:"id"`
-    Title string `json:"title"`
-}
-
-type ResponseMessage struct {
-    Message string `json:"message"`
-    Key string `json:"key"`
-}
-
-type ServerFirewallMemberType string
-
-type ServerFirewallRuleType string
-
-type ResponsePagination struct {
-    Total int `json:"total"`
-    Page int `json:"page"`
-    PageSize int `json:"page_size"`
-}
-
-type ScheduledServerAction struct {
-    BackupId *string `json:"backup_id"`
-    BackupRetention *int `json:"backup_retention"`
-    CreatedAt string `json:"created_at"`
-    Interval ScheduledServerActionInterval `json:"interval"`
-    Id string `json:"id"`
-    ExecuteAt string `json:"execute_at"`
-    ServerId string `json:"server_id"`
-    Type ServerActionType `json:"type"`
-}
-
-type ServerFirewallMember struct {
-    LabelValue *string `json:"label_value"`
-    Applied bool `json:"applied"`
-    Children *[]ServerFirewallMember `json:"children"`
-    CreatedAt string `json:"created_at"`
-    Id string `json:"id"`
-    Type ServerFirewallMemberType `json:"type"`
-    ServerId *string `json:"server_id"`
-    LabelName *string `json:"label_name"`
-}
-
-type Subnet struct {
-    NetworkId string `json:"network_id"`
-    Address string `json:"address"`
-    Prefix int `json:"prefix"`
-    CreatedAt string `json:"created_at"`
-    Id string `json:"id"`
-}
-
-type ServerFirewallRule struct {
-    Addresses *[]string `json:"addresses"`
-    Protocol *ServerFirewallRuleProtocol `json:"protocol"`
-    Applied bool `json:"applied"`
-    Description *string `json:"description"`
-    CreatedAt string `json:"created_at"`
-    Id string `json:"id"`
-    Type ServerFirewallRuleType `json:"type"`
-    Ports *[]string `json:"ports"`
-}
-
-type ServerStorageClass struct {
-    Replication int `json:"replication"`
-    Id string `json:"id"`
-    Title string `json:"title"`
-}
-
-type ResponseMetadata struct {
-    TransactionId string `json:"transaction_id"`
-    BuildCommit string `json:"build_commit"`
-    BuildTimestamp string `json:"build_timestamp"`
-}
-
-type AddressAssignments struct {
-    AssignedType ObjectType `json:"assigned_type"`
-    AssignedId string `json:"assigned_id"`
-}
-
-type ServerGraphEntry struct {
-    DiskRead int `json:"disk_read"`
-    Memory float32 `json:"memory"`
-    NetworkIngress float32 `json:"network_ingress"`
-    NetworkEgress float32 `json:"network_egress"`
-    MemoryUsage float32 `json:"memory_usage"`
-    Time int `json:"time"`
-    CpuUsage float32 `json:"cpu_usage"`
-    DiskWrite int `json:"disk_write"`
 }
 
 type ObjectType string
@@ -352,7 +218,34 @@ type ServerTemplate struct {
 
 type NetworkType string
 
+type Network struct {
+    ZoneId string `json:"zone_id"`
+    ProjectId string `json:"project_id"`
+    CreatedAt string `json:"created_at"`
+    Id string `json:"id"`
+    Tag *int `json:"tag"`
+    Title string `json:"title"`
+    Type *NetworkType `json:"type"`
+    Labels map[string]*string `json:"labels"`
+}
+
+type ServerStatus struct {
+    Memory *int `json:"memory"`
+    Online bool `json:"online"`
+    MemoryUsage *float32 `json:"memory_usage"`
+    CpuUsage *float32 `json:"cpu_usage"`
+    Uptime *int `json:"uptime"`
+}
+
 type ServerBackupState string
+
+type ResponseMessages struct {
+    Warnings []ResponseMessage `json:"warnings"`
+    Errors []ResponseMessage `json:"errors"`
+    Infos []ResponseMessage `json:"infos"`
+}
+
+type ServerActionState string
 
 type ServerHost struct {
     ZoneId string `json:"zone_id"`
@@ -362,20 +255,32 @@ type ServerHost struct {
     Title string `json:"title"`
 }
 
-type PleskLicense struct {
-    License string `json:"license"`
-    ProjectId string `json:"project_id"`
-    CreatedAt string `json:"created_at"`
-    Id string `json:"id"`
-    Key string `json:"key"`
-    Labels map[string]*string `json:"labels"`
-}
-
 type ServerFirewall struct {
     ProjectId string `json:"project_id"`
     CreatedAt string `json:"created_at"`
     Id string `json:"id"`
     Title string `json:"title"`
+}
+
+type ServerVolume struct {
+    ZoneId string `json:"zone_id"`
+    Size int `json:"size"`
+    ProjectId string `json:"project_id"`
+    StorageId *string `json:"storage_id"`
+    ClassId string `json:"class_id"`
+    Root *bool `json:"root"`
+    CreatedAt string `json:"created_at"`
+    Id string `json:"id"`
+    Title string `json:"title"`
+    ServerId *string `json:"server_id"`
+    Labels map[string]*string `json:"labels"`
+}
+
+type ServerPriceRangeAssignment struct {
+    UserId string `json:"user_id"`
+    ProjectId *string `json:"project_id"`
+    Id string `json:"id"`
+    RangeId string `json:"range_id"`
 }
 
 type ServerVNC struct {
@@ -385,6 +290,13 @@ type ServerVNC struct {
 }
 
 type ServerState string
+
+type AvailabilityZone struct {
+    CountryCode string `json:"country_code"`
+    City string `json:"city"`
+    Id string `json:"id"`
+    Title string `json:"title"`
+}
 
 type ServerNetwork struct {
     Default bool `json:"default"`
@@ -402,6 +314,13 @@ type ServerStorage struct {
     ExternalId string `json:"external_id"`
     Id string `json:"id"`
 }
+
+type ResponseMessage struct {
+    Message string `json:"message"`
+    Key string `json:"key"`
+}
+
+type ServerFirewallMemberType string
 
 type ServerVariantPrice struct {
     VariantId string `json:"variant_id"`
@@ -423,6 +342,14 @@ type ServerMedia struct {
 
 type ServerFirewallRuleProtocol string
 
+type ServerFirewallRuleType string
+
+type ResponsePagination struct {
+    Total int `json:"total"`
+    Page int `json:"page"`
+    PageSize int `json:"page_size"`
+}
+
 type ServerActionType string
 
 type ServerCreateRequestNetwork struct {
@@ -434,11 +361,58 @@ type ServerPriceRange struct {
     Title string `json:"title"`
 }
 
+type ScheduledServerAction struct {
+    BackupId *string `json:"backup_id"`
+    BackupRetention *int `json:"backup_retention"`
+    CreatedAt string `json:"created_at"`
+    Interval ScheduledServerActionInterval `json:"interval"`
+    Id string `json:"id"`
+    ExecuteAt string `json:"execute_at"`
+    ServerId string `json:"server_id"`
+    Type ServerActionType `json:"type"`
+}
+
+type ServerFirewallMember struct {
+    LabelValue *string `json:"label_value"`
+    Applied bool `json:"applied"`
+    Children *[]ServerFirewallMember `json:"children"`
+    CreatedAt string `json:"created_at"`
+    Id string `json:"id"`
+    Type ServerFirewallMemberType `json:"type"`
+    ServerId *string `json:"server_id"`
+    LabelName *string `json:"label_name"`
+}
+
 type ServerVariant struct {
     Disk int `json:"disk"`
     Cores int `json:"cores"`
     Memory int `json:"memory"`
     StorageClassId string `json:"storage_class_id"`
+    Id string `json:"id"`
+    Title string `json:"title"`
+}
+
+type Subnet struct {
+    NetworkId string `json:"network_id"`
+    Address string `json:"address"`
+    Prefix int `json:"prefix"`
+    CreatedAt string `json:"created_at"`
+    Id string `json:"id"`
+}
+
+type ServerFirewallRule struct {
+    Addresses *[]string `json:"addresses"`
+    Protocol *ServerFirewallRuleProtocol `json:"protocol"`
+    Applied bool `json:"applied"`
+    Description *string `json:"description"`
+    CreatedAt string `json:"created_at"`
+    Id string `json:"id"`
+    Type ServerFirewallRuleType `json:"type"`
+    Ports *[]string `json:"ports"`
+}
+
+type ServerStorageClass struct {
+    Replication int `json:"replication"`
     Id string `json:"id"`
     Title string `json:"title"`
 }
@@ -451,6 +425,17 @@ type ServerAction struct {
     Type ServerActionType `json:"type"`
     Cancellable bool `json:"cancellable"`
     EndedAt *string `json:"ended_at"`
+}
+
+type ResponseMetadata struct {
+    TransactionId string `json:"transaction_id"`
+    BuildCommit string `json:"build_commit"`
+    BuildTimestamp string `json:"build_timestamp"`
+}
+
+type AddressAssignments struct {
+    AssignedType ObjectType `json:"assigned_type"`
+    AssignedId string `json:"assigned_id"`
 }
 
 type S3AccessGrantListResponse struct {
@@ -517,13 +502,6 @@ type SubnetListResponse struct {
 type ServerGraphResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
     Data []ServerGraphEntry `json:"data"`
-    Success bool `json:"success"`
-    Messages ResponseMessages `json:"messages"`
-}
-
-type PleskLicenseSingleResponse struct {
-    Metadata ResponseMetadata `json:"metadata"`
-    Data PleskLicense `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
 }
@@ -715,14 +693,6 @@ type ScheduledServerActionListResponse struct {
     Messages ResponseMessages `json:"messages"`
 }
 
-type PleskLicenseTypeListResponse struct {
-    Metadata ResponseMetadata `json:"metadata"`
-    Pagination *ResponsePagination `json:"pagination"`
-    Data []PleskLicenseType `json:"data"`
-    Success bool `json:"success"`
-    Messages ResponseMessages `json:"messages"`
-}
-
 type ServerActionSingleResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
     Data ServerAction `json:"data"`
@@ -740,13 +710,6 @@ type S3BucketSingleResponse struct {
 type InvalidRequestResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
     Data interface{} `json:"data"`
-    Success bool `json:"success"`
-    Messages ResponseMessages `json:"messages"`
-}
-
-type PleskLicenseTypeSingleResponse struct {
-    Metadata ResponseMetadata `json:"metadata"`
-    Data PleskLicenseType `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
 }
@@ -785,14 +748,6 @@ type ServerFirewallListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
     Pagination *ResponsePagination `json:"pagination"`
     Data []ServerFirewall `json:"data"`
-    Success bool `json:"success"`
-    Messages ResponseMessages `json:"messages"`
-}
-
-type PleskLicenseListResponse struct {
-    Metadata ResponseMetadata `json:"metadata"`
-    Pagination *ResponsePagination `json:"pagination"`
-    Data []PleskLicense `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
 }
@@ -1134,22 +1089,10 @@ type ServerHostCreateRequest struct {
     Title string `json:"title"`
 }
 
-type PleskLicenseCreateRequest struct {
-    Address *string `json:"address"`
-    ProjectId string `json:"project_id"`
-    TypeId string `json:"type_id"`
-    Labels map[string]*string `json:"labels"`
-}
-
 type ServerStorageClassCreateRequest struct {
     Replication int `json:"replication"`
     StorageIds []string `json:"storage_ids"`
     Title string `json:"title"`
-}
-
-type PleskLicenseUpdateRequest struct {
-    Address *string `json:"address"`
-    Labels map[string]*string `json:"labels"`
 }
 
 type ServerRestoreRequest struct {
@@ -2120,23 +2063,6 @@ func (c ComputeClient) GetServerVolumes(qParams GetServerVolumesQueryParams) (Se
     return body, res, err
 }
 
-func (c ComputeClient) GetPleskLicenseType(id string) (PleskLicenseTypeSingleResponse, *http.Response, error) {
-    body := PleskLicenseTypeSingleResponse{}
-    res, j, err := c.Request("GET", "/licenses/plesk-types/"+c.toStr(id), nil)
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
 func (c ComputeClient) CreateServerStorageClass(in ServerStorageClassCreateRequest) (ServerStorageClassSingleResponse, *http.Response, error) {
     c.applyCurrentProject(reflect.ValueOf(&in))
     body := ServerStorageClassSingleResponse{}
@@ -2372,36 +2298,6 @@ func (c ComputeClient) GetS3Buckets(qParams GetS3BucketsQueryParams) (S3BucketLi
     return body, res, err
 }
 
-type GetPleskLicenseTypesQueryParams struct {
-    Order *string `url:"order,omitempty"`
-    PageSize *int `url:"page_size,omitempty"`
-    OrderBy *string `url:"order_by,omitempty"`
-    Search *string `url:"search,omitempty"`
-    Page *int `url:"page,omitempty"`
-}
-
-func (c ComputeClient) GetPleskLicenseTypes(qParams GetPleskLicenseTypesQueryParams) (PleskLicenseTypeListResponse, *http.Response, error) {
-    c.applyCurrentProject(reflect.ValueOf(&qParams))
-    body := PleskLicenseTypeListResponse{}
-    q, err := query.Values(qParams)
-    if err != nil {
-        return body, nil, err
-    }
-    res, j, err := c.Request("GET", "/licenses/plesk-types"+"?"+q.Encode(), nil)
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
 func (c ComputeClient) GetServerStatus(id string) (ServerStatusResponse, *http.Response, error) {
     body := ServerStatusResponse{}
     res, j, err := c.Request("GET", "/servers/"+c.toStr(id)+"/status", nil)
@@ -2551,42 +2447,6 @@ func (c ComputeClient) UpdateServerVariantPrice(in ServerVariantPriceUpdateReque
     body := ServerVariantPriceSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("PUT", "/server-price-ranges/"+c.toStr(id)+"/variant-prices/"+c.toStr(variant_id), bytes.NewBuffer(inJson))
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-func (c ComputeClient) GetPleskLicense(id string) (PleskLicenseSingleResponse, *http.Response, error) {
-    body := PleskLicenseSingleResponse{}
-    res, j, err := c.Request("GET", "/licenses/plesk/"+c.toStr(id), nil)
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-func (c ComputeClient) UpdatePleskLicense(in PleskLicenseUpdateRequest, id string) (PleskLicenseSingleResponse, *http.Response, error) {
-    c.applyCurrentProject(reflect.ValueOf(&in))
-    body := PleskLicenseSingleResponse{}
-    inJson, err := json.Marshal(in)
-    res, j, err := c.Request("PUT", "/licenses/plesk/"+c.toStr(id), bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
@@ -3284,63 +3144,6 @@ func (c ComputeClient) AttachServerVolume(in ServerVolumeAttachRequest, id strin
     body := ServerVolumeSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/server-volumes/"+c.toStr(id)+"/attach", bytes.NewBuffer(inJson))
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-func (c ComputeClient) CreatePleskLicense(in PleskLicenseCreateRequest) (PleskLicenseSingleResponse, *http.Response, error) {
-    c.applyCurrentProject(reflect.ValueOf(&in))
-    body := PleskLicenseSingleResponse{}
-    inJson, err := json.Marshal(in)
-    res, j, err := c.Request("POST", "/licenses/plesk", bytes.NewBuffer(inJson))
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-type GetPleskLicensesQueryParamsFilter struct {
-    ProjectId *string `url:"project_id,omitempty"`
-    Labels map[string]*string `url:"labels,omitempty"`
-    TypeId *string `url:"type_id,omitempty"`
-}
-
-type GetPleskLicensesQueryParams struct {
-    Order *string `url:"order,omitempty"`
-    Filter *GetPleskLicensesQueryParamsFilter `url:"filter,omitempty"`
-    PageSize *int `url:"page_size,omitempty"`
-    OrderBy *string `url:"order_by,omitempty"`
-    Search *string `url:"search,omitempty"`
-    Page *int `url:"page,omitempty"`
-    WithLabels *bool `url:"with_labels,omitempty"`
-}
-
-func (c ComputeClient) GetPleskLicenses(qParams GetPleskLicensesQueryParams) (PleskLicenseListResponse, *http.Response, error) {
-    c.applyCurrentProject(reflect.ValueOf(&qParams))
-    body := PleskLicenseListResponse{}
-    q, err := query.Values(qParams)
-    if err != nil {
-        return body, nil, err
-    }
-    res, j, err := c.Request("GET", "/licenses/plesk"+"?"+q.Encode(), nil)
     if err != nil {
         return body, res, err
     }

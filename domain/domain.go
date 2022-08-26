@@ -35,11 +35,11 @@ func NewClientWithUrl (apiKey string, baseUrl string) DomainClient {
     }
 }
 
-func (c *DomainClient) SetProject (project string) {
+func (c *DomainClient) SetCurrentProject (project string) {
     c.currentProject = project
 }
 
-func (c *DomainClient) GetProject () string {
+func (c *DomainClient) GetCurrentProject () string {
     return c.currentProject
 }
 
