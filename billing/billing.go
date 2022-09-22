@@ -83,13 +83,15 @@ func (c BillingClient) toStr(in interface{}) string {
 type BillingInterval string
 
 type InvoiceDetailed struct {
-    PaidAt *string `json:"paid_at"`
-    CreatedAt *string `json:"created_at"`
-    DueAt *string `json:"due_at"`
-    Positions *[]Position `json:"positions"`
-    Id *string `json:"id"`
-    State *InvoiceState `json:"state"`
-    CustomerId *string `json:"customer_id"`
+    PaidAt string `json:"paid_at"`
+    CreatedAt string `json:"created_at"`
+    DueAt string `json:"due_at"`
+    NetPrice float32 `json:"net_price"`
+    GrossPrice float32 `json:"gross_price"`
+    Positions []Position `json:"positions"`
+    Id string `json:"id"`
+    State InvoiceState `json:"state"`
+    CustomerId string `json:"customer_id"`
 }
 
 type OfferCreateRequestPosition struct {
@@ -105,12 +107,14 @@ type OfferCreateRequestPosition struct {
 }
 
 type Invoice struct {
-    PaidAt *string `json:"paid_at"`
-    CreatedAt *string `json:"created_at"`
-    DueAt *string `json:"due_at"`
-    Id *string `json:"id"`
-    State *InvoiceState `json:"state"`
-    CustomerId *string `json:"customer_id"`
+    PaidAt string `json:"paid_at"`
+    CreatedAt string `json:"created_at"`
+    DueAt string `json:"due_at"`
+    NetPrice float32 `json:"net_price"`
+    GrossPrice float32 `json:"gross_price"`
+    Id string `json:"id"`
+    State InvoiceState `json:"state"`
+    CustomerId string `json:"customer_id"`
 }
 
 type Customer struct {
@@ -258,34 +262,12 @@ type ResponseMessage struct {
 
 type PaymentReminderStage string
 
-type OfferPosition struct {
-    PurchasingPrice *float32 `json:"purchasing_price"`
-    Note *string `json:"note"`
-    Amount *float32 `json:"amount"`
-    Price *float32 `json:"price"`
-    Description *string `json:"description"`
-    Interval *string `json:"interval"`
-    Id string `json:"id"`
-    Title *string `json:"title"`
-    OfferId string `json:"offer_id"`
-    VatRate *float32 `json:"vat_rate"`
-}
-
 type PaymentReminderState string
 
 type ResponsePagination struct {
     Total int `json:"total"`
     Page int `json:"page"`
     PageSize int `json:"page_size"`
-}
-
-type Offer struct {
-    Number *string `json:"number"`
-    Amount *float32 `json:"amount"`
-    Id string `json:"id"`
-    NetAmount *float32 `json:"net_amount"`
-    State *OfferState `json:"state"`
-    CustomerId int `json:"customer_id"`
 }
 
 type BillingPosition struct {
@@ -330,6 +312,29 @@ type ResponseMetadata struct {
     BuildTimestamp string `json:"build_timestamp"`
 }
 
+type BankTransactionSingleResponse struct {
+    Metadata ResponseMetadata `json:"metadata"`
+    Data BankTransaction `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
+}
+
+type PaymentReminderListResponse struct {
+    Metadata ResponseMetadata `json:"metadata"`
+    Pagination *ResponsePagination `json:"pagination"`
+    Data []PaymentReminder `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
+}
+
+type BankTransactionListResponse struct {
+    Metadata ResponseMetadata `json:"metadata"`
+    Pagination ResponsePagination `json:"pagination"`
+    Data *[]BankTransaction `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
+}
+
 type ServiceContractListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
     Pagination *ResponsePagination `json:"pagination"`
@@ -342,6 +347,13 @@ type CustomerListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
     Pagination *ResponsePagination `json:"pagination"`
     Data []Customer `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
+}
+
+type InvoicePositionSingleResponse struct {
+    Metadata ResponseMetadata `json:"metadata"`
+    Data Position `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
 }
@@ -382,90 +394,6 @@ type DebitMandateSingleResponse struct {
     Messages ResponseMessages `json:"messages"`
 }
 
-type DebitMandateListResponse struct {
-    Metadata ResponseMetadata `json:"metadata"`
-    Pagination *ResponsePagination `json:"pagination"`
-    Data []DebitMandate `json:"data"`
-    Success bool `json:"success"`
-    Messages ResponseMessages `json:"messages"`
-}
-
-type OfferPositionSingleResponse struct {
-    Metadata ResponseMetadata `json:"metadata"`
-    Data OfferPosition `json:"data"`
-    Success bool `json:"success"`
-    Messages ResponseMessages `json:"messages"`
-}
-
-type OfferPositionListResponse struct {
-    Metadata ResponseMetadata `json:"metadata"`
-    Pagination *ResponsePagination `json:"pagination"`
-    Data []OfferPosition `json:"data"`
-    Success bool `json:"success"`
-    Messages ResponseMessages `json:"messages"`
-}
-
-type OnlinePaymentListResponse struct {
-    Metadata ResponseMetadata `json:"metadata"`
-    Pagination *ResponsePagination `json:"pagination"`
-    Data []OnlinePayment `json:"data"`
-    Success bool `json:"success"`
-    Messages ResponseMessages `json:"messages"`
-}
-
-type BillingPositionSingleResponse struct {
-    Metadata ResponseMetadata `json:"metadata"`
-    Data BillingPosition `json:"data"`
-    Success bool `json:"success"`
-    Messages ResponseMessages `json:"messages"`
-}
-
-type InvoicePositionListResponse struct {
-    Metadata ResponseMetadata `json:"metadata"`
-    Pagination *ResponsePagination `json:"pagination"`
-    Data []Position `json:"data"`
-    Success bool `json:"success"`
-    Messages ResponseMessages `json:"messages"`
-}
-
-type BankTransactionSingleResponse struct {
-    Metadata ResponseMetadata `json:"metadata"`
-    Data BankTransaction `json:"data"`
-    Success bool `json:"success"`
-    Messages ResponseMessages `json:"messages"`
-}
-
-type PaymentReminderListResponse struct {
-    Metadata ResponseMetadata `json:"metadata"`
-    Pagination *ResponsePagination `json:"pagination"`
-    Data []PaymentReminder `json:"data"`
-    Success bool `json:"success"`
-    Messages ResponseMessages `json:"messages"`
-}
-
-type BankTransactionListResponse struct {
-    Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
-    Data *[]BankTransaction `json:"data"`
-    Success bool `json:"success"`
-    Messages ResponseMessages `json:"messages"`
-}
-
-type InvoicePositionSingleResponse struct {
-    Metadata ResponseMetadata `json:"metadata"`
-    Data Position `json:"data"`
-    Success bool `json:"success"`
-    Messages ResponseMessages `json:"messages"`
-}
-
-type OfferListResponse struct {
-    Metadata ResponseMetadata `json:"metadata"`
-    Pagination *ResponsePagination `json:"pagination"`
-    Data []Offer `json:"data"`
-    Success bool `json:"success"`
-    Messages ResponseMessages `json:"messages"`
-}
-
 type InvoiceSingleResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
     Data InvoiceDetailed `json:"data"`
@@ -476,13 +404,6 @@ type InvoiceSingleResponse struct {
 type CustomerSingleResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
     Data CustomerDetailed `json:"data"`
-    Success bool `json:"success"`
-    Messages ResponseMessages `json:"messages"`
-}
-
-type OfferSingleResponse struct {
-    Metadata ResponseMetadata `json:"metadata"`
-    Data Offer `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
 }
@@ -501,9 +422,10 @@ type DebitSingleResponse struct {
     Messages ResponseMessages `json:"messages"`
 }
 
-type OnlinePaymentSingleResponse struct {
+type DebitMandateListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
-    Data OnlinePayment `json:"data"`
+    Pagination *ResponsePagination `json:"pagination"`
+    Data []DebitMandate `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
 }
@@ -538,11 +460,19 @@ type BillingPositionListResponse struct {
     Messages ResponseMessages `json:"messages"`
 }
 
-type OfferUpdateRequest struct {
-    Amount *float32 `json:"amount"`
-    NetAmount *float32 `json:"net_amount"`
-    State *OfferState `json:"state"`
-    CustomerId *string `json:"customer_id"`
+type BillingPositionSingleResponse struct {
+    Metadata ResponseMetadata `json:"metadata"`
+    Data BillingPosition `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
+}
+
+type InvoicePositionListResponse struct {
+    Metadata ResponseMetadata `json:"metadata"`
+    Pagination *ResponsePagination `json:"pagination"`
+    Data []Position `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
 }
 
 type InvoiceCreateRequest struct {
@@ -559,17 +489,6 @@ type PositionCreateRequest struct {
     Description string `json:"description"`
     VatRate *float32 `json:"vat_rate"`
     GroupKey string `json:"group_key"`
-}
-
-type OfferPositionUpdateRequest struct {
-    PurchasingPrice *float32 `json:"purchasing_price"`
-    Note *string `json:"note"`
-    Amount *float32 `json:"amount"`
-    Price *float32 `json:"price"`
-    Description *string `json:"description"`
-    Interval *OfferPositionInterval `json:"interval"`
-    Title *string `json:"title"`
-    VatRate *float32 `json:"vat_rate"`
 }
 
 type CustomerCreateRequest struct {
@@ -611,15 +530,6 @@ type InvoiceUpdateRequest struct {
     DueAt *string `json:"due_at"`
     State *InvoiceState `json:"state"`
     CustomerId *string `json:"customer_id"`
-}
-
-type OfferCreateRequest struct {
-    Number *string `json:"number"`
-    Amount *float32 `json:"amount"`
-    Positions *[]OfferCreateRequestPosition `json:"positions"`
-    NetAmount *float32 `json:"net_amount"`
-    State *OfferState `json:"state"`
-    CustomerId string `json:"customer_id"`
 }
 
 type PaymentReminderUpdateRequest struct {
@@ -722,16 +632,86 @@ type CustomerUpdateRequest struct {
     Email *string `json:"email"`
 }
 
-type OfferPositionCreateRequest struct {
-    PurchasingPrice *float32 `json:"purchasing_price"`
-    Note *string `json:"note"`
-    Amount float32 `json:"amount"`
-    Price float32 `json:"price"`
-    Description string `json:"description"`
-    Interval *OfferPositionInterval `json:"interval"`
-    Title string `json:"title"`
-    OfferId string `json:"offer_id"`
-    VatRate *float32 `json:"vat_rate"`
+func (c BillingClient) GetPaymentReminder(id string) (PaymentReminderSingleResponse, *http.Response, error) {
+    body := PaymentReminderSingleResponse{}
+    res, j, err := c.Request("GET", "/payment-reminders/"+c.toStr(id), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c BillingClient) UpdatePaymentReminder(in PaymentReminderUpdateRequest, id string) (PaymentReminderSingleResponse, *http.Response, error) {
+    body := PaymentReminderSingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("PUT", "/payment-reminders/"+c.toStr(id), bytes.NewBuffer(inJson))
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c BillingClient) CreateDebitMandate(in DebitMandateCreateRequest) (DebitMandateSingleResponse, *http.Response, error) {
+    body := DebitMandateSingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("POST", "/debit-mandates", bytes.NewBuffer(inJson))
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+type GetDebitMandatesQueryParams struct {
+    Order *string `url:"order,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+}
+
+func (c BillingClient) GetDebitMandates(qParams GetDebitMandatesQueryParams) (DebitMandateListResponse, *http.Response, error) {
+    body := DebitMandateListResponse{}
+    q, err := query.Values(qParams)
+    if err != nil {
+        return body, nil, err
+    }
+    res, j, err := c.Request("GET", "/debit-mandates"+"?"+q.Encode(), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
 }
 
 func (c BillingClient) GetInvoiceFile(id string) (FileSingleResponse, *http.Response, error) {
@@ -850,6 +830,69 @@ func (c BillingClient) UpdateBillingPosition(in BillingPositionUpdateRequest, id
     return body, res, err
 }
 
+type GetBankTransactionsQueryParams struct {
+    Order *string `url:"order,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+}
+
+func (c BillingClient) GetBankTransactions(qParams GetBankTransactionsQueryParams) (BankTransactionListResponse, *http.Response, error) {
+    body := BankTransactionListResponse{}
+    q, err := query.Values(qParams)
+    if err != nil {
+        return body, nil, err
+    }
+    res, j, err := c.Request("GET", "/bank-transactions"+"?"+q.Encode(), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c BillingClient) GetDebitMandate(id string) (DebitMandateSingleResponse, *http.Response, error) {
+    body := DebitMandateSingleResponse{}
+    res, j, err := c.Request("GET", "/debit-mandates/"+c.toStr(id), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c BillingClient) GetBankTransaction(id string) (BankTransactionSingleResponse, *http.Response, error) {
+    body := BankTransactionSingleResponse{}
+    res, j, err := c.Request("GET", "/bank-transactions/"+c.toStr(id), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
 func (c BillingClient) CreateBillingPosition(in BillingPositionCreateRequest) (BillingPositionSingleResponse, *http.Response, error) {
     body := BillingPositionSingleResponse{}
     inJson, err := json.Marshal(in)
@@ -940,477 +983,6 @@ func (c BillingClient) GetCustomers(qParams GetCustomersQueryParams) (CustomerLi
         return body, nil, err
     }
     res, j, err := c.Request("GET", "/customers"+"?"+q.Encode(), nil)
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-type GetDebitsQueryParams struct {
-    Order *string `url:"order,omitempty"`
-    PageSize *int `url:"page_size,omitempty"`
-    OrderBy *string `url:"order_by,omitempty"`
-    Search *string `url:"search,omitempty"`
-    Page *int `url:"page,omitempty"`
-}
-
-func (c BillingClient) GetDebits(qParams GetDebitsQueryParams) (DebitListResponse, *http.Response, error) {
-    body := DebitListResponse{}
-    q, err := query.Values(qParams)
-    if err != nil {
-        return body, nil, err
-    }
-    res, j, err := c.Request("GET", "/debits"+"?"+q.Encode(), nil)
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-func (c BillingClient) GetCustomer(id int) (CustomerSingleResponse, *http.Response, error) {
-    body := CustomerSingleResponse{}
-    res, j, err := c.Request("GET", "/customers/"+c.toStr(id), nil)
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-func (c BillingClient) UpdateCustomer(in CustomerUpdateRequest, id int) (CustomerSingleResponse, *http.Response, error) {
-    body := CustomerSingleResponse{}
-    inJson, err := json.Marshal(in)
-    res, j, err := c.Request("PUT", "/customers/"+c.toStr(id), bytes.NewBuffer(inJson))
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-type GetOnlinePaymentsQueryParams struct {
-    Order *string `url:"order,omitempty"`
-    PageSize *int `url:"page_size,omitempty"`
-    OrderBy *string `url:"order_by,omitempty"`
-    Search *string `url:"search,omitempty"`
-    Page *int `url:"page,omitempty"`
-}
-
-func (c BillingClient) GetOnlinePayments(qParams GetOnlinePaymentsQueryParams) (OnlinePaymentListResponse, *http.Response, error) {
-    body := OnlinePaymentListResponse{}
-    q, err := query.Values(qParams)
-    if err != nil {
-        return body, nil, err
-    }
-    res, j, err := c.Request("GET", "/online-payments"+"?"+q.Encode(), nil)
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-func (c BillingClient) GetServiceContractPosition(contract_id string, id string) (ServiceContractPositionSingleResponse, *http.Response, error) {
-    body := ServiceContractPositionSingleResponse{}
-    res, j, err := c.Request("GET", "/service-contracts/"+c.toStr(contract_id)+"/positions/"+c.toStr(id), nil)
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-func (c BillingClient) DeleteServiceContractPosition(contract_id string, id string) (EmptyResponse, *http.Response, error) {
-    body := EmptyResponse{}
-    res, j, err := c.Request("DELETE", "/service-contracts/"+c.toStr(contract_id)+"/positions/"+c.toStr(id), nil)
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-func (c BillingClient) UpdateServiceContractPosition(in PositionUpdateRequest, contract_id string, id string) (ServiceContractPositionSingleResponse, *http.Response, error) {
-    body := ServiceContractPositionSingleResponse{}
-    inJson, err := json.Marshal(in)
-    res, j, err := c.Request("PUT", "/service-contracts/"+c.toStr(contract_id)+"/positions/"+c.toStr(id), bytes.NewBuffer(inJson))
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-func (c BillingClient) CreateInvoice(in InvoiceCreateRequest) (InvoiceSingleResponse, *http.Response, error) {
-    body := InvoiceSingleResponse{}
-    inJson, err := json.Marshal(in)
-    res, j, err := c.Request("POST", "/invoices", bytes.NewBuffer(inJson))
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-type GetInvoicesQueryParams struct {
-    Order *string `url:"order,omitempty"`
-    PageSize *int `url:"page_size,omitempty"`
-    OrderBy *string `url:"order_by,omitempty"`
-    Search *string `url:"search,omitempty"`
-    Page *int `url:"page,omitempty"`
-}
-
-func (c BillingClient) GetInvoices(qParams GetInvoicesQueryParams) (InvoiceListResponse, *http.Response, error) {
-    body := InvoiceListResponse{}
-    q, err := query.Values(qParams)
-    if err != nil {
-        return body, nil, err
-    }
-    res, j, err := c.Request("GET", "/invoices"+"?"+q.Encode(), nil)
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-func (c BillingClient) CreateServiceContractPosition(in PositionCreateRequest, contract_id string) (ServiceContractPositionSingleResponse, *http.Response, error) {
-    body := ServiceContractPositionSingleResponse{}
-    inJson, err := json.Marshal(in)
-    res, j, err := c.Request("POST", "/service-contracts/"+c.toStr(contract_id)+"/positions", bytes.NewBuffer(inJson))
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-type GetServiceContractPositionsQueryParams struct {
-    Order *string `url:"order,omitempty"`
-    PageSize *int `url:"page_size,omitempty"`
-    OrderBy *string `url:"order_by,omitempty"`
-    Search *string `url:"search,omitempty"`
-    Page *int `url:"page,omitempty"`
-}
-
-func (c BillingClient) GetServiceContractPositions(contract_id string, qParams GetServiceContractPositionsQueryParams) (ServiceContractPositionListResponse, *http.Response, error) {
-    body := ServiceContractPositionListResponse{}
-    q, err := query.Values(qParams)
-    if err != nil {
-        return body, nil, err
-    }
-    res, j, err := c.Request("GET", "/service-contracts/"+c.toStr(contract_id)+"/positions"+"?"+q.Encode(), nil)
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-func (c BillingClient) GetOfferPosition(id string) (OfferPositionSingleResponse, *http.Response, error) {
-    body := OfferPositionSingleResponse{}
-    res, j, err := c.Request("GET", "/offer-positions/"+c.toStr(id), nil)
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-func (c BillingClient) DeleteOfferPosition(id string) (EmptyResponse, *http.Response, error) {
-    body := EmptyResponse{}
-    res, j, err := c.Request("DELETE", "/offer-positions/"+c.toStr(id), nil)
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-func (c BillingClient) UpdateOfferPosition(in OfferPositionUpdateRequest, id string) (OfferPositionSingleResponse, *http.Response, error) {
-    body := OfferPositionSingleResponse{}
-    inJson, err := json.Marshal(in)
-    res, j, err := c.Request("PUT", "/offer-positions/"+c.toStr(id), bytes.NewBuffer(inJson))
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-func (c BillingClient) GetPaymentReminder(id string) (PaymentReminderSingleResponse, *http.Response, error) {
-    body := PaymentReminderSingleResponse{}
-    res, j, err := c.Request("GET", "/payment-reminders/"+c.toStr(id), nil)
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-func (c BillingClient) UpdatePaymentReminder(in PaymentReminderUpdateRequest, id string) (PaymentReminderSingleResponse, *http.Response, error) {
-    body := PaymentReminderSingleResponse{}
-    inJson, err := json.Marshal(in)
-    res, j, err := c.Request("PUT", "/payment-reminders/"+c.toStr(id), bytes.NewBuffer(inJson))
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-func (c BillingClient) CreateDebitMandate(in DebitMandateCreateRequest) (DebitMandateSingleResponse, *http.Response, error) {
-    body := DebitMandateSingleResponse{}
-    inJson, err := json.Marshal(in)
-    res, j, err := c.Request("POST", "/debit-mandates", bytes.NewBuffer(inJson))
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-type GetDebitMandatesQueryParams struct {
-    Order *string `url:"order,omitempty"`
-    PageSize *int `url:"page_size,omitempty"`
-    OrderBy *string `url:"order_by,omitempty"`
-    Search *string `url:"search,omitempty"`
-    Page *int `url:"page,omitempty"`
-}
-
-func (c BillingClient) GetDebitMandates(qParams GetDebitMandatesQueryParams) (DebitMandateListResponse, *http.Response, error) {
-    body := DebitMandateListResponse{}
-    q, err := query.Values(qParams)
-    if err != nil {
-        return body, nil, err
-    }
-    res, j, err := c.Request("GET", "/debit-mandates"+"?"+q.Encode(), nil)
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-type GetBankTransactionsQueryParams struct {
-    Order *string `url:"order,omitempty"`
-    PageSize *int `url:"page_size,omitempty"`
-    OrderBy *string `url:"order_by,omitempty"`
-    Search *string `url:"search,omitempty"`
-    Page *int `url:"page,omitempty"`
-}
-
-func (c BillingClient) GetBankTransactions(qParams GetBankTransactionsQueryParams) (BankTransactionListResponse, *http.Response, error) {
-    body := BankTransactionListResponse{}
-    q, err := query.Values(qParams)
-    if err != nil {
-        return body, nil, err
-    }
-    res, j, err := c.Request("GET", "/bank-transactions"+"?"+q.Encode(), nil)
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-func (c BillingClient) GetDebitMandate(id string) (DebitMandateSingleResponse, *http.Response, error) {
-    body := DebitMandateSingleResponse{}
-    res, j, err := c.Request("GET", "/debit-mandates/"+c.toStr(id), nil)
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-func (c BillingClient) GetBankTransaction(id string) (BankTransactionSingleResponse, *http.Response, error) {
-    body := BankTransactionSingleResponse{}
-    res, j, err := c.Request("GET", "/bank-transactions/"+c.toStr(id), nil)
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-func (c BillingClient) GetOffer(id string) (OfferSingleResponse, *http.Response, error) {
-    body := OfferSingleResponse{}
-    res, j, err := c.Request("GET", "/offers/"+c.toStr(id), nil)
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-func (c BillingClient) UpdateOffer(in OfferUpdateRequest, id string) (OfferSingleResponse, *http.Response, error) {
-    body := OfferSingleResponse{}
-    inJson, err := json.Marshal(in)
-    res, j, err := c.Request("PUT", "/offers/"+c.toStr(id), bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
@@ -1524,6 +1096,70 @@ func (c BillingClient) GetServiceContracts(qParams GetServiceContractsQueryParam
     return body, res, err
 }
 
+type GetDebitsQueryParams struct {
+    Order *string `url:"order,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+}
+
+func (c BillingClient) GetDebits(qParams GetDebitsQueryParams) (DebitListResponse, *http.Response, error) {
+    body := DebitListResponse{}
+    q, err := query.Values(qParams)
+    if err != nil {
+        return body, nil, err
+    }
+    res, j, err := c.Request("GET", "/debits"+"?"+q.Encode(), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c BillingClient) GetCustomer(id int) (CustomerSingleResponse, *http.Response, error) {
+    body := CustomerSingleResponse{}
+    res, j, err := c.Request("GET", "/customers/"+c.toStr(id), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c BillingClient) UpdateCustomer(in CustomerUpdateRequest, id int) (CustomerSingleResponse, *http.Response, error) {
+    body := CustomerSingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("PUT", "/customers/"+c.toStr(id), bytes.NewBuffer(inJson))
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
 func (c BillingClient) GetInvoice(id string) (InvoiceSingleResponse, *http.Response, error) {
     body := InvoiceSingleResponse{}
     res, j, err := c.Request("GET", "/invoices/"+c.toStr(id), nil)
@@ -1576,9 +1212,91 @@ func (c BillingClient) UpdateInvoice(in InvoiceUpdateRequest, id string) (Invoic
     return body, res, err
 }
 
-func (c BillingClient) GetOnlinePayment(id string) (OnlinePaymentSingleResponse, *http.Response, error) {
-    body := OnlinePaymentSingleResponse{}
-    res, j, err := c.Request("GET", "/online-payments/"+c.toStr(id), nil)
+func (c BillingClient) GetServiceContractPosition(contract_id string, id string) (ServiceContractPositionSingleResponse, *http.Response, error) {
+    body := ServiceContractPositionSingleResponse{}
+    res, j, err := c.Request("GET", "/service-contracts/"+c.toStr(contract_id)+"/positions/"+c.toStr(id), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c BillingClient) DeleteServiceContractPosition(contract_id string, id string) (EmptyResponse, *http.Response, error) {
+    body := EmptyResponse{}
+    res, j, err := c.Request("DELETE", "/service-contracts/"+c.toStr(contract_id)+"/positions/"+c.toStr(id), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c BillingClient) UpdateServiceContractPosition(in PositionUpdateRequest, contract_id string, id string) (ServiceContractPositionSingleResponse, *http.Response, error) {
+    body := ServiceContractPositionSingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("PUT", "/service-contracts/"+c.toStr(contract_id)+"/positions/"+c.toStr(id), bytes.NewBuffer(inJson))
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c BillingClient) CreateInvoice(in InvoiceCreateRequest) (InvoiceSingleResponse, *http.Response, error) {
+    body := InvoiceSingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("POST", "/invoices", bytes.NewBuffer(inJson))
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+type GetInvoicesQueryParams struct {
+    Order *string `url:"order,omitempty"`
+    PageSize *int `url:"page_size,omitempty"`
+    OrderBy *string `url:"order_by,omitempty"`
+    Search *string `url:"search,omitempty"`
+    Page *int `url:"page,omitempty"`
+}
+
+func (c BillingClient) GetInvoices(qParams GetInvoicesQueryParams) (InvoiceListResponse, *http.Response, error) {
+    body := InvoiceListResponse{}
+    q, err := query.Values(qParams)
+    if err != nil {
+        return body, nil, err
+    }
+    res, j, err := c.Request("GET", "/invoices"+"?"+q.Encode(), nil)
     if err != nil {
         return body, res, err
     }
@@ -1610,10 +1328,10 @@ func (c BillingClient) GetDebit(id string) (DebitSingleResponse, *http.Response,
     return body, res, err
 }
 
-func (c BillingClient) CreateOffer(in OfferCreateRequest) (OfferSingleResponse, *http.Response, error) {
-    body := OfferSingleResponse{}
+func (c BillingClient) CreateServiceContractPosition(in PositionCreateRequest, contract_id string) (ServiceContractPositionSingleResponse, *http.Response, error) {
+    body := ServiceContractPositionSingleResponse{}
     inJson, err := json.Marshal(in)
-    res, j, err := c.Request("POST", "/offers", bytes.NewBuffer(inJson))
+    res, j, err := c.Request("POST", "/service-contracts/"+c.toStr(contract_id)+"/positions", bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
@@ -1628,7 +1346,7 @@ func (c BillingClient) CreateOffer(in OfferCreateRequest) (OfferSingleResponse, 
     return body, res, err
 }
 
-type GetOffersQueryParams struct {
+type GetServiceContractPositionsQueryParams struct {
     Order *string `url:"order,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
     OrderBy *string `url:"order_by,omitempty"`
@@ -1636,13 +1354,13 @@ type GetOffersQueryParams struct {
     Page *int `url:"page,omitempty"`
 }
 
-func (c BillingClient) GetOffers(qParams GetOffersQueryParams) (OfferListResponse, *http.Response, error) {
-    body := OfferListResponse{}
+func (c BillingClient) GetServiceContractPositions(contract_id string, qParams GetServiceContractPositionsQueryParams) (ServiceContractPositionListResponse, *http.Response, error) {
+    body := ServiceContractPositionListResponse{}
     q, err := query.Values(qParams)
     if err != nil {
         return body, nil, err
     }
-    res, j, err := c.Request("GET", "/offers"+"?"+q.Encode(), nil)
+    res, j, err := c.Request("GET", "/service-contracts/"+c.toStr(contract_id)+"/positions"+"?"+q.Encode(), nil)
     if err != nil {
         return body, res, err
     }
@@ -1695,53 +1413,6 @@ func (c BillingClient) UpdateServiceContract(in ServiceContractUpdateRequest, id
     body := ServiceContractSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("PUT", "/service-contracts/"+c.toStr(id), bytes.NewBuffer(inJson))
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-func (c BillingClient) CreateOfferPosition(in OfferPositionCreateRequest) (OfferPositionSingleResponse, *http.Response, error) {
-    body := OfferPositionSingleResponse{}
-    inJson, err := json.Marshal(in)
-    res, j, err := c.Request("POST", "/offer-positions", bytes.NewBuffer(inJson))
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-type GetOfferPositionsQueryParams struct {
-    Order *string `url:"order,omitempty"`
-    PageSize *int `url:"page_size,omitempty"`
-    OrderBy *string `url:"order_by,omitempty"`
-    Search *string `url:"search,omitempty"`
-    Page *int `url:"page,omitempty"`
-}
-
-func (c BillingClient) GetOfferPositions(qParams GetOfferPositionsQueryParams) (OfferPositionListResponse, *http.Response, error) {
-    body := OfferPositionListResponse{}
-    q, err := query.Values(qParams)
-    if err != nil {
-        return body, nil, err
-    }
-    res, j, err := c.Request("GET", "/offer-positions"+"?"+q.Encode(), nil)
     if err != nil {
         return body, res, err
     }

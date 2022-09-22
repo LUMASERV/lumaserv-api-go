@@ -173,6 +173,7 @@ type SearchResults struct {
     ServerMedias *[]ServerMedia `json:"server_medias"`
     S3Buckets *[]S3Bucket `json:"s3_buckets"`
     S3AccessKeys *[]S3AccessKey `json:"s3_access_keys"`
+    ServerFirewalls *[]ServerFirewall `json:"server_firewalls"`
 }
 
 type ServerBackup struct {
