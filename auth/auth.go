@@ -314,6 +314,7 @@ type UserSingleResponse struct {
 
 type AuditLogEntryListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
+    Pagination *ResponsePagination `json:"pagination"`
     Data []AuditLogEntry `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
@@ -729,9 +730,11 @@ func (c AuthClient) InsertAuditLogEntry(in AuditLogRequest) (EmptyResponse, *htt
 }
 
 type SearchAuditLogQueryParams struct {
+    PageSize *int `url:"page_size,omitempty"`
     ObjectType *string `url:"object_type,omitempty"`
     ObjectId *string `url:"object_id,omitempty"`
     ProjectId *string `url:"project_id,omitempty"`
+    Page *int `url:"page,omitempty"`
     UserId *string `url:"user_id,omitempty"`
 }
 
