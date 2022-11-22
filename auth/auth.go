@@ -353,8 +353,30 @@ type ProjectMemberCreateRequest struct {
     UserId string `json:"user_id"`
 }
 
+type TokenCreateRequest struct {
+    UserId *string `json:"user_id"`
+    Scope *TokenScope `json:"scope"`
+    Title string `json:"title"`
+}
+
+type LoginRequest struct {
+    Password string `json:"password"`
+    Username string `json:"username"`
+}
+
+type EmailChangeRequest struct {
+    Password string `json:"password"`
+    Email string `json:"email"`
+}
+
 type RequestPasswordResetRequest struct {
     Username string `json:"username"`
+}
+
+type PasswordChangeRequest struct {
+    NewPasswordConfirm string `json:"new_password_confirm"`
+    NewPassword string `json:"new_password"`
+    CurrentPassword string `json:"current_password"`
 }
 
 type ExecutePasswordResetRequest struct {
@@ -371,17 +393,6 @@ type TransactionLogRequest struct {
 type ProjectInviteCreateRequest struct {
     ProjectId string `json:"project_id"`
     Email string `json:"email"`
-}
-
-type TokenCreateRequest struct {
-    UserId *string `json:"user_id"`
-    Scope *TokenScope `json:"scope"`
-    Title string `json:"title"`
-}
-
-type LoginRequest struct {
-    Password string `json:"password"`
-    Username string `json:"username"`
 }
 
 type ProjectCreateRequest struct {
@@ -693,6 +704,25 @@ func (c AuthClient) ExecutePasswordReset(in ExecutePasswordResetRequest) (EmptyR
     return body, res, err
 }
 
+func (c AuthClient) ChangeEmail(in EmailChangeRequest) (EmptyResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
+    body := EmptyResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("PUT", "/email-change", bytes.NewBuffer(inJson))
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
 func (c AuthClient) RejectProjectInvite(id string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
     res, j, err := c.Request("POST", "/project-invites/"+c.toStr(id)+"/reject", nil)
@@ -820,6 +850,25 @@ func (c AuthClient) GetTokens(qParams GetTokensQueryParams) (TokenListResponse, 
 func (c AuthClient) GetCountry(code string) (CountrySingleResponse, *http.Response, error) {
     body := CountrySingleResponse{}
     res, j, err := c.Request("GET", "/countries/"+c.toStr(code), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c AuthClient) ChangePassword(in PasswordChangeRequest) (EmptyResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
+    body := EmptyResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("PUT", "/password-change", bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }

@@ -80,109 +80,6 @@ func (c BillingClient) toStr(in interface{}) string {
 
     panic("Unhandled type in toStr")
 }
-type BillingInterval string
-
-type InvoiceDetailed struct {
-    PaidAt string `json:"paid_at"`
-    CreatedAt string `json:"created_at"`
-    DueAt string `json:"due_at"`
-    NetPrice float32 `json:"net_price"`
-    GrossPrice float32 `json:"gross_price"`
-    Positions []Position `json:"positions"`
-    Id string `json:"id"`
-    State InvoiceState `json:"state"`
-    CustomerId string `json:"customer_id"`
-}
-
-type OfferCreateRequestPosition struct {
-    PurchasingPrice *string `json:"purchasing_price"`
-    Note *string `json:"note"`
-    Amount *string `json:"amount"`
-    Price *string `json:"price"`
-    Description *string `json:"description"`
-    Interval *string `json:"interval"`
-    Title *string `json:"title"`
-    OfferId *string `json:"offer_id"`
-    VatRate *string `json:"vat_rate"`
-}
-
-type Invoice struct {
-    PaidAt string `json:"paid_at"`
-    CreatedAt string `json:"created_at"`
-    DueAt string `json:"due_at"`
-    NetPrice float32 `json:"net_price"`
-    GrossPrice float32 `json:"gross_price"`
-    Id string `json:"id"`
-    State InvoiceState `json:"state"`
-    CustomerId string `json:"customer_id"`
-}
-
-type Customer struct {
-    Balance *float32 `json:"balance"`
-    UserId string `json:"user_id"`
-    CompanyName *string `json:"company_name"`
-    CreditLimit *float32 `json:"credit_limit"`
-    LastName *string `json:"last_name"`
-    BillingInterval *BillingInterval `json:"billing_interval"`
-    Id string `json:"id"`
-    FirstName *string `json:"first_name"`
-    NextBillingDate *string `json:"next_billing_date"`
-}
-
-type CreateRequestPosition struct {
-    Amount float32 `json:"amount"`
-    Unit string `json:"unit"`
-    Price float32 `json:"price"`
-    Name string `json:"name"`
-    Description *string `json:"description"`
-    GroupKey *string `json:"group_key"`
-    VatRate *float32 `json:"vat_rate"`
-}
-
-type ServiceContractInterval string
-
-type BankTransaction struct {
-    BankAccountId *string `json:"bank_account_id"`
-    BankCode *string `json:"bank_code"`
-    AccountNumber *string `json:"account_number"`
-    Amount *string `json:"amount"`
-    BookingDate *string `json:"booking_date"`
-    BookingText *string `json:"booking_text"`
-    Type *string `json:"type"`
-    DebitId *string `json:"debit_id"`
-    Reference *string `json:"reference"`
-    Depositor *string `json:"depositor"`
-    Id string `json:"id"`
-    ExtendedReference *string `json:"extended_reference"`
-    ValueDate *string `json:"value_date"`
-}
-
-type PaymentReminder struct {
-    Date *string `json:"date"`
-    Stage *PaymentReminderStage `json:"stage"`
-    DueDate *string `json:"due_date"`
-    InvoiceId string `json:"invoice_id"`
-    Id string `json:"id"`
-    State *PaymentReminderState `json:"state"`
-    CustomerId *string `json:"customer_id"`
-}
-
-type InvoiceCreateRequestPosition struct {
-    Amount float32 `json:"amount"`
-    Unit string `json:"unit"`
-    Price float32 `json:"price"`
-    Name string `json:"name"`
-    Description string `json:"description"`
-    VatRate *float32 `json:"vat_rate"`
-    Group string `json:"group"`
-}
-
-type ResponseMessages struct {
-    Warnings []ResponseMessage `json:"warnings"`
-    Errors []ResponseMessage `json:"errors"`
-    Infos []ResponseMessage `json:"infos"`
-}
-
 type CustomerDetailed struct {
     AdditionalAddress *string `json:"additional_address"`
     City *string `json:"city"`
@@ -204,6 +101,20 @@ type CustomerDetailed struct {
     NextBillingDate *string `json:"next_billing_date"`
 }
 
+type BillingInterval string
+
+type InvoiceDetailed struct {
+    PaidAt string `json:"paid_at"`
+    CreatedAt string `json:"created_at"`
+    DueAt string `json:"due_at"`
+    NetPrice float32 `json:"net_price"`
+    GrossPrice float32 `json:"gross_price"`
+    Positions []Position `json:"positions"`
+    Id string `json:"id"`
+    State InvoiceState `json:"state"`
+    CustomerId string `json:"customer_id"`
+}
+
 type Debit struct {
     Date *string `json:"date"`
     DueDate *string `json:"due_date"`
@@ -211,13 +122,15 @@ type Debit struct {
     Title *string `json:"title"`
 }
 
-type OnlinePayment struct {
-    Amount *float32 `json:"amount"`
-    Provider *string `json:"provider"`
-    ExternalId *string `json:"external_id"`
+type Invoice struct {
+    PaidAt string `json:"paid_at"`
+    CreatedAt string `json:"created_at"`
+    DueAt string `json:"due_at"`
+    NetPrice float32 `json:"net_price"`
+    GrossPrice float32 `json:"gross_price"`
     Id string `json:"id"`
-    State *string `json:"state"`
-    CustomerId *string `json:"customer_id"`
+    State InvoiceState `json:"state"`
+    CustomerId string `json:"customer_id"`
 }
 
 type ServiceContractPosition struct {
@@ -228,6 +141,18 @@ type ServiceContractPosition struct {
     Id string `json:"id"`
     Title *string `json:"title"`
     VatRate *float32 `json:"vat_rate"`
+}
+
+type Customer struct {
+    Balance *float32 `json:"balance"`
+    UserId string `json:"user_id"`
+    CompanyName *string `json:"company_name"`
+    CreditLimit *float32 `json:"credit_limit"`
+    LastName *string `json:"last_name"`
+    BillingInterval *BillingInterval `json:"billing_interval"`
+    Id string `json:"id"`
+    FirstName *string `json:"first_name"`
+    NextBillingDate *string `json:"next_billing_date"`
 }
 
 type Position struct {
@@ -253,16 +178,22 @@ type ServiceContract struct {
     AccountingPeriod *string `json:"accounting_period"`
 }
 
-type OfferPositionInterval string
+type CreateRequestPosition struct {
+    Amount float32 `json:"amount"`
+    Unit string `json:"unit"`
+    Price float32 `json:"price"`
+    Name string `json:"name"`
+    Description *string `json:"description"`
+    GroupKey *string `json:"group_key"`
+    VatRate *float32 `json:"vat_rate"`
+}
 
 type ResponseMessage struct {
     Message string `json:"message"`
     Key string `json:"key"`
 }
 
-type PaymentReminderStage string
-
-type PaymentReminderState string
+type ServiceContractInterval string
 
 type ResponsePagination struct {
     Total int `json:"total"`
@@ -302,37 +233,28 @@ type DebitMandate struct {
     PostalCode *string `json:"postal_code"`
 }
 
-type InvoiceState string
+type InvoiceCreateRequestPosition struct {
+    Amount float32 `json:"amount"`
+    Unit string `json:"unit"`
+    Price float32 `json:"price"`
+    Name string `json:"name"`
+    Description string `json:"description"`
+    VatRate *float32 `json:"vat_rate"`
+    Group string `json:"group"`
+}
 
-type OfferState string
+type ResponseMessages struct {
+    Warnings []ResponseMessage `json:"warnings"`
+    Errors []ResponseMessage `json:"errors"`
+    Infos []ResponseMessage `json:"infos"`
+}
+
+type InvoiceState string
 
 type ResponseMetadata struct {
     TransactionId string `json:"transaction_id"`
     BuildCommit string `json:"build_commit"`
     BuildTimestamp string `json:"build_timestamp"`
-}
-
-type BankTransactionSingleResponse struct {
-    Metadata ResponseMetadata `json:"metadata"`
-    Data BankTransaction `json:"data"`
-    Success bool `json:"success"`
-    Messages ResponseMessages `json:"messages"`
-}
-
-type PaymentReminderListResponse struct {
-    Metadata ResponseMetadata `json:"metadata"`
-    Pagination *ResponsePagination `json:"pagination"`
-    Data []PaymentReminder `json:"data"`
-    Success bool `json:"success"`
-    Messages ResponseMessages `json:"messages"`
-}
-
-type BankTransactionListResponse struct {
-    Metadata ResponseMetadata `json:"metadata"`
-    Pagination ResponsePagination `json:"pagination"`
-    Data *[]BankTransaction `json:"data"`
-    Success bool `json:"success"`
-    Messages ResponseMessages `json:"messages"`
 }
 
 type ServiceContractListResponse struct {
@@ -361,13 +283,6 @@ type InvoicePositionSingleResponse struct {
 type InvalidRequestResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
     Data interface{} `json:"data"`
-    Success bool `json:"success"`
-    Messages ResponseMessages `json:"messages"`
-}
-
-type PaymentReminderSingleResponse struct {
-    Metadata ResponseMetadata `json:"metadata"`
-    Data PaymentReminder `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
 }
@@ -475,92 +390,6 @@ type InvoicePositionListResponse struct {
     Messages ResponseMessages `json:"messages"`
 }
 
-type InvoiceCreateRequest struct {
-    DueAt string `json:"due_at"`
-    Positions *[]InvoiceCreateRequestPosition `json:"positions"`
-    CustomerId string `json:"customer_id"`
-}
-
-type PositionCreateRequest struct {
-    Amount string `json:"amount"`
-    Unit string `json:"unit"`
-    Price float32 `json:"price"`
-    Name string `json:"name"`
-    Description string `json:"description"`
-    VatRate *float32 `json:"vat_rate"`
-    GroupKey string `json:"group_key"`
-}
-
-type CustomerCreateRequest struct {
-    AdditionalAddress *string `json:"additional_address"`
-    Gender string `json:"gender"`
-    City string `json:"city"`
-    LastName string `json:"last_name"`
-    BillingInterval BillingInterval `json:"billing_interval"`
-    CustomVatRate float32 `json:"custom_vat_rate"`
-    CountryCode string `json:"country_code"`
-    Balance *float32 `json:"balance"`
-    UserId string `json:"user_id"`
-    Street string `json:"street"`
-    TaxNumber string `json:"tax_number"`
-    CompanyName *string `json:"company_name"`
-    AutoFinalize *bool `json:"auto_finalize"`
-    StreetNumber string `json:"street_number"`
-    CreditLimit float32 `json:"credit_limit"`
-    PaymentPeriod int `json:"payment_period"`
-    VatId string `json:"vat_id"`
-    PostalCode string `json:"postal_code"`
-    FirstName string `json:"first_name"`
-    Email string `json:"email"`
-}
-
-type PositionUpdateRequest struct {
-    Amount *float32 `json:"amount"`
-    Unit *string `json:"unit"`
-    Price *float32 `json:"price"`
-    Name *string `json:"name"`
-    Description *string `json:"description"`
-    VatRate *float32 `json:"vat_rate"`
-    GroupKey *string `json:"group_key"`
-}
-
-type InvoiceUpdateRequest struct {
-    PaidAt *string `json:"paid_at"`
-    CancelledAt *string `json:"cancelled_at"`
-    DueAt *string `json:"due_at"`
-    State *InvoiceState `json:"state"`
-    CustomerId *string `json:"customer_id"`
-}
-
-type PaymentReminderUpdateRequest struct {
-    Date *string `json:"date"`
-    Stage *PaymentReminderStage `json:"stage"`
-    DueDate *string `json:"due_date"`
-    State *PaymentReminderState `json:"state"`
-}
-
-type BillingPositionUpdateRequest struct {
-    InvoicePositionId *string `json:"invoice_position_id"`
-    Amount *float32 `json:"amount"`
-    Unit *string `json:"unit"`
-    Price *float32 `json:"price"`
-    Draft *bool `json:"draft"`
-    Description *string `json:"description"`
-    Title *string `json:"title"`
-    AvailableAt *string `json:"available_at"`
-    VatRate *float32 `json:"vat_rate"`
-    GroupKey *string `json:"group_key"`
-}
-
-type PaymentReminderCreateRequest struct {
-    Date *string `json:"date"`
-    Stage *string `json:"stage"`
-    DueDate *string `json:"due_date"`
-    InvoiceId string `json:"invoice_id"`
-    State *string `json:"state"`
-    CustomerId string `json:"customer_id"`
-}
-
 type BillingPositionCreateRequest struct {
     InvoicePositionId *string `json:"invoice_position_id"`
     Amount float32 `json:"amount"`
@@ -577,13 +406,16 @@ type BillingPositionCreateRequest struct {
 }
 
 type ServiceContractCreateRequest struct {
+    Unit string `json:"unit"`
     CancellationPeriod int `json:"cancellation_period"`
     Description string `json:"description"`
-    Runtime ServiceContractInterval `json:"runtime"`
-    Positions *[]CreateRequestPosition `json:"positions"`
+    BillingInterval *ServiceContractInterval `json:"billing_interval"`
+    UnitAmount *float32 `json:"unit_amount"`
     CustomerId string `json:"customer_id"`
     Title string `json:"title"`
-    AccountingPeriod ServiceContractInterval `json:"accounting_period"`
+    RenewalInterval *ServiceContractInterval `json:"renewal_interval"`
+    UnitPrice float32 `json:"unit_price"`
+    VatRate *float32 `json:"vat_rate"`
 }
 
 type DebitMandateCreateRequest struct {
@@ -602,13 +434,68 @@ type DebitMandateCreateRequest struct {
     PostalCode string `json:"postal_code"`
 }
 
+type InvoiceCreateRequest struct {
+    DueAt string `json:"due_at"`
+    Positions *[]InvoiceCreateRequestPosition `json:"positions"`
+    CustomerId string `json:"customer_id"`
+}
+
+type PositionCreateRequest struct {
+    Amount string `json:"amount"`
+    Unit string `json:"unit"`
+    Price float32 `json:"price"`
+    PeriodFrom *string `json:"period_from"`
+    Name string `json:"name"`
+    Description string `json:"description"`
+    PeriodTo *string `json:"period_to"`
+    VatRate *float32 `json:"vat_rate"`
+    GroupKey string `json:"group_key"`
+}
+
 type ServiceContractUpdateRequest struct {
+    Unit *string `json:"unit"`
     CancellationPeriod *int `json:"cancellation_period"`
     Description *string `json:"description"`
-    Runtime *ServiceContractInterval `json:"runtime"`
+    UnitAmount *float32 `json:"unit_amount"`
     CustomerId *string `json:"customer_id"`
     Title *string `json:"title"`
+    UnitPrice *float32 `json:"unit_price"`
+    RenewalInterval *ServiceContractInterval `json:"renewal_interval"`
     AccountingPeriod *ServiceContractInterval `json:"accounting_period"`
+}
+
+type CustomerCreateRequest struct {
+    AdditionalAddress *string `json:"additional_address"`
+    Gender string `json:"gender"`
+    City string `json:"city"`
+    LastName string `json:"last_name"`
+    BillingInterval BillingInterval `json:"billing_interval"`
+    CustomVatRate float32 `json:"custom_vat_rate"`
+    CountryCode string `json:"country_code"`
+    UserId string `json:"user_id"`
+    Street string `json:"street"`
+    TaxNumber string `json:"tax_number"`
+    CompanyName *string `json:"company_name"`
+    AutoFinalize *bool `json:"auto_finalize"`
+    StreetNumber string `json:"street_number"`
+    CreditLimit float32 `json:"credit_limit"`
+    PaymentPeriod int `json:"payment_period"`
+    VatId string `json:"vat_id"`
+    PostalCode string `json:"postal_code"`
+    FirstName string `json:"first_name"`
+    Email string `json:"email"`
+}
+
+type PositionUpdateRequest struct {
+    Amount *float32 `json:"amount"`
+    Unit *string `json:"unit"`
+    Price *float32 `json:"price"`
+    PeriodFrom *string `json:"period_from"`
+    Name *string `json:"name"`
+    Description *string `json:"description"`
+    PeriodTo *string `json:"period_to"`
+    VatRate *float32 `json:"vat_rate"`
+    GroupKey *string `json:"group_key"`
 }
 
 type CustomerUpdateRequest struct {
@@ -632,39 +519,25 @@ type CustomerUpdateRequest struct {
     Email *string `json:"email"`
 }
 
-func (c BillingClient) GetPaymentReminder(id string) (PaymentReminderSingleResponse, *http.Response, error) {
-    body := PaymentReminderSingleResponse{}
-    res, j, err := c.Request("GET", "/payment-reminders/"+c.toStr(id), nil)
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
+type InvoiceUpdateRequest struct {
+    PaidAt *string `json:"paid_at"`
+    CancelledAt *string `json:"cancelled_at"`
+    DueAt *string `json:"due_at"`
+    State *InvoiceState `json:"state"`
+    CustomerId *string `json:"customer_id"`
 }
 
-func (c BillingClient) UpdatePaymentReminder(in PaymentReminderUpdateRequest, id string) (PaymentReminderSingleResponse, *http.Response, error) {
-    body := PaymentReminderSingleResponse{}
-    inJson, err := json.Marshal(in)
-    res, j, err := c.Request("PUT", "/payment-reminders/"+c.toStr(id), bytes.NewBuffer(inJson))
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
+type BillingPositionUpdateRequest struct {
+    InvoicePositionId *string `json:"invoice_position_id"`
+    Amount *float32 `json:"amount"`
+    Unit *string `json:"unit"`
+    Price *float32 `json:"price"`
+    Draft *bool `json:"draft"`
+    Description *string `json:"description"`
+    Title *string `json:"title"`
+    AvailableAt *string `json:"available_at"`
+    VatRate *float32 `json:"vat_rate"`
+    GroupKey *string `json:"group_key"`
 }
 
 func (c BillingClient) CreateDebitMandate(in DebitMandateCreateRequest) (DebitMandateSingleResponse, *http.Response, error) {
@@ -830,55 +703,9 @@ func (c BillingClient) UpdateBillingPosition(in BillingPositionUpdateRequest, id
     return body, res, err
 }
 
-type GetBankTransactionsQueryParams struct {
-    Order *string `url:"order,omitempty"`
-    PageSize *int `url:"page_size,omitempty"`
-    OrderBy *string `url:"order_by,omitempty"`
-    Search *string `url:"search,omitempty"`
-    Page *int `url:"page,omitempty"`
-}
-
-func (c BillingClient) GetBankTransactions(qParams GetBankTransactionsQueryParams) (BankTransactionListResponse, *http.Response, error) {
-    body := BankTransactionListResponse{}
-    q, err := query.Values(qParams)
-    if err != nil {
-        return body, nil, err
-    }
-    res, j, err := c.Request("GET", "/bank-transactions"+"?"+q.Encode(), nil)
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
 func (c BillingClient) GetDebitMandate(id string) (DebitMandateSingleResponse, *http.Response, error) {
     body := DebitMandateSingleResponse{}
     res, j, err := c.Request("GET", "/debit-mandates/"+c.toStr(id), nil)
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-func (c BillingClient) GetBankTransaction(id string) (BankTransactionSingleResponse, *http.Response, error) {
-    body := BankTransactionSingleResponse{}
-    res, j, err := c.Request("GET", "/bank-transactions/"+c.toStr(id), nil)
     if err != nil {
         return body, res, err
     }
@@ -1067,8 +894,13 @@ func (c BillingClient) CreateServiceContract(in ServiceContractCreateRequest) (S
     return body, res, err
 }
 
+type GetServiceContractsQueryParamsFilter struct {
+    CustomerId *string `url:"customer_id,omitempty"`
+}
+
 type GetServiceContractsQueryParams struct {
     Order *string `url:"order,omitempty"`
+    Filter *GetServiceContractsQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
     OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
@@ -1282,8 +1114,13 @@ func (c BillingClient) CreateInvoice(in InvoiceCreateRequest) (InvoiceSingleResp
     return body, res, err
 }
 
+type GetInvoicesQueryParamsFilter struct {
+    CustomerId *string `url:"customer_id,omitempty"`
+}
+
 type GetInvoicesQueryParams struct {
     Order *string `url:"order,omitempty"`
+    Filter *GetInvoicesQueryParamsFilter `url:"filter,omitempty"`
     PageSize *int `url:"page_size,omitempty"`
     OrderBy *string `url:"order_by,omitempty"`
     Search *string `url:"search,omitempty"`
@@ -1413,53 +1250,6 @@ func (c BillingClient) UpdateServiceContract(in ServiceContractUpdateRequest, id
     body := ServiceContractSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("PUT", "/service-contracts/"+c.toStr(id), bytes.NewBuffer(inJson))
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-func (c BillingClient) CreatePaymentReminder(in PaymentReminderCreateRequest) (PaymentReminderSingleResponse, *http.Response, error) {
-    body := PaymentReminderSingleResponse{}
-    inJson, err := json.Marshal(in)
-    res, j, err := c.Request("POST", "/payment-reminders", bytes.NewBuffer(inJson))
-    if err != nil {
-        return body, res, err
-    }
-    err = json.Unmarshal(j, &body)
-    if err != nil {
-        return body, res, err
-    }
-    if !body.Success {
-        errMsg, _ := json.Marshal(body.Messages.Errors)
-        return body, res, errors.New(string(errMsg))
-    }
-    return body, res, err
-}
-
-type GetPaymentRemindersQueryParams struct {
-    Order *string `url:"order,omitempty"`
-    PageSize *int `url:"page_size,omitempty"`
-    OrderBy *string `url:"order_by,omitempty"`
-    Search *string `url:"search,omitempty"`
-    Page *int `url:"page,omitempty"`
-}
-
-func (c BillingClient) GetPaymentReminders(qParams GetPaymentRemindersQueryParams) (PaymentReminderListResponse, *http.Response, error) {
-    body := PaymentReminderListResponse{}
-    q, err := query.Values(qParams)
-    if err != nil {
-        return body, nil, err
-    }
-    res, j, err := c.Request("GET", "/payment-reminders"+"?"+q.Encode(), nil)
     if err != nil {
         return body, res, err
     }
