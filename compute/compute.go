@@ -982,6 +982,10 @@ type SSHKeyCreateRequest struct {
     Labels map[string]*string `json:"labels"`
 }
 
+type SSHKeyUpdateRequest struct {
+    Title *string `json:"title"`
+}
+
 type ServerFirewallMemberCreateRequest struct {
     LabelValue *string `json:"label_value"`
     Type ServerFirewallMemberType `json:"type"`
@@ -2889,6 +2893,25 @@ func (c ComputeClient) GetSSHKey(id string) (SSHKeySingleResponse, *http.Respons
 func (c ComputeClient) DeleteSSHKey(id string) (EmptyResponse, *http.Response, error) {
     body := EmptyResponse{}
     res, j, err := c.Request("DELETE", "/ssh-keys/"+c.toStr(id), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c ComputeClient) UpdateSSHKey(in SSHKeyUpdateRequest, id string) (SSHKeySingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
+    body := SSHKeySingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("PUT", "/ssh-keys/"+c.toStr(id), bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
