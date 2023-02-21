@@ -122,6 +122,7 @@ type SSHKey struct {
     CreatedAt string `json:"created_at"`
     Id string `json:"id"`
     Title string `json:"title"`
+    Type string `json:"type"`
     Labels map[string]*string `json:"labels"`
 }
 
@@ -213,6 +214,7 @@ type S3AccessGrant struct {
 }
 
 type ServerTemplate struct {
+    ProjectId *string `json:"project_id"`
     Id string `json:"id"`
     Title string `json:"title"`
 }
@@ -275,6 +277,11 @@ type ServerVolume struct {
     Title string `json:"title"`
     ServerId *string `json:"server_id"`
     Labels map[string]*string `json:"labels"`
+}
+
+type ServerVolumePrice struct {
+    Price float32 `json:"price"`
+    ClassId string `json:"class_id"`
 }
 
 type ServerPriceRangeAssignment struct {
@@ -619,6 +626,13 @@ type ServerStorageClassListResponse struct {
     Messages ResponseMessages `json:"messages"`
 }
 
+type ServerVolumePriceSingleResponse struct {
+    Metadata ResponseMetadata `json:"metadata"`
+    Data ServerVolumePrice `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
+}
+
 type ServerMediaListResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
     Pagination *ResponsePagination `json:"pagination"`
@@ -652,6 +666,14 @@ type ServerTemplateListResponse struct {
 type ServerHostSingleResponse struct {
     Metadata ResponseMetadata `json:"metadata"`
     Data ServerHost `json:"data"`
+    Success bool `json:"success"`
+    Messages ResponseMessages `json:"messages"`
+}
+
+type ServerVolumePriceListResponse struct {
+    Metadata ResponseMetadata `json:"metadata"`
+    Pagination *ResponsePagination `json:"pagination"`
+    Data []ServerVolumePrice `json:"data"`
     Success bool `json:"success"`
     Messages ResponseMessages `json:"messages"`
 }
@@ -912,12 +934,18 @@ type ServerCreateRequest struct {
     Labels map[string]*string `json:"labels"`
 }
 
+type ServerVolumePriceCreateRequest struct {
+    Price float32 `json:"price"`
+    ClassId string `json:"class_id"`
+}
+
 type ServerHostUpdateRequest struct {
     Active *bool `json:"active"`
     Title *string `json:"title"`
 }
 
 type ServerTemplateCreateRequest struct {
+    ProjectId *string `json:"project_id"`
     RootSlot string `json:"root_slot"`
     Zones interface{} `json:"zones"`
     Title string `json:"title"`
@@ -1061,6 +1089,10 @@ type ServerMediaCreateRequest struct {
 type ServerUpdateRequest struct {
     Name *string `json:"name"`
     Labels map[string]*string `json:"labels"`
+}
+
+type ServerVolumePriceUpdateRequest struct {
+    Price *float32 `json:"price"`
 }
 
 type ServerVolumeCreateRequest struct {
@@ -2466,6 +2498,37 @@ func (c ComputeClient) UpdateServerVariantPrice(in ServerVariantPriceUpdateReque
     return body, res, err
 }
 
+type GetServerVolumePricingQueryParamsFilter struct {
+    ClassId *string `url:"class_id,omitempty"`
+}
+
+type GetServerVolumePricingQueryParams struct {
+    Filter *GetServerVolumePricingQueryParamsFilter `url:"filter,omitempty"`
+    ProjectId *string `url:"project_id,omitempty"`
+}
+
+func (c ComputeClient) GetServerVolumePricing(qParams GetServerVolumePricingQueryParams) (ServerVolumePriceListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
+    body := ServerVolumePriceListResponse{}
+    q, err := query.Values(qParams)
+    if err != nil {
+        return body, nil, err
+    }
+    res, j, err := c.Request("GET", "/pricing/server-volumes"+"?"+q.Encode(), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
 func (c ComputeClient) CreateServerTemplate(in ServerTemplateCreateRequest) (ServerTemplateSingleResponse, *http.Response, error) {
     c.applyCurrentProject(reflect.ValueOf(&in))
     body := ServerTemplateSingleResponse{}
@@ -2616,6 +2679,55 @@ func (c ComputeClient) GetServerFirewallRules(id string, qParams GetServerFirewa
     return body, res, err
 }
 
+func (c ComputeClient) CreateServerPriceRangeVolumePrice(in ServerVolumePriceCreateRequest, id string) (ServerVolumePriceSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
+    body := ServerVolumePriceSingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("POST", "/server-price-ranges/"+c.toStr(id)+"/volume-prices", bytes.NewBuffer(inJson))
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+type GetServerPriceRangeVolumePricesQueryParamsFilter struct {
+    ClassId *string `url:"class_id,omitempty"`
+}
+
+type GetServerPriceRangeVolumePricesQueryParams struct {
+    Filter *GetServerPriceRangeVolumePricesQueryParamsFilter `url:"filter,omitempty"`
+}
+
+func (c ComputeClient) GetServerPriceRangeVolumePrices(id string, qParams GetServerPriceRangeVolumePricesQueryParams) (ServerVolumePriceListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
+    body := ServerVolumePriceListResponse{}
+    q, err := query.Values(qParams)
+    if err != nil {
+        return body, nil, err
+    }
+    res, j, err := c.Request("GET", "/server-price-ranges/"+c.toStr(id)+"/volume-prices"+"?"+q.Encode(), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
 func (c ComputeClient) CreateScheduledServerAction(in ScheduledServerActionCreateRequest, id string) (ScheduledServerActionSingleResponse, *http.Response, error) {
     c.applyCurrentProject(reflect.ValueOf(&in))
     body := ScheduledServerActionSingleResponse{}
@@ -2651,6 +2763,37 @@ func (c ComputeClient) GetScheduledServerActions(id string, qParams GetScheduled
         return body, nil, err
     }
     res, j, err := c.Request("GET", "/servers/"+c.toStr(id)+"/scheduled-actions"+"?"+q.Encode(), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+type GetServerPricingQueryParamsFilter struct {
+    VariantId *string `url:"variant_id,omitempty"`
+}
+
+type GetServerPricingQueryParams struct {
+    Filter *GetServerPricingQueryParamsFilter `url:"filter,omitempty"`
+    ProjectId *string `url:"project_id,omitempty"`
+}
+
+func (c ComputeClient) GetServerPricing(qParams GetServerPricingQueryParams) (ServerVariantPriceListResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
+    body := ServerVariantPriceListResponse{}
+    q, err := query.Values(qParams)
+    if err != nil {
+        return body, nil, err
+    }
+    res, j, err := c.Request("GET", "/pricing/servers"+"?"+q.Encode(), nil)
     if err != nil {
         return body, res, err
     }
@@ -3168,6 +3311,59 @@ func (c ComputeClient) AttachServerVolume(in ServerVolumeAttachRequest, id strin
     body := ServerVolumeSingleResponse{}
     inJson, err := json.Marshal(in)
     res, j, err := c.Request("POST", "/server-volumes/"+c.toStr(id)+"/attach", bytes.NewBuffer(inJson))
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c ComputeClient) GetServerPriceRangeVolumePrice(id string, class_id string) (ServerVolumePriceSingleResponse, *http.Response, error) {
+    body := ServerVolumePriceSingleResponse{}
+    res, j, err := c.Request("GET", "/server-price-ranges/"+c.toStr(id)+"/volume-prices/"+c.toStr(class_id), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c ComputeClient) DeleteServerPriceRangeVolumePrice(id string, class_id string) (EmptyResponse, *http.Response, error) {
+    body := EmptyResponse{}
+    res, j, err := c.Request("DELETE", "/server-price-ranges/"+c.toStr(id)+"/volume-prices/"+c.toStr(class_id), nil)
+    if err != nil {
+        return body, res, err
+    }
+    err = json.Unmarshal(j, &body)
+    if err != nil {
+        return body, res, err
+    }
+    if !body.Success {
+        errMsg, _ := json.Marshal(body.Messages.Errors)
+        return body, res, errors.New(string(errMsg))
+    }
+    return body, res, err
+}
+
+func (c ComputeClient) UpdateServerPriceRangeVolumePrice(in ServerVolumePriceUpdateRequest, id string, class_id string) (ServerVolumePriceSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&in))
+    body := ServerVolumePriceSingleResponse{}
+    inJson, err := json.Marshal(in)
+    res, j, err := c.Request("PUT", "/server-price-ranges/"+c.toStr(id)+"/volume-prices/"+c.toStr(class_id), bytes.NewBuffer(inJson))
     if err != nil {
         return body, res, err
     }
@@ -3775,9 +3971,18 @@ func (c ComputeClient) DeleteS3Bucket(id string) (EmptyResponse, *http.Response,
     return body, res, err
 }
 
-func (c ComputeClient) DetachServerVolume(id string) (ServerVolumeSingleResponse, *http.Response, error) {
+type DetachServerVolumeQueryParams struct {
+    Iknowthisisunsafe *string `url:"iknowthisisunsafe,omitempty"`
+}
+
+func (c ComputeClient) DetachServerVolume(id string, qParams DetachServerVolumeQueryParams) (ServerVolumeSingleResponse, *http.Response, error) {
+    c.applyCurrentProject(reflect.ValueOf(&qParams))
     body := ServerVolumeSingleResponse{}
-    res, j, err := c.Request("POST", "/server-volumes/"+c.toStr(id)+"/detach", nil)
+    q, err := query.Values(qParams)
+    if err != nil {
+        return body, nil, err
+    }
+    res, j, err := c.Request("POST", "/server-volumes/"+c.toStr(id)+"/detach"+"?"+q.Encode(), nil)
     if err != nil {
         return body, res, err
     }
